@@ -1,34 +1,78 @@
 package net.bplo.nodes;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
+import net.bplo.nodes.editor.Editor;
+import net.bplo.nodes.imgui.ImGuiPlatform;
 
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
+/** {@link ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
-    private SpriteBatch batch;
-    private Texture image;
+
+    public static Main app;
+
+    public final ImGuiPlatform imgui;
+
+    public Assets assets;
+    public Editor editor;
+    public OrthographicCamera windowCamera;
+
+    public Main(ImGuiPlatform imguiPlatform) {
+        Main.app = this;
+        this.imgui = imguiPlatform;
+    }
 
     @Override
     public void create() {
-        batch = new SpriteBatch();
-        image = new Texture("libgdx.png");
+        assets = new Assets();
+
+        windowCamera = new OrthographicCamera();
+        windowCamera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        windowCamera.update();
+
+        imgui.init();
+
+        editor = new Editor();
     }
 
     @Override
     public void render() {
+        var shouldExit = Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE);
+        if (shouldExit) {
+            Gdx.app.exit();
+        }
+
+        var delta = Gdx.graphics.getDeltaTime();
+        var batch = assets.batch;
+        var image = assets.image;
+        var imgWidth = image.getWidth();
+        var imgHeight = image.getHeight();
+        var winWidth = windowCamera.viewportWidth;
+        var winHeight = windowCamera.viewportHeight;
+
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
         batch.begin();
-        batch.draw(image, 140, 210);
+        batch.draw(image, (winWidth - imgWidth) / 2, (winHeight - imgHeight) / 2);
         batch.end();
+
+        imgui.startFrame();
+        editor.update(delta);
+        editor.render();
+        imgui.endFrame();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        windowCamera.setToOrtho(false, width, height);
+        windowCamera.update();
     }
 
     @Override
     public void dispose() {
-        batch.dispose();
-        image.dispose();
+        assets.dispose();
+        imgui.dispose();
     }
 }
