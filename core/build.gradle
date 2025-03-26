@@ -12,6 +12,7 @@ dependencies {
   api "com.github.tommyettinger:jdkgdxds_interop:$jdkgdxdsInteropVersion"
   api "com.github.tommyettinger:juniper:$juniperVersion"
   api "space.earlygrey:shapedrawer:$shapeDrawerVersion"
+  api "io.github.spair:imgui-java-binding:$imguiJavaVersion"
   annotationProcessor "org.projectlombok:lombok:$lombokVersion"
   compileOnly "org.projectlombok:lombok:$lombokVersion"
 

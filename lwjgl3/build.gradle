@@ -32,13 +32,23 @@ dependencies {
   implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
   implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
   implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+
+  implementation "io.github.spair:imgui-java-binding:$imguiJavaVersion"
+  implementation "io.github.spair:imgui-java-lwjgl3:$imguiJavaVersion"
+
+  implementation "io.github.spair:imgui-java-natives-linux:$imguiJavaVersion"
+  implementation "io.github.spair:imgui-java-natives-macos:$imguiJavaVersion"
+  implementation "io.github.spair:imgui-java-natives-windows:$imguiJavaVersion"
+
   implementation project(':core')
-  implementation("com.badlogicgames.gdx:gdx-tools:$gdxVersion"){exclude group: 'com.badlogicgames.gdx', module: 'gdx-backend-lwjgl'}
+
+  implementation("com.badlogicgames.gdx:gdx-tools:$gdxVersion") {
+    exclude group: 'com.badlogicgames.gdx', module: 'gdx-backend-lwjgl'
+  }
 
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-backend-lwjgl3:$graalHelperVersion"
       implementation "io.github.berstanio:gdx-svmhelper-extension-freetype:$graalHelperVersion"
-
     }
 }
 
