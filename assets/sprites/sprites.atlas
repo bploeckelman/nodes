@@ -1,0 +1,27 @@
+
+sprites.png
+size: 512, 128
+format: RGBA8888
+filter: MipMapNearestLinear, Linear
+repeat: none
+libgdx
+  rotate: false
+  xy: 1, 35
+  size: 378, 63
+  orig: 378, 63
+  offset: 0, 0
+  index: -1
+noise-bg
+  rotate: false
+  xy: 1, 1
+  size: 150, 32
+  orig: 150, 32
+  offset: 0, 0
+  index: -1
+pixel
+  rotate: false
+  xy: 381, 97
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1

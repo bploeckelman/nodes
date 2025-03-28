@@ -116,13 +116,15 @@ public class ImGuiDesktop implements ImGuiPlatform {
         config.setMergeMode(false);
 
         // load normal fonts
-        var defaultSize = 18f;
+        var defaultSize = 20f;
         var glyphRanges = rangesBuilder.buildRanges();
-        loadFontTTF("tahoma.ttf",                   defaultSize, config, glyphRanges);
-        loadFontTTF("noto-sans-cjk-jp-medium.otf",  defaultSize, config, glyphRanges);
         loadFontTTF("cousine-regular.ttf",          defaultSize, config, glyphRanges);
         loadFontTTF("droid-sans.ttf",               defaultSize, config, glyphRanges);
         loadFontTTF("play-regular.ttf",             defaultSize, config, glyphRanges);
+
+        // load special fonts (custom sizes)
+        loadFontTTF("tahoma.ttf",                   defaultSize * 0.75f, config, glyphRanges);
+        loadFontTTF("noto-sans-cjk-jp-medium.otf",  defaultSize * 1.25f, config, glyphRanges);
 
         // load 'icon' fonts, with a more 'monospace' look to facilitate alignment
         // see: https://github.com/ocornut/imgui/blob/master/docs/FONTS.md#using-icon-fonts

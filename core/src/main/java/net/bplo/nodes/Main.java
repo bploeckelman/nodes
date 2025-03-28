@@ -6,7 +6,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
-import net.bplo.nodes.editor.Editor;
 import net.bplo.nodes.imgui.ImGuiPlatform;
 
 /** {@link ApplicationListener} implementation shared by all platforms. */
@@ -35,6 +34,8 @@ public class Main extends ApplicationAdapter {
 
         imgui.init();
 
+        EditorUtil.init(imgui, assets);
+
         editor = new Editor();
     }
 
@@ -47,9 +48,9 @@ public class Main extends ApplicationAdapter {
 
         var delta = Gdx.graphics.getDeltaTime();
         var batch = assets.batch;
-        var image = assets.image;
-        var imgWidth = image.getWidth();
-        var imgHeight = image.getHeight();
+        var image = assets.gdx;
+        var imgWidth = image.getRegionWidth();
+        var imgHeight = image.getRegionHeight();
         var winWidth = windowCamera.viewportWidth;
         var winHeight = windowCamera.viewportHeight;
 

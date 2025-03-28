@@ -14,5 +14,9 @@ public abstract class EditorObject {
         this.id = NEXT_ID++;
     }
 
+    public String label() {
+        return "%s#%d".formatted(objectType.name().toLowerCase(), id);
+    }
+
     public abstract void render();
 }
