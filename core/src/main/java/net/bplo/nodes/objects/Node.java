@@ -2,6 +2,7 @@ package net.bplo.nodes.objects;
 
 import imgui.ImGui;
 import imgui.extension.nodeditor.NodeEditor;
+import net.bplo.nodes.EditorUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,11 +10,23 @@ import java.util.List;
 public class Node extends EditorObject {
 
     public final List<NodeProperty> props = new ArrayList<>();
+    public final List<Pin> pins = new ArrayList<>();
 
     // TODO(brian): how to handle querying linkage?
 
     public Node() {
         super(Type.NODE);
+    }
+
+    public NodeProperty add(NodeProperty property) {
+        property.node = this;
+        props.add(property);
+        return property;
+    }
+
+    public Pin add(Pin pin) {
+        pins.add(pin);
+        return pin;
     }
 
     @Override
@@ -22,35 +35,25 @@ public class Node extends EditorObject {
         ImGui.pushID(id);
         ImGui.beginGroup();
 
+        pins.stream().filter(Pin::isInput).forEach(Pin::render);
+
         ImGui.setNextItemWidth(100);
-        beginColumn();
+        EditorUtil.beginColumn();
         {
-            ImGui.text("This is a node");
-            ImGui.text("content under construction");
+            ImGui.pushFont(EditorUtil.Fonts.nodeHeader);
+            ImGui.textColored(EditorUtil.Colors.white, "Node");
+            ImGui.popFont();
+
+            ImGui.pushFont(EditorUtil.Fonts.nodeContent);
+            props.forEach(NodeProperty::render);
+            ImGui.popFont();
         }
-        endColumn();
+        EditorUtil.endColumn();
+
+        pins.stream().filter(Pin::isOutput).forEach(Pin::render);
 
         ImGui.endGroup();
         ImGui.popID();
         NodeEditor.endNode();
-    }
-
-    // NOTE(brian): these 'begin/next/endColumn()' methods are a workaround for tables...
-    //  table api uses 'begin/endChild()' which node-editor doesn't play nice with
-    //  see: https://github.com/ocornut/imgui/blob/master/imgui_tables.cpp#L39
-    //  interestingly, it achieves the same thing with simpler layout code ¯\_(ツ)_/¯
-
-    public static void beginColumn() {
-        ImGui.beginGroup();
-    }
-
-    public static void nextColumn() {
-        ImGui.endGroup();
-        ImGui.sameLine();
-        ImGui.beginGroup();
-    }
-
-    public static void endColumn() {
-        ImGui.endGroup();
     }
 }

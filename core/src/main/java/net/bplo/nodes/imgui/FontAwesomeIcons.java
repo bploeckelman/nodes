@@ -1,4 +1,4 @@
-package net.bplo.nodes.lwjgl3;
+package net.bplo.nodes.imgui;
 
 /* Names and glyph code points extracted from fa-solid-900-v6.ttf by the script at the bottom of this file */
 public class FontAwesomeIcons {

@@ -10,6 +10,7 @@ import imgui.ImFontGlyphRangesBuilder;
 import imgui.ImGui;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
+import net.bplo.nodes.imgui.FontAwesomeIcons;
 import net.bplo.nodes.imgui.ImGuiPlatform;
 
 import java.util.HashMap;

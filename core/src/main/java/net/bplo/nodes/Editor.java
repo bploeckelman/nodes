@@ -17,6 +17,7 @@ import imgui.type.ImLong;
 import net.bplo.nodes.objects.EditorObject;
 import net.bplo.nodes.objects.Link;
 import net.bplo.nodes.objects.Node;
+import net.bplo.nodes.objects.NodeProperty;
 import net.bplo.nodes.objects.Pin;
 
 import java.util.ArrayList;
@@ -29,6 +30,24 @@ public class Editor implements Disposable {
 
     public static final String SETTINGS_FILE = "editor.json";
     public static final String DEFAULT_FONT = "play-regular.ttf";
+
+    public static class TestProperty extends NodeProperty {
+
+        public TestProperty() {
+            pins.add(new Pin(Pin.PinKind.OUTPUT, Pin.PinType.DATA, this));
+        }
+
+        @Override
+        public void render() {
+            EditorUtil.beginColumn();
+            pins.stream().filter(Pin::isInput).forEach(Pin::render);
+            EditorUtil.nextColumn();
+            ImGui.bulletText("Node property");
+            EditorUtil.nextColumn();
+            pins.stream().filter(Pin::isOutput).forEach(Pin::render);
+            EditorUtil.endColumn();
+        }
+    }
 
     /**
      * String identifiers for each right-click context menu popup
@@ -56,8 +75,6 @@ public class Editor implements Disposable {
     public final List<Pin> pins;
     public final Map<Long, EditorObject> objectsById;
     public final NodeEditorContext context;
-
-    public boolean addTestNode = true;
 
     public Editor() {
         var config = new NodeEditorConfig();
@@ -89,15 +106,6 @@ public class Editor implements Disposable {
      * to ensure that the input processor is active.
      */
     public void update(float delta) {
-        if (addTestNode) {
-            addTestNode = false;
-
-            var node = new Node();
-            nodes.add(node);
-
-            var position = new ImVec2(0, 0);
-            NodeEditor.setNodePosition(node.id, position);
-        }
     }
 
     public void render() {
@@ -141,11 +149,74 @@ public class Editor implements Disposable {
     }
 
     private void handleCreateLink() {
+        if (NodeEditor.beginCreate(EditorUtil.Colors.createLink, 2f)) {
+            var a = new ImLong();
+            var b = new ImLong();
 
+            if (NodeEditor.queryNewLink(a, b)) {
+                var aPinId = a.get();
+                var bPinId = b.get();
+
+                var srcPin = findPin(aPinId);
+                var dstPin = findPin(bPinId);
+                if (srcPin.isPresent() && dstPin.isPresent()) {
+                    var src = srcPin.get();
+                    var dst = dstPin.get();
+
+                    // ensure the pins are connected in the correct direction
+                    // if (Pin.PinKind.INPUT  == dst.kind
+                    //  && Pin.PinKind.OUTPUT == src.kind) {
+                    //     // already correct, src(out) -> dst(in)
+                    // } else
+                    if (Pin.PinKind.INPUT  == src.kind
+                     && Pin.PinKind.OUTPUT == dst.kind) {
+                        // reversed, src(in) <- dst(out); swap src/dst pins
+                        var temp = src;
+                        src = dst;
+                        dst = temp;
+                    }
+
+                    // reject incompatible pins, otherwise create a new link if accepted
+                    var compatibility = src.canLinkTo(dst);
+                    if (compatibility.incompatible()) {
+                        EditorUtil.showMessage(compatibility.message(), EditorUtil.Colors.rejectLabelBackground);
+                        NodeEditor.rejectNewItem(EditorUtil.Colors.rejectLink, 2f);
+                    } else {
+                        EditorUtil.showMessage("Create link", EditorUtil.Colors.acceptLabelBackground);
+                        if (NodeEditor.acceptNewItem(EditorUtil.Colors.acceptLink, 4f)) {
+                            var link = new Link(src, dst);
+                            addLink(link);
+                        }
+                    }
+                }
+            }
+
+            NodeEditor.endCreate();
+        }
     }
 
     private void handleDeleteObject() {
+        // handle deleting nodes and links
+        if (NodeEditor.beginDelete()) {
+            var id = new ImLong();
 
+            // if this is a node, remove it
+            while (NodeEditor.queryDeletedNode(id)) {
+                if (NodeEditor.acceptDeletedItem()) {
+                    findNode(id.get()).ifPresent(this::removeNode);
+                }
+            }
+
+            // if this is a link, remove it
+            while (NodeEditor.queryDeletedLink(id)) {
+                if (NodeEditor.acceptDeletedItem()) {
+                    findLink(id.get()).ifPresent(this::removeLink);
+                }
+            }
+        }
+        // NOTE: this needs to be called outside the if block,
+        //  unlike some other ImGui begin/end pairs
+        NodeEditor.endDelete();
     }
 
     private void handleContextMenus() {
@@ -267,7 +338,7 @@ public class Editor implements Disposable {
                 }
 
                 if (ImGui.menuItem(type)) {
-                    newNode = new Node();
+                    newNode = createTestNode();
                 }
             }
             ImGui.dummy(0, 2);
@@ -356,5 +427,13 @@ public class Editor implements Disposable {
     private void popEditorStyles() {
         NodeEditor.popStyleVar(10);
         NodeEditor.popStyleColor(4);
+    }
+
+    private Node createTestNode() {
+        var node = new Node();
+        node.add(new Pin(Pin.PinKind.INPUT, Pin.PinType.FLOW, node));
+        node.add(new Pin(Pin.PinKind.OUTPUT, Pin.PinType.FLOW, node));
+        node.add(new TestProperty());
+        return node;
     }
 }
