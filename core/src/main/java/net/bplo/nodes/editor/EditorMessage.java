@@ -2,21 +2,24 @@ package net.bplo.nodes.editor;
 
 import imgui.ImGui;
 import imgui.ImVec2;
+import net.bplo.nodes.imgui.ImGuiColors;
 
 import java.util.Map;
-
-import static net.bplo.nodes.editor.EditorUtil.Colors.*;
 
 public class EditorMessage {
 
     public enum Type { INFO, WARNING, ERROR }
 
-    private record MessageColors(int background, int border, int text) {}
+    private record MessageColors(int background, int border, int text) {
+        public MessageColors(ImGuiColors.Value background, ImGuiColors.Value border, ImGuiColors.Value text) {
+            this(background.asInt(), border.asInt(), text.asInt());
+        }
+    }
 
     private static final Map<Type, MessageColors> colorsByType = Map.of(
-        Type.INFO,    new MessageColors(lightBlue,   medBlue,   darkBlue),
-        Type.WARNING, new MessageColors(lightYellow, medYellow, darkYellow),
-        Type.ERROR,   new MessageColors(lightRed,    medRed,    darkRed)
+        Type.INFO,    new MessageColors(ImGuiColors.darkGray,  ImGuiColors.lightBlue, ImGuiColors.darkBlue),
+        Type.WARNING, new MessageColors(ImGuiColors.medGray,   ImGuiColors.orange,    ImGuiColors.darkYellow),
+        Type.ERROR,   new MessageColors(ImGuiColors.lightGray, ImGuiColors.scarlet,   ImGuiColors.darkRed)
     );
 
     public static void show(String text) {

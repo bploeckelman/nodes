@@ -6,6 +6,7 @@ import imgui.extension.nodeditor.NodeEditor;
 import net.bplo.nodes.assets.Icons;
 import net.bplo.nodes.editor.EditorObject;
 import net.bplo.nodes.editor.EditorUtil;
+import net.bplo.nodes.imgui.ImGuiColors;
 import net.bplo.nodes.imgui.ImGuiWidgetBounds;
 import net.bplo.nodes.objects.utils.PinAttachment;
 import net.bplo.nodes.objects.utils.PinCompatibility;
@@ -110,7 +111,7 @@ public class Pin extends EditorObject {
         record TintedIcon(Icons.Type icon, ImVec4 tint) {}
 
         var isLinked = NodeEditor.pinHadAnyLinks(id);
-        var unlinkedColor = EditorUtil.Colors.Vec4.white;
+        var unlinkedColor = ImGuiColors.white.asVec4();
         var tintedIcon = switch (type) {
             case FLOW -> isLinked
                 ? new TintedIcon(Icons.Type.PIN_FLOW_LINKED, Link.Appearance.FLOW.color)

@@ -1,11 +1,10 @@
 package net.bplo.nodes.objects;
 
-import imgui.ImColor;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.extension.nodeditor.NodeEditor;
 import net.bplo.nodes.editor.EditorObject;
-import net.bplo.nodes.editor.EditorUtil;
+import net.bplo.nodes.imgui.ImGuiColors;
 import net.bplo.nodes.imgui.ImGuiWidgetBounds;
 
 import java.util.ArrayList;
@@ -96,17 +95,18 @@ public class Node extends EditorObject {
         // draw node background
         var img = Images.nodeHeader;
         var bg  = bounds.nodeBackground;
-        var color = ImColor.rgba("#2f2f2faf");
+        var color = ImGuiColors.darkGray.asInt(0.5f);
         bg.setWithPadding(bounds.node, padding);
         draw.addRectFilled(bg.min(), bg.max(), color, rounding);
 
         // draw node header background
         bg = bounds.headerBackground;
         bg.setWithPadding(bounds.header, padding, -border);
+        color = ImGuiColors.teal.asInt();
         draw.addImageRounded(img.id(),
             bg.min(), bg.max(),
             img.uv1(), img.uv2(),
-            Colors.teal, rounding);
+            color, rounding);
 
         // NOTE: not needed at the moment because the inline text looks ok
         // draw the node header text, centered in the header rectangle
@@ -140,7 +140,7 @@ public class Node extends EditorObject {
                 ImGui.setNextItemAllowOverlap();
                 ImGui.dummy(textColumnSize);
                 ImGui.setCursorPos(cursor);
-                ImGui.textColored(EditorUtil.Colors.white, "Node Header");
+                ImGui.textColored(ImGuiColors.white.asInt(), "Node Header");
 
                 ImGui.popFont();
             }

@@ -17,6 +17,7 @@ import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImLong;
 import net.bplo.nodes.Main;
+import net.bplo.nodes.imgui.ImGuiColors;
 import net.bplo.nodes.imgui.ImGuiWidgetBounds;
 import net.bplo.nodes.objects.Link;
 import net.bplo.nodes.objects.Node;
@@ -192,7 +193,7 @@ public class Editor implements Disposable {
     }
 
     private void handleCreateLink() {
-        if (NodeEditor.beginCreate(Colors.createLink, 2f)) {
+        if (NodeEditor.beginCreate(ImGuiColors.green.asVec4(0.8f), 2f)) {
             var aPinId = new ImLong();
             var bPinId = new ImLong();
 
@@ -216,10 +217,10 @@ public class Editor implements Disposable {
                     var compatibility = src.canLinkTo(dst);
                     if (compatibility.incompatible()) {
                         EditorMessage.show(EditorMessage.Type.ERROR, compatibility.message());
-                        NodeEditor.rejectNewItem(Colors.rejectLink, 2f);
+                        NodeEditor.rejectNewItem(ImGuiColors.red.asVec4(0.8f), 2f);
                     } else {
                         EditorMessage.show(EditorMessage.Type.INFO, "Create link");
-                        if (NodeEditor.acceptNewItem(Colors.acceptLink, 4f)) {
+                        if (NodeEditor.acceptNewItem(ImGuiColors.yellow.asVec4(0.8f), 4f)) {
                             // TODO(brian): track links in nodes? add to src,dst nodes
                             add(new Link(src, dst));
                         }
@@ -336,7 +337,7 @@ public class Editor implements Disposable {
         ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 20f, 10f);
         if (ImGui.beginPopup(PopupIds.NODE_CREATE)) {
             ImGui.pushFont(Fonts.nodeHeader);
-            ImGui.textColored(Colors.newNodeHeader, PopupIds.NODE_CREATE);
+            ImGui.textColored(ImGuiColors.cyan.asVec4(), PopupIds.NODE_CREATE);
             ImGui.popFont();
 
             ImGui.separator();
@@ -363,7 +364,7 @@ public class Editor implements Disposable {
                     if (separatorText.isBlank()) {
                         ImGui.separator();
                     } else {
-                        ImGui.pushStyleColor(ImGuiCol.Text, Colors.dim);
+                        ImGui.pushStyleColor(ImGuiCol.Text, ImGuiColors.medGray.asInt());
                         ImGui.pushFont(Fonts.small);
                         ImGui.separatorText(separatorText);
                         ImGui.popFont();

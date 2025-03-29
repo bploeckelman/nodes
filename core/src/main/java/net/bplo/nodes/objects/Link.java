@@ -4,7 +4,7 @@ import imgui.ImVec4;
 import imgui.extension.nodeditor.NodeEditor;
 import lombok.RequiredArgsConstructor;
 import net.bplo.nodes.editor.EditorObject;
-import net.bplo.nodes.editor.EditorUtil;
+import net.bplo.nodes.imgui.ImGuiColors;
 import net.bplo.nodes.objects.utils.PinType;
 
 public class Link extends EditorObject {
@@ -16,8 +16,8 @@ public class Link extends EditorObject {
 
     @RequiredArgsConstructor
     public enum Appearance {
-          FLOW (5f, EditorUtil.Colors.Vec4.cyan)
-        , DATA (2f, EditorUtil.Colors.Vec4.yellow)
+          FLOW (5f, ImGuiColors.cyan.asVec4())
+        , DATA (2f, ImGuiColors.yellow.asVec4())
         ;
         public final float thickness;
         public final ImVec4 color;
