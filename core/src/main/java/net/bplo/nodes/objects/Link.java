@@ -15,12 +15,12 @@ public class Link extends EditorObject {
     private final Appearance appearance;
 
     @RequiredArgsConstructor
-    private enum Appearance {
+    public enum Appearance {
           FLOW (5f, EditorUtil.Colors.Vec4.cyan)
         , DATA (2f, EditorUtil.Colors.Vec4.yellow)
         ;
-        private final float thickness;
-        private final ImVec4 color;
+        public final float thickness;
+        public final ImVec4 color;
     }
 
     public Link(Pin src, Pin dst) {

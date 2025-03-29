@@ -52,8 +52,13 @@ public class Pin extends EditorObject {
 
         ImGui.beginGroup();
         {
-            var icon = buildIcon();
-            ImGui.image(icon.id(), icon.size(), icon.uv1(), icon.uv2());
+            var pinIcon = buildPinIcon();
+            ImGui.image(
+                pinIcon.image.id(),
+                pinIcon.image.size(),
+                pinIcon.image.uv1(),
+                pinIcon.image.uv2(),
+                pinIcon.tint);
             iconBounds.update();
 
             // configure the pin rectangle and pivot, ie. where link lines start from
@@ -101,23 +106,31 @@ public class Pin extends EditorObject {
         return PinCompatibility.ok();
     }
 
-    private EditorUtil.Image buildIcon() {
-        var isLinked = NodeEditor.pinHadAnyLinks(id);
+    private PinIcon buildPinIcon() {
+        record TintedIcon(Icons.Type icon, ImVec4 tint) {}
 
-        var region  = switch (type) {
-            case FLOW -> isLinked ? Icons.Type.PIN_FLOW_LINKED.get() : Icons.Type.PIN_FLOW.get();
+        var isLinked = NodeEditor.pinHadAnyLinks(id);
+        var unlinkedColor = EditorUtil.Colors.Vec4.white;
+        var tintedIcon = switch (type) {
+            case FLOW -> isLinked
+                ? new TintedIcon(Icons.Type.PIN_FLOW_LINKED, Link.Appearance.FLOW.color)
+                : new TintedIcon(Icons.Type.PIN_FLOW,        unlinkedColor);
             case DATA -> {
                 if (isLinked) {
-                    yield Icons.Type.PIN_DATA_LINKED.get();
+                    yield new TintedIcon(Icons.Type.PIN_DATA_LINKED, Link.Appearance.DATA.color);
                 } else {
                     yield switch (kind) {
-                        case INPUT -> Icons.Type.PIN_DATA_INPUT.get();
-                        case OUTPUT -> Icons.Type.PIN_DATA_OUTPUT.get();
+                        case INPUT  -> new TintedIcon(Icons.Type.PIN_DATA_INPUT,  unlinkedColor);
+                        case OUTPUT -> new TintedIcon(Icons.Type.PIN_DATA_OUTPUT, unlinkedColor);
                     };
                 }
             }
         };
 
-        return EditorUtil.Image.from(region, SIZE, SIZE);
+        var region = tintedIcon.icon.get();
+        var image = EditorUtil.Image.from(region, SIZE, SIZE);
+        return new PinIcon(image, tintedIcon.tint);
     }
+
+    private record PinIcon(EditorUtil.Image image, ImVec4 tint) {}
 }
