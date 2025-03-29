@@ -1,4 +1,4 @@
-package net.bplo.nodes;
+package net.bplo.nodes.assets;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
@@ -15,11 +15,15 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.ObjectMap;
+import net.bplo.nodes.assets.framework.AssetContainer;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Assets implements Disposable {
+
+    public final ObjectMap<Class<? extends AssetContainer<?, ?>>, AssetContainer<?, ?>> containers;
 
     public final List<Disposable> disposables;
     public final AssetManager mgr;
@@ -33,6 +37,9 @@ public class Assets implements Disposable {
     public TextureRegion gdx;
 
     public Assets() {
+        containers = new ObjectMap<>();
+        containers.put(Icons.class, new Icons());
+
         disposables = new ArrayList<>();
 
         // create a single pixel texture and associated region
@@ -63,23 +70,37 @@ public class Assets implements Disposable {
         mgr.setLoader(BitmapFont.class, ".ttf", fontLoader);
         mgr.setLoader(BitmapFont.class, ".otf", fontLoader);
 
-        mgr.load("sprites/sprites.atlas", TextureAtlas.class);
+        // populate the asset manager
+        {
+            mgr.load("sprites/sprites.atlas", TextureAtlas.class);
 
-        loadFont("fonts/chevyray-rise.ttf");
-        loadFont("fonts/chevyray-roundabout.ttf");
-        loadFont("fonts/cousine-regular.ttf");
-        loadFont("fonts/droid-sans.ttf");
-        loadFont("fonts/fa-regular-400.ttf");
-        loadFont("fonts/fa-solid-900.ttf");
-        loadFont("fonts/fa-solid-900-v6.ttf");
-        loadFont("fonts/noto-sans-cjk-jp-medium.otf");
-        loadFont("fonts/play-regular.ttf");
-        loadFont("fonts/tahoma.ttf");
+            for (var container : containers.values()) {
+                container.load(this);
+            }
 
+            loadFont("fonts/chevyray-rise.ttf");
+            loadFont("fonts/chevyray-roundabout.ttf");
+            loadFont("fonts/cousine-regular.ttf");
+            loadFont("fonts/droid-sans.ttf");
+            loadFont("fonts/fa-regular-400.ttf");
+            loadFont("fonts/fa-solid-900.ttf");
+            loadFont("fonts/fa-solid-900-v6.ttf");
+            loadFont("fonts/noto-sans-cjk-jp-medium.otf");
+            loadFont("fonts/play-regular.ttf");
+            loadFont("fonts/tahoma.ttf");
+        }
         mgr.finishLoading();
 
-        atlas = mgr.get("sprites/sprites.atlas", TextureAtlas.class);
-        gdx = atlas.findRegion("libgdx");
+        // initialize containers and fetch asset references
+        {
+            atlas = mgr.get("sprites/sprites.atlas", TextureAtlas.class);
+
+            gdx = atlas.findRegion("libgdx");
+
+            for (var container : containers.values()) {
+                container.init(this);
+            }
+        }
     }
 
     private final FreeTypeFontLoaderParameter fontLoaderParams = new FreeTypeFontLoaderParameter() {{

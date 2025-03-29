@@ -1,0 +1,10 @@
+package net.bplo.nodes.objects.utils;
+
+import imgui.extension.nodeditor.flag.NodeEditorPinKind;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+public enum PinKind {
+    INPUT(NodeEditorPinKind.Input), OUTPUT(NodeEditorPinKind.Output);
+    public final int value;
+}

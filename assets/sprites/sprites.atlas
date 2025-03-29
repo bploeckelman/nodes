@@ -1,26 +1,68 @@
 
 sprites.png
-size: 512, 128
+size: 1024, 128
 format: RGBA8888
-filter: MipMapNearestLinear, Linear
+filter: MipMapLinearLinear, MipMapLinearLinear
 repeat: none
+icons/pin-data
+  rotate: false
+  xy: 381, 37
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+icons/pin-data-input
+  rotate: false
+  xy: 447, 37
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+icons/pin-data-linked
+  rotate: false
+  xy: 513, 37
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+icons/pin-data-output
+  rotate: false
+  xy: 579, 37
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+icons/pin-flow
+  rotate: false
+  xy: 645, 37
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+icons/pin-flow-linked
+  rotate: false
+  xy: 711, 37
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
 libgdx
   rotate: false
-  xy: 1, 35
+  xy: 1, 38
   size: 378, 63
   orig: 378, 63
   offset: 0, 0
   index: -1
 noise-bg
   rotate: false
-  xy: 1, 1
+  xy: 1, 4
   size: 150, 32
   orig: 150, 32
   offset: 0, 0
   index: -1
 pixel
   rotate: false
-  xy: 381, 97
+  xy: 1, 1
   size: 1, 1
   orig: 1, 1
   offset: 0, 0

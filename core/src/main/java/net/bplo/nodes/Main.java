@@ -6,6 +6,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
+import net.bplo.nodes.assets.Assets;
+import net.bplo.nodes.editor.Editor;
+import net.bplo.nodes.editor.EditorUtil;
 import net.bplo.nodes.imgui.ImGuiPlatform;
 
 /** {@link ApplicationListener} implementation shared by all platforms. */

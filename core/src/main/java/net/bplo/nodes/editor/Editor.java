@@ -1,6 +1,7 @@
-package net.bplo.nodes;
+package net.bplo.nodes.editor;
 
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.ImVec4;
@@ -14,11 +15,13 @@ import imgui.flag.ImGuiCond;
 import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImLong;
-import net.bplo.nodes.objects.EditorObject;
+import net.bplo.nodes.Main;
 import net.bplo.nodes.objects.Link;
 import net.bplo.nodes.objects.Node;
-import net.bplo.nodes.objects.NodeProperty;
 import net.bplo.nodes.objects.Pin;
+import net.bplo.nodes.objects.Prop;
+import net.bplo.nodes.objects.utils.PinKind;
+import net.bplo.nodes.objects.utils.PinType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,26 +29,56 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static net.bplo.nodes.editor.EditorUtil.*;
+
 public class Editor implements Disposable {
 
     public static final String SETTINGS_FILE = "editor.json";
     public static final String DEFAULT_FONT = "play-regular.ttf";
 
-    public static class TestProperty extends NodeProperty {
+    public static class TestProperty extends Prop {
+
+        private final ImVec2 min = new ImVec2();
+        private final ImVec2 max = new ImVec2();
+        private final int backgroundColor = Colors.darkGray;
 
         public TestProperty() {
-            pins.add(new Pin(Pin.PinKind.OUTPUT, Pin.PinType.DATA, this));
+            this.pins.add(new Pin(PinKind.INPUT,  PinType.DATA, this));
+            this.pins.add(new Pin(PinKind.OUTPUT, PinType.DATA, this));
         }
 
         @Override
         public void render() {
-            EditorUtil.beginColumn();
-            pins.stream().filter(Pin::isInput).forEach(Pin::render);
-            EditorUtil.nextColumn();
-            ImGui.bulletText("Node property");
-            EditorUtil.nextColumn();
-            pins.stream().filter(Pin::isOutput).forEach(Pin::render);
-            EditorUtil.endColumn();
+            var contentWidth = node.width - 2 * Pin.SIZE;
+            ImGui.beginGroup();
+            {
+                ImGui.setNextItemWidth(Pin.SIZE);
+                beginColumn();
+                inputPins().forEach(Pin::render);
+
+                nextColumn(contentWidth);
+                var cursorPos = ImGui.getCursorPos();
+                ImGui.setNextItemAllowOverlap();
+                ImGui.dummy(contentWidth, Pin.SIZE);
+
+                ImGui.setCursorPos(cursorPos);
+                ImGui.bulletText("property");
+
+                nextColumn(Pin.SIZE);
+                outputPins().forEach(Pin::render);
+
+                endColumn();
+            }
+            ImGui.endGroup();
+            ImGui.getItemRectMin(min);
+            ImGui.getItemRectMax(max);
+        }
+
+        @Override
+        public void renderAfterNode() {
+            var draw = NodeEditor.getNodeBackgroundDrawList(node.id);
+            var rounding = NodeEditor.getStyle().getNodeRounding();
+            draw.addRectFilled(min, max, backgroundColor, rounding);
         }
     }
 
@@ -53,12 +86,15 @@ public class Editor implements Disposable {
      * String identifiers for each right-click context menu popup
      */
     private static class PopupIds {
-        static final String NODE_NEW = "Create Node";
+        static final String NODE_CREATE = "Create Node";
         static final String NODE = "Node Context Menu";
-        static final String PIN = "Pin Context Menu";
+        static final String PIN  = "Pin Context Menu";
         static final String LINK = "Link Context Menu";
     }
 
+    /**
+     * Container for data used by right-click context menus
+     */
     public static class ContextMenu {
         public ImLong nodeId = new ImLong();
         public ImLong pinId = new ImLong();
@@ -67,14 +103,15 @@ public class Editor implements Disposable {
         public Pin    newNodeLinkPin = null;
     }
 
-    private final ContextMenu contextMenu = new ContextMenu();
+    private final ContextMenu contextMenu;
+    private final NodeEditorContext editorContext;
 
     public final Main app;
     public final List<Node> nodes;
+    public final List<Prop> props;
+    public final List<Pin>  pins;
     public final List<Link> links;
-    public final List<Pin> pins;
     public final Map<Long, EditorObject> objectsById;
-    public final NodeEditorContext context;
 
     public Editor() {
         var config = new NodeEditorConfig();
@@ -82,21 +119,22 @@ public class Editor implements Disposable {
 
         this.app = Main.app;
         this.nodes = new ArrayList<>();
-        this.links = new ArrayList<>();
+        this.props = new ArrayList<>();
         this.pins = new ArrayList<>();
+        this.links = new ArrayList<>();
         this.objectsById = new HashMap<>();
-        this.context = NodeEditor.createEditor(config);
+        this.contextMenu = new ContextMenu();
+        this.editorContext = NodeEditor.createEditor(config);
 
-        NodeEditor.setCurrentEditor(context);
-
-        // disabling key shortcuts because 'f' is bound to zoom by default
-        // and I can't find an easy way to override it when doing text input
+        NodeEditor.setCurrentEditor(editorContext);
+        // NOTE: disabling key shortcuts because 'f' is bound to zoom by default
+        //  and I can't find an easy way to override it when doing text input
         NodeEditor.enableShortcuts(false);
     }
 
     @Override
     public void dispose() {
-        NodeEditor.destroyEditor(context);
+        NodeEditor.destroyEditor(editorContext);
     }
 
     /**
@@ -109,7 +147,7 @@ public class Editor implements Disposable {
     }
 
     public void render() {
-        NodeEditor.setCurrentEditor(context);
+        NodeEditor.setCurrentEditor(editorContext);
         pushWindowStyles();
 
         // editor window always fills entire screen
@@ -149,43 +187,36 @@ public class Editor implements Disposable {
     }
 
     private void handleCreateLink() {
-        if (NodeEditor.beginCreate(EditorUtil.Colors.createLink, 2f)) {
-            var a = new ImLong();
-            var b = new ImLong();
+        if (NodeEditor.beginCreate(Colors.createLink, 2f)) {
+            var aPinId = new ImLong();
+            var bPinId = new ImLong();
 
-            if (NodeEditor.queryNewLink(a, b)) {
-                var aPinId = a.get();
-                var bPinId = b.get();
-
-                var srcPin = findPin(aPinId);
-                var dstPin = findPin(bPinId);
+            if (NodeEditor.queryNewLink(aPinId, bPinId)) {
+                var srcPin = findPin(aPinId.get());
+                var dstPin = findPin(bPinId.get());
                 if (srcPin.isPresent() && dstPin.isPresent()) {
                     var src = srcPin.get();
                     var dst = dstPin.get();
 
-                    // ensure the pins are connected in the correct direction
-                    // if (Pin.PinKind.INPUT  == dst.kind
-                    //  && Pin.PinKind.OUTPUT == src.kind) {
-                    //     // already correct, src(out) -> dst(in)
-                    // } else
-                    if (Pin.PinKind.INPUT  == src.kind
-                     && Pin.PinKind.OUTPUT == dst.kind) {
-                        // reversed, src(in) <- dst(out); swap src/dst pins
+                    // swap src/dst if necessary to ensure links are
+                    // directionally correct: src(out) -> dst(in)
+                    if (PinKind.INPUT  == src.kind && PinKind.OUTPUT == dst.kind) {
                         var temp = src;
                         src = dst;
                         dst = temp;
                     }
 
-                    // reject incompatible pins, otherwise create a new link if accepted
+                    // reject links for pin pairs that are incompatible,
+                    // otherwise create a new link if accepted
                     var compatibility = src.canLinkTo(dst);
                     if (compatibility.incompatible()) {
-                        EditorUtil.showMessage(compatibility.message(), EditorUtil.Colors.rejectLabelBackground);
-                        NodeEditor.rejectNewItem(EditorUtil.Colors.rejectLink, 2f);
+                        EditorMessage.show(EditorMessage.Type.ERROR, compatibility.message());
+                        NodeEditor.rejectNewItem(Colors.rejectLink, 2f);
                     } else {
-                        EditorUtil.showMessage("Create link", EditorUtil.Colors.acceptLabelBackground);
-                        if (NodeEditor.acceptNewItem(EditorUtil.Colors.acceptLink, 4f)) {
-                            var link = new Link(src, dst);
-                            addLink(link);
+                        EditorMessage.show(EditorMessage.Type.INFO, "Create link");
+                        if (NodeEditor.acceptNewItem(Colors.acceptLink, 4f)) {
+                            // TODO(brian): track links in nodes? add to src,dst nodes
+                            add(new Link(src, dst));
                         }
                     }
                 }
@@ -203,20 +234,19 @@ public class Editor implements Disposable {
             // if this is a node, remove it
             while (NodeEditor.queryDeletedNode(id)) {
                 if (NodeEditor.acceptDeletedItem()) {
-                    findNode(id.get()).ifPresent(this::removeNode);
+                    findNode(id.get()).ifPresent(this::remove);
                 }
             }
 
             // if this is a link, remove it
             while (NodeEditor.queryDeletedLink(id)) {
                 if (NodeEditor.acceptDeletedItem()) {
-                    findLink(id.get()).ifPresent(this::removeLink);
+                    findLink(id.get()).ifPresent(this::remove);
                 }
             }
+
+            NodeEditor.endDelete();
         }
-        // NOTE: this needs to be called outside the if block,
-        //  unlike some other ImGui begin/end pairs
-        NodeEditor.endDelete();
     }
 
     private void handleContextMenus() {
@@ -237,7 +267,7 @@ public class Editor implements Disposable {
         } else if (NodeEditor.showLinkContextMenu(contextMenu.linkId)) {
             ImGui.openPopup(PopupIds.LINK);
         } else if (NodeEditor.showBackgroundContextMenu()) {
-            ImGui.openPopup(PopupIds.NODE_NEW);
+            ImGui.openPopup(PopupIds.NODE_CREATE);
             contextMenu.newNodeLinkPin = null;
 
             // NOTE(brian): we want the mouse pos in 'graph' space not screen space
@@ -257,7 +287,7 @@ public class Editor implements Disposable {
                 ImGui.text("Node: %s".formatted(node.label()));
                 ImGui.separator();
                 if (ImGui.menuItem("Delete")) {
-                    removeNode(node);
+                    remove(node);
                 }
             }, () -> ImGui.text("Unknown node: %d".formatted(nodeId)));
 
@@ -288,7 +318,7 @@ public class Editor implements Disposable {
                 ImGui.text("ID: %d".formatted(link.id));
                 ImGui.separator();
                 if (ImGui.menuItem("Delete")) {
-                    removeLink(link);
+                    remove(link);
                 }
             }, () -> ImGui.text("Unknown link: %s".formatted(linkId)));
 
@@ -299,9 +329,9 @@ public class Editor implements Disposable {
         ImGui.pushStyleVar(ImGuiStyleVar.PopupBorderSize, 2f);
         ImGui.pushStyleVar(ImGuiStyleVar.PopupRounding, 10f);
         ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 20f, 10f);
-        if (ImGui.beginPopup(PopupIds.NODE_NEW)) {
-            ImGui.pushFont(EditorUtil.Fonts.nodeHeader);
-            ImGui.textColored(EditorUtil.Colors.newNodeHeader, PopupIds.NODE_NEW);
+        if (ImGui.beginPopup(PopupIds.NODE_CREATE)) {
+            ImGui.pushFont(Fonts.nodeHeader);
+            ImGui.textColored(Colors.newNodeHeader, PopupIds.NODE_CREATE);
             ImGui.popFont();
 
             ImGui.separator();
@@ -328,8 +358,8 @@ public class Editor implements Disposable {
                     if (separatorText.isBlank()) {
                         ImGui.separator();
                     } else {
-                        ImGui.pushStyleColor(ImGuiCol.Text, EditorUtil.Colors.dim);
-                        ImGui.pushFont(EditorUtil.Fonts.small);
+                        ImGui.pushStyleColor(ImGuiCol.Text, Colors.dim);
+                        ImGui.pushFont(Fonts.small);
                         ImGui.separatorText(separatorText);
                         ImGui.popFont();
                         ImGui.popStyleColor();
@@ -345,7 +375,7 @@ public class Editor implements Disposable {
 
             // if a new node was spawned, add it to the editor
             if (newNode != null) {
-                addNode(newNode);
+                add(newNode);
 
                 // position the new node near the right-click position
                 NodeEditor.setNodePosition(newNode.id, contextMenu.newNodePosition);
@@ -361,36 +391,72 @@ public class Editor implements Disposable {
         NodeEditor.resume();
     }
 
-    private void addNode(Node node) {
-        nodes.add(node);
-        objectsById.put(node.id, node);
+    private void add(EditorObject object) {
+        switch (object) {
+            case Node node -> {
+                objectsById.put(node.id, node);
+                node.pins.forEach(this::add);
+                node.props.forEach(this::add);
+                nodes.add(node);
+            }
+            case Prop prop -> {
+                objectsById.put(prop.id, prop);
+                prop.pins.forEach(this::add);
+                props.add(prop);
+            }
+            case Pin pin -> {
+                objectsById.put(pin.id, pin);
+                pins.add(pin);
+            }
+            case Link link -> {
+                objectsById.put(link.id, link);
+                links.add(link);
+            }
+            case null, default ->
+                throw new GdxRuntimeException("Cannot add editor object with null value or unsupported type");
+        }
     }
 
-    private void removeNode(Node node) {
-        nodes.remove(node);
-        objectsById.remove(node.id);
-    }
-
-    private void addLink(Link link) {
-        links.add(link);
-        objectsById.put(link.id, link);
-    }
-
-    private void removeLink(Link link) {
-        links.remove(link);
-        objectsById.remove(link.id);
+    private void remove(EditorObject object) {
+        switch (object) {
+            case Node node -> {
+                node.pins.forEach(this::remove);
+                node.props.forEach(this::remove);
+                nodes.remove(node);
+                objectsById.remove(node.id);
+            }
+            case Prop prop -> {
+                prop.pins.forEach(this::remove);
+                props.remove(prop);
+                objectsById.remove(prop.id);
+            }
+            case Pin pin -> {
+                pins.remove(pin);
+                objectsById.remove(pin.id);
+            }
+            case Link link -> {
+                links.remove(link);
+                objectsById.remove(link.id);
+            }
+            case null, default ->
+                throw new GdxRuntimeException("Cannot remove editor object with null value or unsupported type");
+        }
     }
 
     private Optional<Node> findNode(long id) {
         return nodes.stream().filter(node -> node.id == id).findFirst();
     }
 
-    private Optional<Link> findLink(long id) {
-        return links.stream().filter(link -> link.id == id).findFirst();
+    private Optional<Prop> findProp(long id) {
+        return props.stream().filter(prop -> prop.id == id).findFirst();
     }
 
     private Optional<Pin> findPin(long id) {
         return pins.stream().filter(pin -> pin.id == id).findFirst();
+    }
+
+    private Optional<Link> findLink(long id) {
+        return links.stream().filter(link -> link.id == id).findFirst();
     }
 
     private void pushWindowStyles() {
@@ -418,7 +484,7 @@ public class Editor implements Disposable {
         NodeEditor.pushStyleVar(NodeEditorStyleVar.HoveredNodeBorderWidth,  2.5f);
         NodeEditor.pushStyleVar(NodeEditorStyleVar.SelectedNodeBorderWidth, 3.5f);
         NodeEditor.pushStyleVar(NodeEditorStyleVar.PinBorderWidth,          2f);
-        NodeEditor.pushStyleVar(NodeEditorStyleVar.PinRadius,               10f);
+        NodeEditor.pushStyleVar(NodeEditorStyleVar.PinRadius,               0f); // NOTE: radius of circle that links can 'slide around' on at their start/end points, 0 means exactly at pivot location
         NodeEditor.pushStyleVar(NodeEditorStyleVar.LinkStrength,            250f);
         NodeEditor.pushStyleVar(NodeEditorStyleVar.SourceDirection,         new ImVec2( 1.0f, 0.0f));
         NodeEditor.pushStyleVar(NodeEditorStyleVar.TargetDirection,         new ImVec2(-1.0f, 0.0f));
@@ -431,8 +497,8 @@ public class Editor implements Disposable {
 
     private Node createTestNode() {
         var node = new Node();
-        node.add(new Pin(Pin.PinKind.INPUT, Pin.PinType.FLOW, node));
-        node.add(new Pin(Pin.PinKind.OUTPUT, Pin.PinType.FLOW, node));
+        node.add(new Pin(PinKind.INPUT, PinType.FLOW, node));
+        node.add(new Pin(PinKind.OUTPUT, PinType.FLOW, node));
         node.add(new TestProperty());
         return node;
     }

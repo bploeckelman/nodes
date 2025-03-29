@@ -1,8 +1,8 @@
-package net.bplo.nodes.objects;
+package net.bplo.nodes.editor;
 
 public abstract class EditorObject {
 
-    public enum Type { NODE, PIN, LINK }
+    public enum Type { NODE, PIN, LINK, PROP }
 
     private static long NEXT_ID = 1L;
 
@@ -19,4 +19,5 @@ public abstract class EditorObject {
     }
 
     public abstract void render();
+    public void renderAfterNode() {}
 }
