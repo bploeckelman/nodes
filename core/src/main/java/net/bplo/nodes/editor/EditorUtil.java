@@ -24,8 +24,16 @@ public class EditorUtil {
     // NOTE(brian): these 'begin/next/endColumn()' methods are a workaround for tables...
     //  table api uses 'begin/endChild()' which node-editor doesn't play nice with
     //  see: https://github.com/ocornut/imgui/blob/master/imgui_tables.cpp#L39
+    // TODO(brian): move into ImGuiUtil in a Layout inner class
 
     public static void beginColumn() {
+        beginColumn(null);
+    }
+
+    public static void beginColumn(Float width) {
+        if (width != null) {
+            ImGui.setNextItemWidth(width);
+        }
         ImGui.beginGroup();
     }
 
@@ -36,8 +44,7 @@ public class EditorUtil {
     public static void nextColumn(Float width) {
         ImGui.endGroup();
         ImGui.sameLine();
-        if (width != null) ImGui.setNextItemWidth(width);
-        ImGui.beginGroup();
+        beginColumn(width);
     }
 
     public static void endColumn() {
@@ -119,62 +126,64 @@ public class EditorUtil {
         //
         // LibGDX Color values converted to int for use in ImGui functions
         //
+        // TODO(brian): make utility class to encapsulate the different color value types; hex-str, int, ImVec4
+        //  and include a method to spit out a variant with different alpha on demand
 
-        public static final int white       = ImColor.rgb("#ffffff");
-        public static final int lightGray   = ImColor.rgb("#bfbfbf");
-        public static final int gray        = ImColor.rgb("#7f7f7f");
-        public static final int darkGray    = ImColor.rgb("#2f2f2f");
-        public static final int black       = ImColor.rgb("#000000");
+        public static final int white       = ImColor.rgba("#ffffffff");
+        public static final int lightGray   = ImColor.rgba("#bfbfbfff");
+        public static final int gray        = ImColor.rgba("#7f7f7fff");
+        public static final int darkGray    = ImColor.rgba("#2f2f2fff");
+        public static final int black       = ImColor.rgba("#000000ff");
 
-        public static final int blue        = ImColor.rgb("#0000ff");
-        public static final int navy        = ImColor.rgb("#00007f");
-        public static final int royal       = ImColor.rgb("#4169e1");
-        public static final int slate       = ImColor.rgb("#708090");
-        public static final int sky         = ImColor.rgb("#87ceeb");
-        public static final int cyan        = ImColor.rgb("#00ffff");
-        public static final int teal        = ImColor.rgb("#007f7f");
+        public static final int blue        = ImColor.rgba("#0000ffff");
+        public static final int navy        = ImColor.rgba("#00007fff");
+        public static final int royal       = ImColor.rgba("#4169e1ff");
+        public static final int slate       = ImColor.rgba("#708090ff");
+        public static final int sky         = ImColor.rgba("#87ceebff");
+        public static final int cyan        = ImColor.rgba("#00ffffff");
+        public static final int teal        = ImColor.rgba("#007f7fff");
 
-        public static final int green       = ImColor.rgb("#00ff00");
-        public static final int chartreuse  = ImColor.rgb("#7fff00");
-        public static final int lime        = ImColor.rgb("#32cd32");
-        public static final int forest      = ImColor.rgb("#228b22");
-        public static final int olive       = ImColor.rgb("#6b8e23");
+        public static final int green       = ImColor.rgba("#00ff00ff");
+        public static final int chartreuse  = ImColor.rgba("#7fff00ff");
+        public static final int lime        = ImColor.rgba("#32cd32ff");
+        public static final int forest      = ImColor.rgba("#228b22ff");
+        public static final int olive       = ImColor.rgba("#6b8e23ff");
 
-        public static final int yellow      = ImColor.rgb("#ffff00");
-        public static final int gold        = ImColor.rgb("#ffd700");
-        public static final int goldenrod   = ImColor.rgb("#daa520");
-        public static final int orange      = ImColor.rgb("#ffa500");
+        public static final int yellow      = ImColor.rgba("#ffff00ff");
+        public static final int gold        = ImColor.rgba("#ffd700ff");
+        public static final int goldenrod   = ImColor.rgba("#daa520ff");
+        public static final int orange      = ImColor.rgba("#ffa500ff");
 
-        public static final int brown       = ImColor.rgb("#8b4513");
-        public static final int tan         = ImColor.rgb("#d2b48c");
-        public static final int firebrick   = ImColor.rgb("#b22222");
+        public static final int brown       = ImColor.rgba("#8b4513ff");
+        public static final int tan         = ImColor.rgba("#d2b48cff");
+        public static final int firebrick   = ImColor.rgba("#b22222ff");
 
-        public static final int red         = ImColor.rgb("#ff0000");
-        public static final int scarlet     = ImColor.rgb("#ff341c");
-        public static final int coral       = ImColor.rgb("#ff7f50");
-        public static final int salmon      = ImColor.rgb("#fa8072");
-        public static final int pink        = ImColor.rgb("#ff69b4");
-        public static final int magenta     = ImColor.rgb("#ff00ff");
+        public static final int red         = ImColor.rgba("#ff0000ff");
+        public static final int scarlet     = ImColor.rgba("#ff341cff");
+        public static final int coral       = ImColor.rgba("#ff7f50ff");
+        public static final int salmon      = ImColor.rgba("#fa8072ff");
+        public static final int pink        = ImColor.rgba("#ff69b4ff");
+        public static final int magenta     = ImColor.rgba("#ff00ffff");
 
-        public static final int purple      = ImColor.rgb("#a020f0");
-        public static final int violet      = ImColor.rgb("#ee82ee");
-        public static final int maroon      = ImColor.rgb("#b03060");
+        public static final int purple      = ImColor.rgba("#a020f0ff");
+        public static final int violet      = ImColor.rgba("#ee82eeff");
+        public static final int maroon      = ImColor.rgba("#b03060ff");
 
-        public static final int lightGrey   = ImColor.rgb("#f5f5f5");
-        public static final int medGrey     = ImColor.rgb("#d9d9d9");
-        public static final int darkGrey    = ImColor.rgb("#595959");
+        public static final int lightGrey   = ImColor.rgba("#f5f5f5ff");
+        public static final int medGrey     = ImColor.rgba("#d9d9d9ff");
+        public static final int darkGrey    = ImColor.rgba("#595959ff");
 
-        public static final int lightBlue   = ImColor.rgb("#e6f7ff");
-        public static final int medBlue     = ImColor.rgb("#91d5ff");
-        public static final int darkBlue    = ImColor.rgb("#0050b3");
+        public static final int lightBlue   = ImColor.rgba("#b6c7ffff");
+        public static final int medBlue     = ImColor.rgba("#91d5ffff");
+        public static final int darkBlue    = ImColor.rgba("#0050b3ff");
 
-        public static final int lightYellow = ImColor.rgb("#fffbe6");
-        public static final int medYellow   = ImColor.rgb("#ffe58f");
-        public static final int darkYellow  = ImColor.rgb("#d48806");
+        public static final int lightYellow = ImColor.rgba("#ffdbb6ff");
+        public static final int medYellow   = ImColor.rgba("#ffe58fff");
+        public static final int darkYellow  = ImColor.rgba("#d48806ff");
 
-        public static final int lightRed    = ImColor.rgb("#fff1f0");
-        public static final int medRed      = ImColor.rgb("#ffa39e");
-        public static final int darkRed     = ImColor.rgb("#cf1322");
+        public static final int lightRed    = ImColor.rgba("#ffd1d0ff");
+        public static final int medRed      = ImColor.rgba("#ffa39eff");
+        public static final int darkRed     = ImColor.rgba("#cf1322ff");
 
 
         /**

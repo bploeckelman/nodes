@@ -2,6 +2,7 @@ package net.bplo.nodes.editor;
 
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import imgui.ImColor;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.ImVec4;
@@ -16,6 +17,7 @@ import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImLong;
 import net.bplo.nodes.Main;
+import net.bplo.nodes.imgui.ImGuiWidgetBounds;
 import net.bplo.nodes.objects.Link;
 import net.bplo.nodes.objects.Node;
 import net.bplo.nodes.objects.Pin;
@@ -38,47 +40,50 @@ public class Editor implements Disposable {
 
     public static class TestProperty extends Prop {
 
-        private final ImVec2 min = new ImVec2();
-        private final ImVec2 max = new ImVec2();
-        private final int backgroundColor = Colors.darkGray;
+        private final int backgroundColor = ImColor.rgba("#00004f2f");
+        private final ImGuiWidgetBounds bounds = new ImGuiWidgetBounds();
 
-        public TestProperty() {
+        public TestProperty(Node node) {
+            super(node);
             this.pins.add(new Pin(PinKind.INPUT,  PinType.DATA, this));
             this.pins.add(new Pin(PinKind.OUTPUT, PinType.DATA, this));
         }
 
         @Override
         public void render() {
-            var contentWidth = node.width - 2 * Pin.SIZE;
             ImGui.beginGroup();
             {
-                ImGui.setNextItemWidth(Pin.SIZE);
-                beginColumn();
-                inputPins().forEach(Pin::render);
+                var contentWidth = node.width - 2 * Pin.SIZE;
 
+                beginColumn(Pin.SIZE);
+                {
+                    inputPins().forEach(Pin::render);
+                }
                 nextColumn(contentWidth);
-                var cursorPos = ImGui.getCursorPos();
-                ImGui.setNextItemAllowOverlap();
-                ImGui.dummy(contentWidth, Pin.SIZE);
-
-                ImGui.setCursorPos(cursorPos);
-                ImGui.bulletText("property");
-
+                {
+                    // NOTE: same approach as in Node.render() to ensure a fixed column width
+                    //  when the only widget in the column is text, which collapses to fit the string
+                    var cursorPos = ImGui.getCursorPos();
+                    ImGui.setNextItemAllowOverlap();
+                    ImGui.dummy(contentWidth, Pin.SIZE);
+                    ImGui.setCursorPos(cursorPos);
+                    ImGui.text("property");
+                }
                 nextColumn(Pin.SIZE);
-                outputPins().forEach(Pin::render);
-
+                {
+                    outputPins().forEach(Pin::render);
+                }
                 endColumn();
             }
             ImGui.endGroup();
-            ImGui.getItemRectMin(min);
-            ImGui.getItemRectMax(max);
+            bounds.update();
         }
 
         @Override
         public void renderAfterNode() {
             var draw = NodeEditor.getNodeBackgroundDrawList(node.id);
             var rounding = NodeEditor.getStyle().getNodeRounding();
-            draw.addRectFilled(min, max, backgroundColor, rounding);
+            draw.addRectFilled(bounds.min(), bounds.max(), backgroundColor, rounding);
         }
     }
 
@@ -478,7 +483,7 @@ public class Editor implements Disposable {
         NodeEditor.pushStyleColor(NodeEditorStyleColor.PinRect,       new ImVec4( 0.24f, 0.6f, 1f, 0.6f));
         NodeEditor.pushStyleColor(NodeEditorStyleColor.PinRectBorder, new ImVec4( 0.24f, 0.6f, 1f, 0.6f));
 
-        NodeEditor.pushStyleVar(NodeEditorStyleVar.NodePadding,             new ImVec4(6, 6, 6, 6));
+        NodeEditor.pushStyleVar(NodeEditorStyleVar.NodePadding,             new ImVec4(4, 4, 4, 4));
         NodeEditor.pushStyleVar(NodeEditorStyleVar.NodeRounding,            5f);
         NodeEditor.pushStyleVar(NodeEditorStyleVar.NodeBorderWidth,         1.5f);
         NodeEditor.pushStyleVar(NodeEditorStyleVar.HoveredNodeBorderWidth,  2.5f);
@@ -499,7 +504,7 @@ public class Editor implements Disposable {
         var node = new Node();
         node.add(new Pin(PinKind.INPUT, PinType.FLOW, node));
         node.add(new Pin(PinKind.OUTPUT, PinType.FLOW, node));
-        node.add(new TestProperty());
+        node.add(new TestProperty(node));
         return node;
     }
 }

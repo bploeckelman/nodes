@@ -16,8 +16,8 @@ public class Link extends EditorObject {
 
     @RequiredArgsConstructor
     private enum Appearance {
-          FLOW (3f, EditorUtil.Colors.Vec4.lightBlue)
-        , DATA (2f, EditorUtil.Colors.Vec4.medYellow)
+          FLOW (5f, EditorUtil.Colors.Vec4.cyan)
+        , DATA (2f, EditorUtil.Colors.Vec4.yellow)
         ;
         private final float thickness;
         private final ImVec4 color;
@@ -27,6 +27,7 @@ public class Link extends EditorObject {
         super(Type.LINK);
         this.src = src;
         this.dst = dst;
+
         var isFlow = (src.type == PinType.FLOW && dst.type == PinType.FLOW);
         this.appearance = isFlow ? Appearance.FLOW : Appearance.DATA;
     }

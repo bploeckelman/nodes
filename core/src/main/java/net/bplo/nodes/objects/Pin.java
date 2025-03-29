@@ -1,11 +1,12 @@
 package net.bplo.nodes.objects;
 
 import imgui.ImGui;
-import imgui.ImVec2;
+import imgui.ImVec4;
 import imgui.extension.nodeditor.NodeEditor;
 import net.bplo.nodes.assets.Icons;
 import net.bplo.nodes.editor.EditorObject;
 import net.bplo.nodes.editor.EditorUtil;
+import net.bplo.nodes.imgui.ImGuiWidgetBounds;
 import net.bplo.nodes.objects.utils.PinAttachment;
 import net.bplo.nodes.objects.utils.PinCompatibility;
 import net.bplo.nodes.objects.utils.PinKind;
@@ -13,13 +14,19 @@ import net.bplo.nodes.objects.utils.PinType;
 
 public class Pin extends EditorObject {
 
-    private static final String TAG = Pin.class.getSimpleName();
-
     public static final float SIZE = 30f;
+    private static final ImVec4 PIN_RECT_PADDING = new ImVec4(2, 2, 2, 2);
+
+    public static boolean isInput(Pin pin)  { return pin.kind == PinKind.INPUT; }
+    public static boolean isOutput(Pin pin) { return pin.kind == PinKind.OUTPUT; }
 
     public final PinKind kind;
     public final PinType type;
-    public final PinAttachment attachment;
+
+    public PinAttachment attachment;
+
+    private final ImGuiWidgetBounds iconBounds;
+    private final ImGuiWidgetBounds pinRectBounds;
 
     public Pin(PinKind kind, PinType type, Node node) {
         this(kind, type, new PinAttachment.NodeType(node));
@@ -34,17 +41,35 @@ public class Pin extends EditorObject {
         this.kind = kind;
         this.type = type;
         this.attachment = attachment;
+        this.iconBounds = new ImGuiWidgetBounds();
+        this.pinRectBounds = new ImGuiWidgetBounds();
     }
 
-    public static boolean isInput(Pin pin) {
-        return pin.kind == PinKind.INPUT;
+    @Override
+    public void render() {
+        NodeEditor.beginPin(id, kind.value);
+        ImGui.pushID(id);
+
+        ImGui.beginGroup();
+        {
+            var icon = buildIcon();
+            ImGui.image(icon.id(), icon.size(), icon.uv1(), icon.uv2());
+            iconBounds.update();
+
+            // configure the pin rectangle and pivot, ie. where link lines start from
+            pinRectBounds.setWithPadding(iconBounds, PIN_RECT_PADDING);
+            NodeEditor.pinRect(pinRectBounds.min(), pinRectBounds.max());
+
+            // 'lock' link endpoints to the center of the pin icon,
+            // requires NodeEditorStyleVar.PinRadius to be set to zero
+            NodeEditor.pinPivotRect(iconBounds.center(), iconBounds.center());
+        }
+        ImGui.endGroup();
+
+        ImGui.popID();
+        NodeEditor.endPin();
     }
 
-    public static boolean isOutput(Pin pin) {
-        return pin.kind == PinKind.OUTPUT;
-    }
-
-    // TODO(brian): needs to be refined
     public PinCompatibility canLinkTo(Pin dst) {
         var src = this;
 
@@ -68,50 +93,17 @@ public class Pin extends EditorObject {
             if (isSameProperty) return PinCompatibility.reject("Cannot link pins in same property");
         }
 
+        // TODO(brian): evaluate whether existing links
+        //  would invalidate the link under consideration
 //        var isLinkedTo = src.node.linkedTo(dst.node);
 //        else if (isLinkedTo) return Compatibility.reject("Cannot link pins already linked");
 
         return PinCompatibility.ok();
     }
 
-    @Override
-    public void render() {
-        NodeEditor.beginPin(id, kind.value);
-        ImGui.pushID(id);
-        ImGui.beginGroup();
-
-        var icon = buildIcon();
-        ImGui.image(icon.id(), icon.size(), icon.uv1(), icon.uv2());
-
-        // get the icon image widget extents
-        var min = ImGui.getItemRectMin();
-        var max = ImGui.getItemRectMax();
-
-        // configure the pin rectangle and pivot, ie. where link lines start from
-        var halfSize = SIZE / 2f;
-        var center = new ImVec2(
-            min.x + (max.x - min.x) / 2f,
-            min.y + (max.y - min.y) / 2f);
-        var spacing = ImGui.getStyle().getItemInnerSpacing();
-
-        // pin click region is slightly larger than the icon
-        NodeEditor.pinRect(
-            center.x - halfSize - spacing.x,
-            center.y - halfSize - spacing.y,
-            center.x + halfSize + spacing.x,
-            center.y + halfSize + spacing.y);
-
-        // link ends 'lock' at the center of the icon,
-        // requires NodeEditorStyleVar.PinRadius to be set to zero
-        NodeEditor.pinPivotRect(center, center);
-
-        ImGui.endGroup();
-        ImGui.popID();
-        NodeEditor.endPin();
-    }
-
     private EditorUtil.Image buildIcon() {
         var isLinked = NodeEditor.pinHadAnyLinks(id);
+
         var region  = switch (type) {
             case FLOW -> isLinked ? Icons.Type.PIN_FLOW_LINKED.get() : Icons.Type.PIN_FLOW.get();
             case DATA -> {

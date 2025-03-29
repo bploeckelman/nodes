@@ -1,15 +1,19 @@
 package net.bplo.nodes.objects;
 
+import imgui.ImColor;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.extension.nodeditor.NodeEditor;
 import net.bplo.nodes.editor.EditorObject;
 import net.bplo.nodes.editor.EditorUtil;
+import net.bplo.nodes.imgui.ImGuiWidgetBounds;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+
+import static net.bplo.nodes.editor.EditorUtil.*;
 
 public class Node extends EditorObject {
 
@@ -20,16 +24,26 @@ public class Node extends EditorObject {
 
     public float width = DEFAULT_WIDTH;
 
-    private final ImVec2 headerMin = new ImVec2();
-    private final ImVec2 headerMax= new ImVec2();
-    private final ImVec2 contentSize = new ImVec2();
+    private static class Bounds {
+        public final ImGuiWidgetBounds header           = new ImGuiWidgetBounds();
+        public final ImGuiWidgetBounds content          = new ImGuiWidgetBounds();
+        public final ImGuiWidgetBounds node             = new ImGuiWidgetBounds();
+        public final ImGuiWidgetBounds nodeBackground   = new ImGuiWidgetBounds();
+        public final ImGuiWidgetBounds headerBackground = new ImGuiWidgetBounds();
+    }
+
+    private final Bounds bounds = new Bounds();
 
     public Node() {
         super(Type.NODE);
     }
 
+    //
+    // TODO(brian): thinking about whether to use these add(...) methods
+    //  or just add pins/props to the node directly in their constructors
+    //
+
     public Prop add(Prop property) {
-        property.node = this;
         props.add(property);
         return property;
     }
@@ -56,68 +70,16 @@ public class Node extends EditorObject {
         NodeEditor.beginNode(id);
         ImGui.pushID(id);
 
+        // wrap the node in group to calc node bounds
         ImGui.setNextItemWidth(width);
         ImGui.beginGroup();
-
-        // node header
-        ImGui.beginGroup();
         {
-            ImGui.setNextItemWidth(Pin.SIZE);
-            EditorUtil.beginColumn();
-            {
-                inputPins().forEach(Pin::render);
-            }
-
-            var headerTextSize = new ImVec2(width - 2 * Pin.SIZE, Pin.SIZE);
-            EditorUtil.nextColumn(headerTextSize.x);
-            {
-                ImGui.pushFont(EditorUtil.Fonts.nodeHeader);
-
-                // NOTE: normal ImGui.text*() widgets collapse to the width of the text,
-                //  so in order to have a set of fixed sized columns with the text in the middle,
-                //  it needs to be drawn with a draw list and a dummy item is used to reserve the space
-//                var draw = ImGui.getBackgroundDrawList();
-//                var draw = NodeEditor.getNodeBackgroundDrawList(id);
-                ImGui.dummy(headerTextSize);
-
-                // TODO(brian): this isn't solid yet... need to try a few things,
-                //  like using textColored() + setCursorPos() to center the text
-                //  instead of using a draw list and relying on getItemRectMin/max()
-
-//                var headerText = "Node Header";
-//                var textSize = ImGui.calcTextSize(headerText);
-//                var textPos = new ImVec2(
-//                        headerMin.x + (headerMax.x - headerMin.x - textSize.x) / 2f,
-//                        headerMin.y + (headerMax.y - headerMin.y - textSize.y) / 2f);
-//                draw.addText(textPos, EditorUtil.Colors.white, headerText);
-//                ImGui.setCursorPos(textPos);
-//                ImGui.textColored(EditorUtil.Colors.white, headerText);
-
-                ImGui.popFont();
-            }
-
-            EditorUtil.nextColumn(Pin.SIZE);
-            {
-                outputPins().forEach(Pin::render);
-            }
-            EditorUtil.endColumn();
+            renderNodeHeader();
+            renderNodeContent();
         }
         ImGui.endGroup();
-        ImGui.getItemRectMin(headerMin);
-        ImGui.getItemRectMax(headerMax);
+        bounds.node.update();
 
-        // node content
-        ImGui.setNextItemWidth(width);
-        EditorUtil.beginColumn();
-        {
-            ImGui.pushFont(EditorUtil.Fonts.nodeContent);
-            props.forEach(Prop::render);
-            ImGui.popFont();
-        }
-        EditorUtil.endColumn();
-        ImGui.getItemRectSize(contentSize);
-
-        ImGui.endGroup();
         ImGui.popID();
         NodeEditor.endNode();
 
@@ -126,20 +88,80 @@ public class Node extends EditorObject {
 
     @Override
     public void renderAfterNode() {
-        var draw = NodeEditor.getNodeBackgroundDrawList(id);
+        var draw     = NodeEditor.getNodeBackgroundDrawList(id);
+        var padding  = NodeEditor.getStyle().getNodePadding();
         var rounding = NodeEditor.getStyle().getNodeRounding();
-        var img = EditorUtil.Images.nodeHeader;
-        var color = EditorUtil.Colors.teal;
-        draw.addImageRounded(img.id(), headerMin, headerMax, img.uv1(), img.uv2(), color, rounding);
+        var border   = NodeEditor.getStyle().getNodeBorderWidth();
 
-        var headerText = "Node Header";
-        var textSize = ImGui.calcTextSize(headerText);
-        var textPos = new ImVec2(
-            headerMin.x + (headerMax.x - headerMin.x - textSize.x) / 2f,
-            headerMin.y + (headerMax.y - headerMin.y - textSize.y) / 2f);
-        draw.addText(textPos, EditorUtil.Colors.white, headerText);
+        // draw node background
+        var img = Images.nodeHeader;
+        var bg  = bounds.nodeBackground;
+        var color = ImColor.rgba("#2f2f2faf");
+        bg.setWithPadding(bounds.node, padding);
+        draw.addRectFilled(bg.min(), bg.max(), color, rounding);
 
+        // draw node header background
+        bg = bounds.headerBackground;
+        bg.setWithPadding(bounds.header, padding, -border);
+        draw.addImageRounded(img.id(),
+            bg.min(), bg.max(),
+            img.uv1(), img.uv2(),
+            Colors.teal, rounding);
+
+        // NOTE: not needed at the moment because the inline text looks ok
+        // draw the node header text, centered in the header rectangle
+        // bounds.headerBackground.setWithPadding(bounds.header, padding, -border);
+        // ImGuiUtil.drawTextCentered("Node Header", Colors.white, draw, bounds.headerBackground);
+
+        // ensure renderAfterNode is called for all this node's 'child' objects
         props.forEach(Prop::renderAfterNode);
         pins.forEach(Pin::renderAfterNode);
+    }
+
+    private void renderNodeHeader() {
+        var textColumnSize = new ImVec2(width - 2 * Pin.SIZE, Pin.SIZE);
+
+        ImGui.beginGroup();
+        {
+            beginColumn(Pin.SIZE);
+            {
+                inputPins().forEach(Pin::render);
+            }
+            nextColumn(textColumnSize.x);
+            {
+                ImGui.pushFont(Fonts.nodeHeader);
+
+                // NOTE: ImGui.text*() widgets collapse to the width of the text,
+                //  so a dummy item is used to reserve space for the text, then
+                //  the cursor is reset to the start of the column to draw the text
+                //  theoretically the cursor could be adjusted to center the text,
+                //  but there were quirks with that the first time I tried
+                var cursor = ImGui.getCursorPos();
+                ImGui.setNextItemAllowOverlap();
+                ImGui.dummy(textColumnSize);
+                ImGui.setCursorPos(cursor);
+                ImGui.textColored(EditorUtil.Colors.white, "Node Header");
+
+                ImGui.popFont();
+            }
+            nextColumn(Pin.SIZE);
+            {
+                outputPins().forEach(Pin::render);
+            }
+            endColumn();
+        }
+        ImGui.endGroup();
+        bounds.header.update();
+    }
+
+    private void renderNodeContent() {
+        beginColumn(width);
+
+        ImGui.pushFont(Fonts.nodeContent);
+        props.forEach(Prop::render);
+        ImGui.popFont();
+
+        endColumn();
+        bounds.content.update();
     }
 }

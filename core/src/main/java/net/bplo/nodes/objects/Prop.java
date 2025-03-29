@@ -9,17 +9,13 @@ import java.util.stream.Stream;
 
 public abstract class Prop extends EditorObject {
 
-    public final List<Pin> pins = new ArrayList<>();
-
-    public Node node;
-
-    public Prop() {
-        this(null);
-    }
+    public final Node node;
+    public final List<Pin> pins;
 
     public Prop(Node node) {
         super(Type.PROP);
         this.node = node;
+        this.pins = new ArrayList<>();
     }
 
     public Stream<Pin> inputPins() {
