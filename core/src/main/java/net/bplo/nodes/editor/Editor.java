@@ -18,6 +18,7 @@ import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImLong;
 import net.bplo.nodes.Main;
 import net.bplo.nodes.imgui.ImGuiColors;
+import net.bplo.nodes.imgui.ImGuiLayout;
 import net.bplo.nodes.imgui.ImGuiWidgetBounds;
 import net.bplo.nodes.objects.Link;
 import net.bplo.nodes.objects.Node;
@@ -32,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static net.bplo.nodes.editor.EditorUtil.*;
+import static net.bplo.nodes.editor.EditorUtil.Fonts;
 
 public class Editor implements Disposable {
 
@@ -56,11 +57,11 @@ public class Editor implements Disposable {
             {
                 var contentWidth = node.width - 2 * Pin.SIZE;
 
-                beginColumn(Pin.SIZE);
+                ImGuiLayout.beginColumn(Pin.SIZE);
                 {
                     inputPins().forEach(Pin::render);
                 }
-                nextColumn(contentWidth);
+                ImGuiLayout.nextColumn(contentWidth);
                 {
                     // NOTE: same approach as in Node.render() to ensure a fixed column width
                     //  when the only widget in the column is text, which collapses to fit the string
@@ -70,11 +71,11 @@ public class Editor implements Disposable {
                     ImGui.setCursorPos(cursorPos);
                     ImGui.text("property");
                 }
-                nextColumn(Pin.SIZE);
+                ImGuiLayout.nextColumn(Pin.SIZE);
                 {
                     outputPins().forEach(Pin::render);
                 }
-                endColumn();
+                ImGuiLayout.endColumn();
             }
             ImGui.endGroup();
             bounds.update();
@@ -193,7 +194,7 @@ public class Editor implements Disposable {
     }
 
     private void handleCreateLink() {
-        if (NodeEditor.beginCreate(ImGuiColors.green.asVec4(0.8f), 2f)) {
+        if (NodeEditor.beginCreate(ImGuiColors.medBlue.asVec4(), 6f)) {
             var aPinId = new ImLong();
             var bPinId = new ImLong();
 
@@ -217,10 +218,10 @@ public class Editor implements Disposable {
                     var compatibility = src.canLinkTo(dst);
                     if (compatibility.incompatible()) {
                         EditorMessage.show(EditorMessage.Type.ERROR, compatibility.message());
-                        NodeEditor.rejectNewItem(ImGuiColors.red.asVec4(0.8f), 2f);
+                        NodeEditor.rejectNewItem(ImGuiColors.red.asVec4(), 4f);
                     } else {
-                        EditorMessage.show(EditorMessage.Type.INFO, "Create link");
-                        if (NodeEditor.acceptNewItem(ImGuiColors.yellow.asVec4(0.8f), 4f)) {
+                        EditorMessage.show(EditorMessage.Type.ACCEPT, "Create link");
+                        if (NodeEditor.acceptNewItem(ImGuiColors.lime.asVec4(), 8f)) {
                             // TODO(brian): track links in nodes? add to src,dst nodes
                             add(new Link(src, dst));
                         }

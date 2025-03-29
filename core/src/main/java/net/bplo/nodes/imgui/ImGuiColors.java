@@ -79,6 +79,14 @@ public class ImGuiColors {
     public static final Value medGray     = new Value("#8f8f8fff");
     public static final Value darkGray    = new Value("#4f4f4fff");
 
+    public static final Value lightRed    = new Value("#ffd1d0ff");
+    public static final Value medRed      = new Value("#ffa39eff");
+    public static final Value darkRed     = new Value("#cf1322ff");
+
+    public static final Value lightGreen  = new Value("#89fc00ff");
+    public static final Value medGreen    = new Value("#29bf12ff");
+    public static final Value darkGreen   = new Value("#054a29ff");
+
     public static final Value lightBlue   = new Value("#b6c7ffff");
     public static final Value medBlue     = new Value("#91d5ffff");
     public static final Value darkBlue    = new Value("#0050b3ff");
@@ -86,8 +94,4 @@ public class ImGuiColors {
     public static final Value lightYellow = new Value("#ffdbb6ff");
     public static final Value medYellow   = new Value("#ffe58fff");
     public static final Value darkYellow  = new Value("#d48806ff");
-
-    public static final Value lightRed    = new Value("#ffd1d0ff");
-    public static final Value medRed      = new Value("#ffa39eff");
-    public static final Value darkRed     = new Value("#cf1322ff");
 }

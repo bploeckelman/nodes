@@ -5,6 +5,7 @@ import imgui.ImVec2;
 import imgui.extension.nodeditor.NodeEditor;
 import net.bplo.nodes.editor.EditorObject;
 import net.bplo.nodes.imgui.ImGuiColors;
+import net.bplo.nodes.imgui.ImGuiLayout;
 import net.bplo.nodes.imgui.ImGuiWidgetBounds;
 
 import java.util.ArrayList;
@@ -123,11 +124,11 @@ public class Node extends EditorObject {
 
         ImGui.beginGroup();
         {
-            beginColumn(Pin.SIZE);
+            ImGuiLayout.beginColumn(Pin.SIZE);
             {
                 inputPins().forEach(Pin::render);
             }
-            nextColumn(textColumnSize.x);
+            ImGuiLayout.nextColumn(textColumnSize.x);
             {
                 ImGui.pushFont(Fonts.nodeHeader);
 
@@ -144,24 +145,24 @@ public class Node extends EditorObject {
 
                 ImGui.popFont();
             }
-            nextColumn(Pin.SIZE);
+            ImGuiLayout.nextColumn(Pin.SIZE);
             {
                 outputPins().forEach(Pin::render);
             }
-            endColumn();
+            ImGuiLayout.endColumn();
         }
         ImGui.endGroup();
         bounds.header.update();
     }
 
     private void renderNodeContent() {
-        beginColumn(width);
-
-        ImGui.pushFont(Fonts.nodeContent);
-        props.forEach(Prop::render);
-        ImGui.popFont();
-
-        endColumn();
+        ImGuiLayout.beginColumn(width);
+        {
+            ImGui.pushFont(Fonts.nodeContent);
+            props.forEach(Prop::render);
+            ImGui.popFont();
+        }
+        ImGuiLayout.endColumn();
         bounds.content.update();
     }
 }

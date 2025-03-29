@@ -18,36 +18,6 @@ public class EditorUtil {
         Images.init(assets);
     }
 
-    // NOTE(brian): these 'begin/next/endColumn()' methods are a workaround for tables...
-    //  table api uses 'begin/endChild()' which node-editor doesn't play nice with
-    //  see: https://github.com/ocornut/imgui/blob/master/imgui_tables.cpp#L39
-    // TODO(brian): move into ImGuiUtil in a Layout inner class
-
-    public static void beginColumn() {
-        beginColumn(null);
-    }
-
-    public static void beginColumn(Float width) {
-        if (width != null) {
-            ImGui.setNextItemWidth(width);
-        }
-        ImGui.beginGroup();
-    }
-
-    public static void nextColumn() {
-        nextColumn(null);
-    }
-
-    public static void nextColumn(Float width) {
-        ImGui.endGroup();
-        ImGui.sameLine();
-        beginColumn(width);
-    }
-
-    public static void endColumn() {
-        ImGui.endGroup();
-    }
-
     public static class Images {
         public static Image nodeHeader;
 
