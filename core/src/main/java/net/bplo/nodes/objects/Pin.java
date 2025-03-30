@@ -4,6 +4,7 @@ import imgui.ImGui;
 import imgui.ImVec4;
 import imgui.extension.nodeditor.NodeEditor;
 import net.bplo.nodes.assets.Icons;
+import net.bplo.nodes.editor.Editor;
 import net.bplo.nodes.editor.EditorObject;
 import net.bplo.nodes.editor.EditorUtil;
 import net.bplo.nodes.imgui.ImGuiColors;
@@ -23,8 +24,7 @@ public class Pin extends EditorObject {
 
     public final PinKind kind;
     public final PinType type;
-
-    public PinAttachment attachment;
+    public final PinAttachment attachment;
 
     private final ImGuiWidgetBounds iconBounds;
     private final ImGuiWidgetBounds pinRectBounds;
@@ -74,6 +74,49 @@ public class Pin extends EditorObject {
 
         ImGui.popID();
         NodeEditor.endPin();
+    }
+
+    @Override
+    public void renderContextMenu(Editor editor) {
+        headerText("Pin #%d".formatted(id));
+
+        separatorText("Details");
+        var kindColor = ImGuiColors.salmon.asInt();
+        var typeColor = ImGuiColors.coral.asInt();
+        var labelColor = ImGuiColors.white.asInt();
+
+        ImGui.textColored(labelColor, "Kind: ");
+        ImGui.sameLine();
+        ImGui.textColored(kindColor, kind.name().toLowerCase());
+
+        ImGui.textColored(labelColor, "Type: ");
+        ImGui.sameLine();
+        ImGui.textColored(typeColor, type.name().toLowerCase());
+
+        separatorText("Attachment");
+        var nodeColor = ImGuiColors.cyan.asInt();
+        var propColor = ImGuiColors.goldenrod.asInt();
+        switch (attachment) {
+            case PinAttachment.NodeType nodeAttachment -> {
+                var node = nodeAttachment.node();
+                ImGui.textColored(labelColor, "Node: ");
+                ImGui.sameLine();
+                ImGui.textColored(nodeColor, node.label());
+            }
+            case PinAttachment.PropType propAttachment -> {
+                var prop = propAttachment.prop();
+                var node = prop.node;
+                ImGui.textColored(labelColor, "Node: ");
+                ImGui.sameLine();
+                ImGui.textColored(nodeColor, node.label());
+
+                ImGui.textColored(labelColor, "Prop: ");
+                ImGui.sameLine();
+                ImGui.textColored(propColor, prop.label());
+            }
+        }
+
+        ImGui.dummy(0, 4);
     }
 
     public PinCompatibility canLinkTo(Pin dst) {

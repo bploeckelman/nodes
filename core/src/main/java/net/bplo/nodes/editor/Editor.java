@@ -70,7 +70,7 @@ public class Editor implements Disposable {
                     ImGui.setNextItemAllowOverlap();
                     ImGui.dummy(contentWidth, Pin.SIZE);
                     ImGui.setCursorPos(cursorPos);
-                    ImGui.text("property");
+                    ImGui.text("prop");
                 }
                 ImGuiLayout.nextColumn(Pin.SIZE);
                 {
@@ -264,7 +264,8 @@ public class Editor implements Disposable {
         //  `suspend()` changes the positioning reference frame from "graph" to "screen"
         //  then all following calls are in screen space and `resume()` returns to reference frame
         NodeEditor.suspend();
-        ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 8f, 8f);
+        ImGui.pushStyleVar(ImGuiStyleVar.PopupBorderSize, 2f);
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 20f, 10f);
 
         // open the appropriate popup, if any, depending on the right-click context
         if (NodeEditor.showNodeContextMenu(contextMenu.nodeId)) {
@@ -285,114 +286,32 @@ public class Editor implements Disposable {
 
         // node context popup -------------------------------------------------
         if (ImGui.beginPopup(PopupIds.NODE)) {
-            ImGui.text("Node Context Menu");
-            ImGui.separator();
-
             var nodeId = contextMenu.nodeId.get();
-            findNode(nodeId).ifPresentOrElse(node -> {
-                ImGui.text("ID: %d".formatted(node.id));
-                ImGui.text("Node: %s".formatted(node.label()));
-
-                ImGui.separatorText("Linked To");
-                node.linkedNodes().forEach(linkedNode ->
-                    ImGui.bulletText(linkedNode.label()));
-
-                ImGui.separator();
-                if (ImGui.menuItem("Delete")) {
-                    remove(node);
-                }
-            }, () -> ImGui.text("Unknown node: %d".formatted(nodeId)));
-
+            findNode(nodeId).ifPresentOrElse(
+                node -> node.renderContextMenu(this),
+                () -> ImGui.text("Unknown node: %d".formatted(nodeId)));
             ImGui.endPopup();
         }
 
         // pin context popup --------------------------------------------------
         if (ImGui.beginPopup(PopupIds.PIN)) {
-            ImGui.text("Pin Context Menu");
-            ImGui.separator();
-
             var pinId = contextMenu.pinId.get();
-            findPin(pinId).ifPresentOrElse(pin -> {
-                ImGui.text("ID: %d".formatted(pin.id));
-                ImGui.text("Pin: %s".formatted(pin.label()));
-            }, () -> ImGui.text("Unknown pin: %d".formatted(pinId)));
-
+            findPin(pinId).ifPresentOrElse(
+                pin -> pin.renderContextMenu(this),
+                () -> ImGui.text("Unknown pin: %d".formatted(pinId)));
             ImGui.endPopup();
         }
 
         // link context popup -------------------------------------------------
-        //
-        // TODO(brian): push context menu rendering up into the EditorObject classes
-        //  eg:
-        //  if (ImGui.beginPopup(PopupIds.LINK)) {
-        //      var linkId = contextMenu.linkId.get();
-        //      findLink(linkId).ifPresentOrElse(Link::renderContextMenu);
-        //      ImGui.endPopup();
-        //  }
-        //
         if (ImGui.beginPopup(PopupIds.LINK)) {
             var linkId = contextMenu.linkId.get();
-
-            ImGui.pushFont(Fonts.nodeHeader);
-            ImGui.textColored(ImGuiColors.cyan.asVec4(), "Link #%d".formatted(linkId));
-            ImGui.popFont();
-            ImGui.separator();
-            ImGui.dummy(0, 2);
-
-            findLink(linkId).ifPresentOrElse(link -> {
-                ImGui.pushStyleColor(ImGuiCol.Text, ImGuiColors.medGray.asInt());
-                ImGui.pushFont(EditorUtil.Fonts.small);
-                ImGui.separatorText("Connects");
-                ImGui.popFont();
-                ImGui.popStyleColor();
-                {
-                    // TODO(brian): use column layout for alignment
-
-                    // print connected nodes "src -> dst"
-                    var nodesColor = ImGuiColors.medYellow.asInt();
-                    link.srcNode().ifPresent(srcNode ->
-                        ImGui.textColored(nodesColor, srcNode.label()));
-                    ImGui.sameLine();
-                    ImGui.pushFont(EditorUtil.Fonts.icons);
-                    ImGui.textColored(ImGuiColors.white.asInt(), FontAwesomeIcons.arrowRightLong);
-                    ImGui.popFont();
-                    ImGui.sameLine();
-                    link.dstNode().ifPresent(dstNode ->
-                        ImGui.textColored(nodesColor, dstNode.label()));
-
-                    // print connected pins "src -> dst"
-                    var pinsColor = ImGuiColors.darkYellow.asInt();
-                    ImGui.textColored(pinsColor, link.src.label());
-                    ImGui.sameLine();
-                    ImGui.pushFont(EditorUtil.Fonts.icons);
-                    ImGui.textColored(ImGuiColors.white.asInt(), FontAwesomeIcons.arrowRightLong);
-                    ImGui.popFont();
-                    ImGui.sameLine();
-                    ImGui.textColored(pinsColor, link.dst.label());
-                }
-
-                ImGui.pushStyleColor(ImGuiCol.Text, ImGuiColors.medGray.asInt());
-                ImGui.pushFont(EditorUtil.Fonts.small);
-                ImGui.separatorText("Actions");
-                ImGui.popFont();
-                ImGui.popStyleColor();
-                {
-                    var availableWidth = ImGui.getContentRegionAvailX();
-                    ImGui.pushFont(EditorUtil.Fonts.icons);
-                    if (ImGui.button("%s Delete".formatted(FontAwesomeIcons.trash), availableWidth, 0)) {
-                        remove(link);
-                        ImGui.closeCurrentPopup();
-                    }
-                    ImGui.popFont();
-                }
-            }, () -> ImGui.text("Unknown link: %s".formatted(linkId)));
-
+            findLink(linkId).ifPresentOrElse(
+                link -> link.renderContextMenu(this),
+                () -> ImGui.text("Unknown link: %s".formatted(linkId)));
             ImGui.endPopup();
         }
 
         // create new node popup ----------------------------------------------
-        ImGui.pushStyleVar(ImGuiStyleVar.PopupBorderSize, 2f);
-        ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 20f, 10f);
         if (ImGui.beginPopup(PopupIds.NODE_CREATE)) {
             ImGui.pushFont(Fonts.nodeHeader);
             ImGui.textColored(ImGuiColors.cyan.asVec4(), PopupIds.NODE_CREATE);
@@ -404,21 +323,22 @@ public class Editor implements Disposable {
             // spawn a node if user selects a type from the popup
             Node newNode = null;
             // TODO(brian): TEMP *** -----------------------------
+            var separatorPrefix = "---";
             var nodeTypes = List.of(
-                  "---Normal"
+                  separatorPrefix + "Normal"
                 , "Node A"
                 , "Node B"
-                , "---Fancy"
+                , separatorPrefix + "Fancy"
                 , "Node C"
             );
             // TODO(brian): TEMP *** -----------------------------
             for (int i = 0; i < nodeTypes.size(); i++) {
                 var type = nodeTypes.get(i);
-                if (type.startsWith("---")) {
+                if (type.startsWith(separatorPrefix)) {
                     if (i != 0) {
                         ImGui.dummy(0, 2);
                     }
-                    var separatorText = type.substring(3);
+                    var separatorText = type.substring(separatorPrefix.length());
                     if (separatorText.isBlank()) {
                         ImGui.separator();
                     } else {
@@ -439,23 +359,20 @@ public class Editor implements Disposable {
 
             // if a new node was spawned, add it to the editor
             if (newNode != null) {
-                add(newNode);
-
+                // TODO(brian): auto-connect a pin in the new node to a link that was dragged out
                 // position the new node near the right-click position
                 NodeEditor.setNodePosition(newNode.id, contextMenu.newNodePosition);
-
-                // TODO: auto-connect a pin in the new node to a link that was dragged out
+                add(newNode);
             }
 
             ImGui.endPopup();
         }
-        ImGui.popStyleVar(2);
 
-        ImGui.popStyleVar();
+        ImGui.popStyleVar(2);
         NodeEditor.resume();
     }
 
-    private void add(EditorObject object) {
+    public void add(EditorObject object) {
         switch (object) {
             case Node node -> {
                 objectsById.put(node.id, node);
@@ -481,7 +398,7 @@ public class Editor implements Disposable {
         }
     }
 
-    private void remove(EditorObject object) {
+    public void remove(EditorObject object) {
         switch (object) {
             case Node node -> {
                 node.pins.forEach(this::remove);

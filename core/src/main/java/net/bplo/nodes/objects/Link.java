@@ -1,10 +1,15 @@
 package net.bplo.nodes.objects;
 
+import imgui.ImGui;
 import imgui.ImVec4;
 import imgui.extension.nodeditor.NodeEditor;
 import lombok.RequiredArgsConstructor;
+import net.bplo.nodes.editor.Editor;
 import net.bplo.nodes.editor.EditorObject;
+import net.bplo.nodes.editor.EditorUtil;
+import net.bplo.nodes.imgui.FontAwesomeIcons;
 import net.bplo.nodes.imgui.ImGuiColors;
+import net.bplo.nodes.imgui.ImGuiLayout;
 import net.bplo.nodes.objects.utils.PinType;
 
 import java.util.Optional;
@@ -57,5 +62,48 @@ public class Link extends EditorObject {
     @Override
     public void render() {
         NodeEditor.link(id, src.id, dst.id, appearance.color, appearance.thickness);
+    }
+
+    @Override
+    public void renderContextMenu(Editor editor) {
+        headerText("Link #%d".formatted(id));
+
+        separatorText("Connects");
+        ImGui.pushFont(EditorUtil.Fonts.icons);
+        {
+            // calculate text column size as max of src/dst node text widths
+            var srcTextWidth = srcNode().map(node -> ImGui.calcTextSizeX(node.label())).orElse(0f);
+            var dstTextWidth = dstNode().map(node -> ImGui.calcTextSizeX(node.label())).orElse(0f);
+            var columnWidth  = Math.max(srcTextWidth, dstTextWidth);
+            var nodeColor  = ImGuiColors.medYellow.asInt();
+            var pinColor   = ImGuiColors.darkYellow.asInt();
+            var arrowColor = ImGuiColors.white.asInt();
+
+            // link source
+            ImGuiLayout.beginColumn(columnWidth);
+            {
+                srcNode().ifPresent(srcNode -> ImGui.textColored(nodeColor, srcNode.label()));
+                ImGui.textColored(pinColor, src.label());
+            }
+            // link arrow
+            ImGuiLayout.nextColumn();
+            {
+                ImGui.textColored(arrowColor, FontAwesomeIcons.arrowRightLong);
+                ImGui.textColored(arrowColor, FontAwesomeIcons.arrowRightLong);
+            }
+            // link destination
+            ImGuiLayout.nextColumn(columnWidth);
+            {
+                dstNode().ifPresent(dstNode -> ImGui.textColored(nodeColor, dstNode.label()));
+                ImGui.textColored(pinColor, dst.label());
+            }
+            ImGuiLayout.endColumn();
+        }
+        ImGui.popFont();
+
+        separatorText("Actions");
+        deleteButton(editor);
+
+        ImGui.dummy(0, 4);
     }
 }

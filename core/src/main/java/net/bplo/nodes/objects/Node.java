@@ -3,6 +3,7 @@ package net.bplo.nodes.objects;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.extension.nodeditor.NodeEditor;
+import net.bplo.nodes.editor.Editor;
 import net.bplo.nodes.editor.EditorObject;
 import net.bplo.nodes.imgui.ImGuiColors;
 import net.bplo.nodes.imgui.ImGuiLayout;
@@ -128,6 +129,24 @@ public class Node extends EditorObject {
         // ensure renderAfterNode is called for all this node's 'child' objects
         props.forEach(Prop::renderAfterNode);
         pins.forEach(Pin::renderAfterNode);
+    }
+
+    @Override
+    public void renderContextMenu(Editor editor) {
+        headerText("Node #%d".formatted(id));
+
+        separatorText("Linked Nodes");
+        var linkedNodes = linkedNodes().toList();
+        if (linkedNodes.isEmpty()) {
+            ImGui.textColored(ImGuiColors.darkYellow.asInt(), "None");
+        } else {
+            linkedNodes.forEach(linkedNode -> ImGui.bulletText(linkedNode.label()));
+        }
+
+        separatorText("Actions");
+        deleteButton(editor);
+
+        ImGui.dummy(0, 4);
     }
 
     private void renderNodeHeader() {

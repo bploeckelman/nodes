@@ -9,7 +9,7 @@ public sealed interface PinAttachment permits PinAttachment.NodeType, PinAttachm
 
     record NodeType(Node node) implements PinAttachment {}
 
-    record PropType(Prop property) implements PinAttachment {}
+    record PropType(Prop prop) implements PinAttachment {}
 
     default Optional<Node> getNode() {
         if      (this instanceof NodeType(Node node)) return Optional.of(node);
@@ -24,7 +24,7 @@ public sealed interface PinAttachment permits PinAttachment.NodeType, PinAttachm
         return Optional.empty();
     }
 
-    default Optional<PropType> asPropertyAttachment() {
+    default Optional<PropType> asPropAttachment() {
         if (this instanceof PropType propertyAttachment) {
             return Optional.of(propertyAttachment);
         }
