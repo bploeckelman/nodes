@@ -7,6 +7,8 @@ import net.bplo.nodes.editor.EditorObject;
 import net.bplo.nodes.imgui.ImGuiColors;
 import net.bplo.nodes.objects.utils.PinType;
 
+import java.util.Optional;
+
 public class Link extends EditorObject {
 
     public final Pin src;
@@ -30,6 +32,26 @@ public class Link extends EditorObject {
 
         var isFlow = (src.type == PinType.FLOW && dst.type == PinType.FLOW);
         this.appearance = isFlow ? Appearance.FLOW : Appearance.DATA;
+
+        connect();
+    }
+
+    public void connect() {
+        srcNode().ifPresent(node -> node.outgoingLinks.add(this));
+        dstNode().ifPresent(node -> node.incomingLinks.add(this));
+    }
+
+    public void disconnect() {
+        srcNode().ifPresent(node -> node.outgoingLinks.remove(this));
+        dstNode().ifPresent(node -> node.incomingLinks.remove(this));
+    }
+
+    public Optional<Node> srcNode() {
+        return src.attachment.getNode();
+    }
+
+    public Optional<Node> dstNode() {
+        return dst.attachment.getNode();
     }
 
     @Override

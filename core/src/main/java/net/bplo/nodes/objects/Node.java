@@ -10,10 +10,12 @@ import net.bplo.nodes.imgui.ImGuiWidgetBounds;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static net.bplo.nodes.editor.EditorUtil.*;
+import static net.bplo.nodes.editor.EditorUtil.Fonts;
+import static net.bplo.nodes.editor.EditorUtil.Images;
 
 public class Node extends EditorObject {
 
@@ -21,6 +23,8 @@ public class Node extends EditorObject {
 
     public final List<Prop> props = new ArrayList<>();
     public final List<Pin> pins = new ArrayList<>();
+    public final List<Link> incomingLinks = new ArrayList<>();
+    public final List<Link> outgoingLinks = new ArrayList<>();
 
     public float width = DEFAULT_WIDTH;
 
@@ -51,6 +55,13 @@ public class Node extends EditorObject {
     public Pin add(Pin pin) {
         pins.add(pin);
         return pin;
+    }
+
+    public Stream<Node> linkedNodes() {
+        return Stream.concat(
+            incomingLinks.stream().map(Link::srcNode).flatMap(Optional::stream),
+            outgoingLinks.stream().map(Link::dstNode).flatMap(Optional::stream)
+        ).distinct();
     }
 
     public Stream<Pin> inputPins() {

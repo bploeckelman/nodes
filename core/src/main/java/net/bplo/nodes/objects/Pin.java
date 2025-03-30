@@ -34,7 +34,7 @@ public class Pin extends EditorObject {
     }
 
     public Pin(PinKind kind, PinType type, Prop property) {
-        this(kind, type, new PinAttachment.PropertyType(property));
+        this(kind, type, new PinAttachment.PropType(property));
     }
 
     private Pin(PinKind kind, PinType type, PinAttachment attachment) {
@@ -93,8 +93,8 @@ public class Pin extends EditorObject {
             var isSameNode = (srcNode.id == dstNode.id);
             if (isSameNode) return PinCompatibility.reject("Cannot link pins in same node");
         }
-        if (src.attachment instanceof PinAttachment.PropertyType(Prop srcProp)
-         && dst.attachment instanceof PinAttachment.PropertyType(Prop dstProp)) {
+        if (src.attachment instanceof PinAttachment.PropType(Prop srcProp)
+         && dst.attachment instanceof PinAttachment.PropType(Prop dstProp)) {
             var isSameProperty = (srcProp.id == dstProp.id);
             if (isSameProperty) return PinCompatibility.reject("Cannot link pins in same property");
         }

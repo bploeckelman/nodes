@@ -17,6 +17,7 @@ import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImLong;
 import net.bplo.nodes.Main;
+import net.bplo.nodes.imgui.FontAwesomeIcons;
 import net.bplo.nodes.imgui.ImGuiColors;
 import net.bplo.nodes.imgui.ImGuiLayout;
 import net.bplo.nodes.imgui.ImGuiWidgetBounds;
@@ -222,7 +223,6 @@ public class Editor implements Disposable {
                     } else {
                         EditorMessage.show(EditorMessage.Type.ACCEPT, "Create link");
                         if (NodeEditor.acceptNewItem(ImGuiColors.lime.asVec4(), 8f)) {
-                            // TODO(brian): track links in nodes? add to src,dst nodes
                             add(new Link(src, dst));
                         }
                     }
@@ -292,6 +292,11 @@ public class Editor implements Disposable {
             findNode(nodeId).ifPresentOrElse(node -> {
                 ImGui.text("ID: %d".formatted(node.id));
                 ImGui.text("Node: %s".formatted(node.label()));
+
+                ImGui.separatorText("Linked To");
+                node.linkedNodes().forEach(linkedNode ->
+                    ImGui.bulletText(linkedNode.label()));
+
                 ImGui.separator();
                 if (ImGui.menuItem("Delete")) {
                     remove(node);
@@ -316,16 +321,69 @@ public class Editor implements Disposable {
         }
 
         // link context popup -------------------------------------------------
+        //
+        // TODO(brian): push context menu rendering up into the EditorObject classes
+        //  eg:
+        //  if (ImGui.beginPopup(PopupIds.LINK)) {
+        //      var linkId = contextMenu.linkId.get();
+        //      findLink(linkId).ifPresentOrElse(Link::renderContextMenu);
+        //      ImGui.endPopup();
+        //  }
+        //
         if (ImGui.beginPopup(PopupIds.LINK)) {
-            ImGui.text("Link Context Menu");
-            ImGui.separator();
-
             var linkId = contextMenu.linkId.get();
+
+            ImGui.pushFont(Fonts.nodeHeader);
+            ImGui.textColored(ImGuiColors.cyan.asVec4(), "Link #%d".formatted(linkId));
+            ImGui.popFont();
+            ImGui.separator();
+            ImGui.dummy(0, 2);
+
             findLink(linkId).ifPresentOrElse(link -> {
-                ImGui.text("ID: %d".formatted(link.id));
-                ImGui.separator();
-                if (ImGui.menuItem("Delete")) {
-                    remove(link);
+                ImGui.pushStyleColor(ImGuiCol.Text, ImGuiColors.medGray.asInt());
+                ImGui.pushFont(EditorUtil.Fonts.small);
+                ImGui.separatorText("Connects");
+                ImGui.popFont();
+                ImGui.popStyleColor();
+                {
+                    // TODO(brian): use column layout for alignment
+
+                    // print connected nodes "src -> dst"
+                    var nodesColor = ImGuiColors.medYellow.asInt();
+                    link.srcNode().ifPresent(srcNode ->
+                        ImGui.textColored(nodesColor, srcNode.label()));
+                    ImGui.sameLine();
+                    ImGui.pushFont(EditorUtil.Fonts.icons);
+                    ImGui.textColored(ImGuiColors.white.asInt(), FontAwesomeIcons.arrowRightLong);
+                    ImGui.popFont();
+                    ImGui.sameLine();
+                    link.dstNode().ifPresent(dstNode ->
+                        ImGui.textColored(nodesColor, dstNode.label()));
+
+                    // print connected pins "src -> dst"
+                    var pinsColor = ImGuiColors.darkYellow.asInt();
+                    ImGui.textColored(pinsColor, link.src.label());
+                    ImGui.sameLine();
+                    ImGui.pushFont(EditorUtil.Fonts.icons);
+                    ImGui.textColored(ImGuiColors.white.asInt(), FontAwesomeIcons.arrowRightLong);
+                    ImGui.popFont();
+                    ImGui.sameLine();
+                    ImGui.textColored(pinsColor, link.dst.label());
+                }
+
+                ImGui.pushStyleColor(ImGuiCol.Text, ImGuiColors.medGray.asInt());
+                ImGui.pushFont(EditorUtil.Fonts.small);
+                ImGui.separatorText("Actions");
+                ImGui.popFont();
+                ImGui.popStyleColor();
+                {
+                    var availableWidth = ImGui.getContentRegionAvailX();
+                    ImGui.pushFont(EditorUtil.Fonts.icons);
+                    if (ImGui.button("%s Delete".formatted(FontAwesomeIcons.trash), availableWidth, 0)) {
+                        remove(link);
+                        ImGui.closeCurrentPopup();
+                    }
+                    ImGui.popFont();
                 }
             }, () -> ImGui.text("Unknown link: %s".formatted(linkId)));
 
@@ -334,7 +392,6 @@ public class Editor implements Disposable {
 
         // create new node popup ----------------------------------------------
         ImGui.pushStyleVar(ImGuiStyleVar.PopupBorderSize, 2f);
-        ImGui.pushStyleVar(ImGuiStyleVar.PopupRounding, 10f);
         ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 20f, 10f);
         if (ImGui.beginPopup(PopupIds.NODE_CREATE)) {
             ImGui.pushFont(Fonts.nodeHeader);
@@ -392,7 +449,7 @@ public class Editor implements Disposable {
 
             ImGui.endPopup();
         }
-        ImGui.popStyleVar(3);
+        ImGui.popStyleVar(2);
 
         ImGui.popStyleVar();
         NodeEditor.resume();
@@ -442,6 +499,7 @@ public class Editor implements Disposable {
                 objectsById.remove(pin.id);
             }
             case Link link -> {
+                link.disconnect();
                 links.remove(link);
                 objectsById.remove(link.id);
             }
@@ -467,16 +525,17 @@ public class Editor implements Disposable {
     }
 
     private void pushWindowStyles() {
-        ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding, 0f);
-        ImGui.pushStyleVar(ImGuiStyleVar.WindowBorderSize, 0f);
-        ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 5, 5);
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding,    0f);
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowBorderSize,  0f);
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding,    5,    5);
         ImGui.pushStyleVar(ImGuiStyleVar.WindowTitleAlign, 0.5f, 0.5f);
+        ImGui.pushStyleVar(ImGuiStyleVar.PopupRounding,     10f);
         ImGui.pushFont(app.imgui.getFont(DEFAULT_FONT));
     }
 
     private void popWindowStyles() {
         ImGui.popFont();
-        ImGui.popStyleVar(4);
+        ImGui.popStyleVar(5);
     }
 
     private void pushEditorStyles() {

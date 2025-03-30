@@ -15,7 +15,7 @@ public abstract class EditorObject {
     }
 
     public String label() {
-        return "%s#%d".formatted(objectType.name().toLowerCase(), id);
+        return "%s-%d".formatted(objectType.name().toLowerCase(), id);
     }
 
     public abstract void render();
