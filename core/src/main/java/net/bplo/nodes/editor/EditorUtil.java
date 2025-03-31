@@ -3,22 +3,19 @@ package net.bplo.nodes.editor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import imgui.ImFont;
-import imgui.ImGui;
 import imgui.ImVec2;
 import net.bplo.nodes.assets.Assets;
 import net.bplo.nodes.imgui.ImGuiPlatform;
 
 public class EditorUtil {
 
-    public static ImGuiPlatform imgui;
-
     public static void init(ImGuiPlatform imgui, Assets assets) {
-        EditorUtil.imgui = imgui;
         Fonts.init(imgui);
         Images.init(assets);
     }
 
     public static class Images {
+
         public static Image nodeHeader;
 
         public static void init(Assets assets) {
@@ -28,6 +25,7 @@ public class EditorUtil {
     }
 
     public static class Fonts {
+
         public static ImFont nodeHeader;
         public static ImFont nodeContent;
         public static ImFont small;

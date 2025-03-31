@@ -1,4 +1,4 @@
-package net.bplo.nodes.objects.utils;
+package net.bplo.nodes.editor.utils;
 
 import imgui.extension.nodeditor.flag.NodeEditorPinKind;
 import lombok.RequiredArgsConstructor;

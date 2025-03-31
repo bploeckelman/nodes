@@ -1,7 +1,11 @@
 package net.bplo.nodes.editor;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.Timer;
 import imgui.ImColor;
 import imgui.ImGui;
 import imgui.ImVec2;
@@ -17,17 +21,17 @@ import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImLong;
 import net.bplo.nodes.Main;
+import net.bplo.nodes.Util;
+import net.bplo.nodes.editor.utils.PinKind;
+import net.bplo.nodes.editor.utils.PinType;
 import net.bplo.nodes.imgui.FontAwesomeIcons;
 import net.bplo.nodes.imgui.ImGuiColors;
 import net.bplo.nodes.imgui.ImGuiLayout;
+import net.bplo.nodes.imgui.ImGuiPlatform;
 import net.bplo.nodes.imgui.ImGuiWidgetBounds;
-import net.bplo.nodes.objects.Link;
-import net.bplo.nodes.objects.Node;
-import net.bplo.nodes.objects.Pin;
-import net.bplo.nodes.objects.Prop;
-import net.bplo.nodes.objects.utils.PinKind;
-import net.bplo.nodes.objects.utils.PinType;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +42,7 @@ import static net.bplo.nodes.editor.EditorUtil.Fonts;
 
 public class Editor implements Disposable {
 
+    public static final String TAG = Editor.class.getSimpleName();
     public static final String SETTINGS_FILE = "editor.json";
     public static final String DEFAULT_FONT = "play-regular.ttf";
 
@@ -48,8 +53,12 @@ public class Editor implements Disposable {
 
         public TestProperty(Node node) {
             super(node);
-            this.pins.add(new Pin(PinKind.INPUT,  PinType.DATA, this));
-            this.pins.add(new Pin(PinKind.OUTPUT, PinType.DATA, this));
+            new Pin(this, PinKind.INPUT,  PinType.DATA);
+            new Pin(this, PinKind.OUTPUT, PinType.DATA);
+        }
+
+        TestProperty(long savedId, Node node) {
+            super(savedId, node);
         }
 
         @Override
@@ -111,6 +120,7 @@ public class Editor implements Disposable {
         public Pin    newNodeLinkPin = null;
     }
 
+    private final Json json;
     private final ContextMenu contextMenu;
     private final NodeEditorContext editorContext;
 
@@ -138,6 +148,9 @@ public class Editor implements Disposable {
         // NOTE: disabling key shortcuts because 'f' is bound to zoom by default
         //  and I can't find an easy way to override it when doing text input
         NodeEditor.enableShortcuts(false);
+
+        this.json = new Json();
+        json.setSerializer(EditorSerializer.NodeList.class, new EditorSerializer());
     }
 
     @Override
@@ -147,8 +160,8 @@ public class Editor implements Disposable {
 
     /**
      * Update the editor state. Must be called between
-     * {@link net.bplo.nodes.imgui.ImGuiPlatform#startFrame()}
-     * and {@link net.bplo.nodes.imgui.ImGuiPlatform#endFrame()}
+     * {@link ImGuiPlatform#startFrame()}
+     * and {@link ImGuiPlatform#endFrame()}
      * to ensure that the input processor is active.
      */
     public void update(float delta) {
@@ -164,6 +177,17 @@ public class Editor implements Disposable {
 
         var flags = ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize;
         if (ImGui.begin("Editor", flags)) {
+
+            ImGui.pushFont(Fonts.icons);
+            if (ImGui.button(FontAwesomeIcons.floppyDisk + " Save")) {
+                save();
+            }
+            ImGui.sameLine();
+            if (ImGui.button(FontAwesomeIcons.folderOpen + " Load")) {
+                load();
+            }
+            ImGui.popFont();
+
             NodeEditor.begin("Editor");
             pushEditorStyles();
 
@@ -425,6 +449,113 @@ public class Editor implements Disposable {
         }
     }
 
+    private void save() {
+        var file = EditorFileDialog.openSaveFile();
+        if (file == null) {
+            Gdx.app.log(TAG, "No file selected");
+            return;
+        }
+
+        var nodeList = new EditorSerializer.NodeList(nodes);
+        var nodeListJson = json.prettyPrint(nodeList); // calls EditorSerializer.write(...)
+        Util.log(TAG, "Exported node graph as json:\n%s".formatted(nodeListJson));
+
+        try {
+            var fileHandle = Gdx.files.absolute(file.getAbsolutePath());
+            fileHandle.writeString(nodeListJson, false);
+            Util.log(TAG, "Saved node graph json to file: '%s'".formatted(file.getPath()));
+        } catch (GdxRuntimeException e) {
+            Gdx.app.error(TAG, "Failed to save file: " + file.getPath(), e);
+        }
+    }
+
+    private void load() {
+        var file = EditorFileDialog.openLoadFile();
+        if (file == null) {
+            Gdx.app.log(TAG, "No file selected");
+            return;
+        }
+
+        // clear existing editor objects
+        nodes.clear();
+        props.clear();
+        pins.clear();
+        links.clear();
+        objectsById.clear();
+
+        EditorSerializer.NodeList nodeList = null;
+        try {
+            // read json from the file and output it for debugging
+            var path = file.toPath();
+            var nodeListJson = new String(Files.readAllBytes(path));
+            Util.log(TAG, "Loaded node graph json from '%s':\n%s".formatted(path, nodeListJson));
+
+            // read json from the file into a NodeList object
+            var jsonValue = new JsonReader().parse(nodeListJson);
+            var editorSerializer = json.getSerializer(EditorSerializer.NodeList.class);
+            nodeList = editorSerializer.read(json, jsonValue, EditorSerializer.NodeList.class);
+        } catch (IOException e) {
+            Gdx.app.error(TAG, "Failed to read file", e);
+        }
+
+        if (nodeList == null) {
+            Gdx.app.error(TAG, "Failed to parse node graph json");
+            return;
+        }
+
+        // put loaded editor objects in Editor containers
+        nodes.addAll(nodeList);
+        for (var node : nodes) {
+            objectsById.put(node.id, node);
+
+            pins.addAll(node.pins);
+            pins.forEach(pin -> objectsById.put(pin.id, pin));
+
+            props.addAll(node.props);
+            props.forEach(prop -> {
+                objectsById.put(prop.id, prop);
+
+                pins.addAll(prop.pins);
+                pins.forEach(pin -> objectsById.put(pin.id, pin));
+            });
+
+            node.incomingLinks.forEach(link -> {
+                var insertedValue = objectsById.putIfAbsent(link.id, link);
+                if (insertedValue == null) {
+                    links.add(link);
+                }
+            });
+            node.outgoingLinks.forEach(link -> {
+                var insertedValue = objectsById.putIfAbsent(link.id, link);
+                if (insertedValue == null) {
+                    links.add(link);
+                }
+            });
+        }
+
+        // NOTE: *** important *** update id counter to max(id) + 1
+        //  otherwise objects created after load will clobber loaded objects
+        var maxObjectId = objectsById.keySet().stream()
+            .mapToLong(Long::longValue)
+            .max().orElse(0L);
+        EditorObject.updateNextIdAfterLoad(maxObjectId);
+
+        Util.log(TAG, "Parsed node graph json into current session");
+
+        // NOTE: pan/zoom values get persisted into the settings file set in the constructor above,
+        //  but it doesn't seem to persist through a new launch. Even if we read that file back on save
+        //  in order to extract the scroll.x,y values, there's not an API that I can find to restore
+        //  those values, so the best we can do for now is center on the loaded nodes...
+        //  *but* it has to be delayed until after the nodes are drawn at least once
+        //  so that the node editor has the content bounds to fit within.
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                fitToContent(0.33f);
+            }
+        }, 0.2f);
+    }
+
     private Optional<Node> findNode(long id) {
         return nodes.stream().filter(node -> node.id == id).findFirst();
     }
@@ -480,9 +611,9 @@ public class Editor implements Disposable {
 
     private Node createTestNode() {
         var node = new Node();
-        node.add(new Pin(PinKind.INPUT, PinType.FLOW, node));
-        node.add(new Pin(PinKind.OUTPUT, PinType.FLOW, node));
-        node.add(new TestProperty(node));
+        new Pin(node, PinKind.INPUT, PinType.FLOW);
+        new Pin(node, PinKind.OUTPUT, PinType.FLOW);
+        new TestProperty(node);
         return node;
     }
 }

@@ -1,4 +1,4 @@
-package net.bplo.nodes.objects.utils;
+package net.bplo.nodes.editor.utils;
 
 public record PinCompatibility(boolean compatible, String message) {
 

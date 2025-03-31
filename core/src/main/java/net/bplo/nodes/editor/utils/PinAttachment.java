@@ -1,7 +1,7 @@
-package net.bplo.nodes.objects.utils;
+package net.bplo.nodes.editor.utils;
 
-import net.bplo.nodes.objects.Node;
-import net.bplo.nodes.objects.Prop;
+import net.bplo.nodes.editor.Node;
+import net.bplo.nodes.editor.Prop;
 
 import java.util.Optional;
 

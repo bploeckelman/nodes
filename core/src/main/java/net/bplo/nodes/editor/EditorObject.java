@@ -19,6 +19,25 @@ public abstract class EditorObject {
         this.id = NEXT_ID++;
     }
 
+    /**
+     * Limited access constructor intended for use by {@link EditorSerializer}
+     * to create {@link EditorObject} instances from saved json data.
+     */
+    EditorObject(Type objectType, long savedId) {
+        this.objectType = objectType;
+        this.id = savedId;
+    }
+
+    /**
+     * Limited access method to update the {@link #NEXT_ID} value
+     * after loading {@link EditorSerializer.NodeList} data from json.
+     * Ensures that newly created {@link EditorObject} instances aren't
+     * assigned ids that are already in use from the loaded node graph.
+     */
+    static void updateNextIdAfterLoad(long maxExistingId) {
+        NEXT_ID = maxExistingId + 1;
+    }
+
     public String label() {
         return "%s-%d".formatted(objectType.name().toLowerCase(), id);
     }

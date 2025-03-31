@@ -1,5 +1,7 @@
 package net.bplo.nodes.assets;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.Color;
@@ -23,10 +25,13 @@ import java.util.List;
 
 public class Assets implements Disposable {
 
+    public static final String PREFERENCES_NAME = "net.bplo.nodes";
+
     public final ObjectMap<Class<? extends AssetContainer<?, ?>>, AssetContainer<?, ?>> containers;
 
     public final List<Disposable> disposables;
     public final AssetManager mgr;
+    public final Preferences prefs;
 
     public SpriteBatch batch;
     public GlyphLayout layout;
@@ -40,7 +45,13 @@ public class Assets implements Disposable {
         containers = new ObjectMap<>();
         containers.put(Icons.class, new Icons());
 
+        prefs = Gdx.app.getPreferences(PREFERENCES_NAME);
         disposables = new ArrayList<>();
+        mgr = new AssetManager();
+        batch = new SpriteBatch();
+        layout = new GlyphLayout();
+        disposables.add(mgr);
+        disposables.add(batch);
 
         // create a single pixel texture and associated region
         var pixmap = new Pixmap(2, 2, Pixmap.Format.RGBA8888);
@@ -56,12 +67,6 @@ public class Assets implements Disposable {
         }
         disposables.add(pixmap);
         disposables.add(pixel);
-
-        mgr = new AssetManager();
-        batch = new SpriteBatch();
-        layout = new GlyphLayout();
-        disposables.add(mgr);
-        disposables.add(batch);
 
         // setup asset manager to support ttf/otf fonts
         var internalFileResolver = new InternalFileHandleResolver();

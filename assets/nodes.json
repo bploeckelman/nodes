@@ -1,0 +1,126 @@
+[
+{
+	id: 1
+	width: 200
+	position: {
+		x: -253
+		y: -453
+	}
+	pins: [
+		{
+			id: 2
+			kind: INPUT
+			type: FLOW
+		}
+		{
+			id: 3
+			kind: OUTPUT
+			type: FLOW
+		}
+	]
+	props: [
+		{
+			id: 4
+			class: net.bplo.nodes.editor.Editor$TestProperty
+			pins: [
+				{
+					id: 5
+					kind: INPUT
+					type: DATA
+				}
+				{
+					id: 6
+					kind: OUTPUT
+					type: DATA
+				}
+			]
+		}
+	]
+	incomingLinks: [
+		{
+			id: 16
+			srcPinId: 12
+			dstPinId: 5
+		}
+		{
+			id: 18
+			srcPinId: 9
+			dstPinId: 2
+		}
+	]
+	outgoingLinks: [
+		{
+			id: 17
+			srcPinId: 3
+			dstPinId: 8
+		}
+		{
+			id: 19
+			srcPinId: 6
+			dstPinId: 11
+		}
+	]
+}
+{
+	id: 7
+	width: 200
+	position: {
+		x: -253
+		y: -293
+	}
+	pins: [
+		{
+			id: 8
+			kind: INPUT
+			type: FLOW
+		}
+		{
+			id: 9
+			kind: OUTPUT
+			type: FLOW
+		}
+	]
+	props: [
+		{
+			id: 10
+			class: net.bplo.nodes.editor.Editor$TestProperty
+			pins: [
+				{
+					id: 11
+					kind: INPUT
+					type: DATA
+				}
+				{
+					id: 12
+					kind: OUTPUT
+					type: DATA
+				}
+			]
+		}
+	]
+	incomingLinks: [
+		{
+			id: 17
+			srcPinId: 3
+			dstPinId: 8
+		}
+		{
+			id: 19
+			srcPinId: 6
+			dstPinId: 11
+		}
+	]
+	outgoingLinks: [
+		{
+			id: 16
+			srcPinId: 12
+			dstPinId: 5
+		}
+		{
+			id: 18
+			srcPinId: 9
+			dstPinId: 2
+		}
+	]
+}
+]

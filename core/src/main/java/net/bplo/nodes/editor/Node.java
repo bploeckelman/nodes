@@ -1,10 +1,8 @@
-package net.bplo.nodes.objects;
+package net.bplo.nodes.editor;
 
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.extension.nodeditor.NodeEditor;
-import net.bplo.nodes.editor.Editor;
-import net.bplo.nodes.editor.EditorObject;
 import net.bplo.nodes.imgui.ImGuiColors;
 import net.bplo.nodes.imgui.ImGuiLayout;
 import net.bplo.nodes.imgui.ImGuiWidgetBounds;
@@ -22,25 +20,26 @@ public class Node extends EditorObject {
 
     public static final float DEFAULT_WIDTH = 200f;
 
-    public final List<Prop> props = new ArrayList<>();
-    public final List<Pin> pins = new ArrayList<>();
-    public final List<Link> incomingLinks = new ArrayList<>();
-    public final List<Link> outgoingLinks = new ArrayList<>();
-
     public float width = DEFAULT_WIDTH;
 
-    private static class Bounds {
-        public final ImGuiWidgetBounds header           = new ImGuiWidgetBounds();
-        public final ImGuiWidgetBounds content          = new ImGuiWidgetBounds();
-        public final ImGuiWidgetBounds node             = new ImGuiWidgetBounds();
-        public final ImGuiWidgetBounds nodeBackground   = new ImGuiWidgetBounds();
-        public final ImGuiWidgetBounds headerBackground = new ImGuiWidgetBounds();
-    }
+    public final List<Prop> props         = new ArrayList<>();
+    public final List<Pin>  pins          = new ArrayList<>();
+    public final List<Link> incomingLinks = new ArrayList<>();
+    public final List<Link> outgoingLinks = new ArrayList<>();
+    public final ImVec2 position          = new ImVec2(0, 0);
 
     private final Bounds bounds = new Bounds();
 
     public Node() {
         super(Type.NODE);
+    }
+
+    /**
+     * Limited access constructor intended for use by {@link EditorSerializer}
+     * to create {@link Node} instances from saved json data.
+     */
+    Node(long savedId) {
+        super(Type.NODE, savedId);
     }
 
     //
@@ -91,6 +90,7 @@ public class Node extends EditorObject {
         }
         ImGui.endGroup();
         bounds.node.update();
+        position.set(bounds.node.min());
 
         ImGui.popID();
         NodeEditor.endNode();
@@ -194,5 +194,13 @@ public class Node extends EditorObject {
         }
         ImGuiLayout.endColumn();
         bounds.content.update();
+    }
+
+    private static class Bounds {
+        public final ImGuiWidgetBounds header           = new ImGuiWidgetBounds();
+        public final ImGuiWidgetBounds content          = new ImGuiWidgetBounds();
+        public final ImGuiWidgetBounds node             = new ImGuiWidgetBounds();
+        public final ImGuiWidgetBounds nodeBackground   = new ImGuiWidgetBounds();
+        public final ImGuiWidgetBounds headerBackground = new ImGuiWidgetBounds();
     }
 }

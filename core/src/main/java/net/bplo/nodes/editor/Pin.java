@@ -1,18 +1,15 @@
-package net.bplo.nodes.objects;
+package net.bplo.nodes.editor;
 
 import imgui.ImGui;
 import imgui.ImVec4;
 import imgui.extension.nodeditor.NodeEditor;
 import net.bplo.nodes.assets.Icons;
-import net.bplo.nodes.editor.Editor;
-import net.bplo.nodes.editor.EditorObject;
-import net.bplo.nodes.editor.EditorUtil;
+import net.bplo.nodes.editor.utils.PinAttachment;
+import net.bplo.nodes.editor.utils.PinCompatibility;
+import net.bplo.nodes.editor.utils.PinKind;
+import net.bplo.nodes.editor.utils.PinType;
 import net.bplo.nodes.imgui.ImGuiColors;
 import net.bplo.nodes.imgui.ImGuiWidgetBounds;
-import net.bplo.nodes.objects.utils.PinAttachment;
-import net.bplo.nodes.objects.utils.PinCompatibility;
-import net.bplo.nodes.objects.utils.PinKind;
-import net.bplo.nodes.objects.utils.PinType;
 
 public class Pin extends EditorObject {
 
@@ -29,16 +26,51 @@ public class Pin extends EditorObject {
     private final ImGuiWidgetBounds iconBounds;
     private final ImGuiWidgetBounds pinRectBounds;
 
-    public Pin(PinKind kind, PinType type, Node node) {
-        this(kind, type, new PinAttachment.NodeType(node));
+    public Pin(Node node, PinKind kind, PinType type) {
+        this(new PinAttachment.NodeType(node), kind, type);
+        node.pins.add(this);
     }
 
-    public Pin(PinKind kind, PinType type, Prop property) {
-        this(kind, type, new PinAttachment.PropType(property));
+    public Pin(Prop prop, PinKind kind, PinType type) {
+        this(new PinAttachment.PropType(prop), kind, type);
+        prop.pins.add(this);
     }
 
-    private Pin(PinKind kind, PinType type, PinAttachment attachment) {
+    private Pin(PinAttachment attachment, PinKind kind, PinType type) {
         super(Type.PIN);
+        this.kind = kind;
+        this.type = type;
+        this.attachment = attachment;
+        this.iconBounds = new ImGuiWidgetBounds();
+        this.pinRectBounds = new ImGuiWidgetBounds();
+    }
+
+    /**
+     * Limited access constructor intended for use by {@link EditorSerializer}
+     * to create {@link Pin} instances from saved json data, when this pin
+     * is attached to a {@link Node}
+     */
+    Pin(long savedId, Node node, PinKind kind, PinType type) {
+        this(savedId, new PinAttachment.NodeType(node), kind, type);
+        node.pins.add(this);
+    }
+
+    /**
+     * Limited access constructor intended for use by {@link EditorSerializer}
+     * to create {@link Pin} instances from saved json data, when this pin
+     * is attached to a {@link Prop}
+     */
+    Pin(long savedId, Prop prop, PinKind kind, PinType type) {
+        this(savedId, new PinAttachment.PropType(prop), kind, type);
+        prop.pins.add(this);
+    }
+
+    /**
+     * Internal shared constructor intended for use by the package-private
+     * {@link EditorSerializer} constructors above.
+     */
+    private Pin(long savedId, PinAttachment attachment, PinKind kind, PinType type) {
+        super(Type.PIN, savedId);
         this.kind = kind;
         this.type = type;
         this.attachment = attachment;

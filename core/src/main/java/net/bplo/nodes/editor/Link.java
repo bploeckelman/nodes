@@ -1,16 +1,13 @@
-package net.bplo.nodes.objects;
+package net.bplo.nodes.editor;
 
 import imgui.ImGui;
 import imgui.ImVec4;
 import imgui.extension.nodeditor.NodeEditor;
 import lombok.RequiredArgsConstructor;
-import net.bplo.nodes.editor.Editor;
-import net.bplo.nodes.editor.EditorObject;
-import net.bplo.nodes.editor.EditorUtil;
+import net.bplo.nodes.editor.utils.PinType;
 import net.bplo.nodes.imgui.FontAwesomeIcons;
 import net.bplo.nodes.imgui.ImGuiColors;
 import net.bplo.nodes.imgui.ImGuiLayout;
-import net.bplo.nodes.objects.utils.PinType;
 
 import java.util.Optional;
 
@@ -32,6 +29,21 @@ public class Link extends EditorObject {
 
     public Link(Pin src, Pin dst) {
         super(Type.LINK);
+        this.src = src;
+        this.dst = dst;
+
+        var isFlow = (src.type == PinType.FLOW && dst.type == PinType.FLOW);
+        this.appearance = isFlow ? Appearance.FLOW : Appearance.DATA;
+
+        connect();
+    }
+
+    /**
+     * Limited access constructor intended for use by {@link EditorSerializer}
+     * to create {@link Link} instances from saved json data.
+     */
+    Link(long savedId, Pin src, Pin dst) {
+        super(Type.LINK, savedId);
         this.src = src;
         this.dst = dst;
 
