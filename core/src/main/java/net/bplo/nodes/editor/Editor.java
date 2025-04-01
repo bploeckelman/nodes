@@ -24,7 +24,6 @@ import net.bplo.nodes.Main;
 import net.bplo.nodes.Util;
 import net.bplo.nodes.editor.utils.PinKind;
 import net.bplo.nodes.editor.utils.PinType;
-import net.bplo.nodes.imgui.FontAwesomeIcons;
 import net.bplo.nodes.imgui.ImGuiColors;
 import net.bplo.nodes.imgui.ImGuiLayout;
 import net.bplo.nodes.imgui.ImGuiPlatform;
@@ -132,6 +131,8 @@ public class Editor implements Disposable {
     public final Map<Long, EditorObject> objectsById;
 
     public Editor() {
+        EditorContent.refresh();
+
         var config = new NodeEditorConfig();
         config.setSettingsFile(SETTINGS_FILE);
 
@@ -177,16 +178,11 @@ public class Editor implements Disposable {
 
         var flags = ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize;
         if (ImGui.begin("Editor", flags)) {
-
-            ImGui.pushFont(Fonts.icons);
-            if (ImGui.button(FontAwesomeIcons.floppyDisk + " Save")) {
-                save();
-            }
-            ImGui.sameLine();
-            if (ImGui.button(FontAwesomeIcons.folderOpen + " Load")) {
-                load();
-            }
-            ImGui.popFont();
+            // render editor menubar widgets
+            EditorWidget.renderSaveButton(this);
+            ImGui.sameLine(); EditorWidget.renderLoadButton(this);
+            ImGui.sameLine(); EditorWidget.renderSetContentPathButton(this);
+            ImGui.sameLine(); EditorWidget.renderContentCombo(this);
 
             NodeEditor.begin("Editor");
             pushEditorStyles();
@@ -449,7 +445,7 @@ public class Editor implements Disposable {
         }
     }
 
-    private void save() {
+    void save() {
         var file = EditorFileDialog.openSaveFile();
         if (file == null) {
             Gdx.app.log(TAG, "No file selected");
@@ -469,7 +465,7 @@ public class Editor implements Disposable {
         }
     }
 
-    private void load() {
+    void load() {
         var file = EditorFileDialog.openLoadFile();
         if (file == null) {
             Gdx.app.log(TAG, "No file selected");

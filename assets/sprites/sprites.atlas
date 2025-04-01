@@ -1,68 +1,383 @@
 
 sprites.png
-size: 1024, 128
+size: 4096, 1024
 format: RGBA8888
 filter: MipMapLinearLinear, MipMapLinearLinear
 repeat: none
+characters/anims/man-attack
+  rotate: false
+  xy: 1, 390
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: 0
+characters/anims/man-attack
+  rotate: false
+  xy: 195, 648
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: 1
+characters/anims/man-attack
+  rotate: false
+  xy: 1, 132
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: 2
+characters/anims/man-cheer
+  rotate: false
+  xy: 195, 132
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: 0
+characters/anims/man-cheer
+  rotate: false
+  xy: 389, 390
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: 1
+characters/anims/man-climb
+  rotate: false
+  xy: 583, 648
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: 0
+characters/anims/man-climb
+  rotate: false
+  xy: 389, 132
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: 1
+characters/anims/man-run
+  rotate: false
+  xy: 1359, 132
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: 0
+characters/anims/man-run
+  rotate: false
+  xy: 1553, 390
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: 1
+characters/anims/man-run
+  rotate: false
+  xy: 1747, 648
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: 2
+characters/anims/man-switch
+  rotate: false
+  xy: 2135, 648
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: 0
+characters/anims/man-switch
+  rotate: false
+  xy: 1941, 132
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: 1
+characters/anims/man-walk
+  rotate: false
+  xy: 2135, 132
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: 0
+characters/anims/man-walk
+  rotate: false
+  xy: 2329, 390
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: 1
+characters/anims/man-walk
+  rotate: false
+  xy: 2523, 648
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: 2
+characters/anims/man-walk
+  rotate: false
+  xy: 2329, 132
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: 3
+characters/anims/man-walk
+  rotate: false
+  xy: 2523, 390
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: 4
+characters/anims/man-walk
+  rotate: false
+  xy: 2717, 648
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: 5
+characters/anims/man-walk
+  rotate: false
+  xy: 2523, 132
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: 6
+characters/anims/man-walk
+  rotate: false
+  xy: 2717, 390
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: 7
+characters/man-attack-kick
+  rotate: false
+  xy: 1, 648
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-back
+  rotate: false
+  xy: 195, 390
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-behind-back
+  rotate: false
+  xy: 389, 648
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-down
+  rotate: false
+  xy: 583, 390
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-drag
+  rotate: false
+  xy: 777, 648
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-duck
+  rotate: false
+  xy: 583, 132
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-fall
+  rotate: false
+  xy: 777, 390
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-fall-down
+  rotate: false
+  xy: 971, 648
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-hang
+  rotate: false
+  xy: 777, 132
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-hit
+  rotate: false
+  xy: 971, 390
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-hold
+  rotate: false
+  xy: 1165, 648
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-hurt
+  rotate: false
+  xy: 971, 132
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-idle
+  rotate: false
+  xy: 1165, 390
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-interact
+  rotate: false
+  xy: 1359, 648
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-jump
+  rotate: false
+  xy: 1165, 132
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-kick
+  rotate: false
+  xy: 1359, 390
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-rope
+  rotate: false
+  xy: 1553, 648
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-shove
+  rotate: false
+  xy: 1553, 132
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-shove-back
+  rotate: false
+  xy: 1747, 390
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-show
+  rotate: false
+  xy: 1941, 648
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-side
+  rotate: false
+  xy: 1747, 132
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-slide
+  rotate: false
+  xy: 1941, 390
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-talk
+  rotate: false
+  xy: 2135, 390
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-think
+  rotate: false
+  xy: 2329, 648
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
+characters/man-wide
+  rotate: false
+  xy: 2911, 648
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
 icons/pin-data
   rotate: false
-  xy: 381, 37
+  xy: 2911, 582
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 icons/pin-data-input
   rotate: false
-  xy: 447, 37
+  xy: 3105, 840
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 icons/pin-data-linked
   rotate: false
-  xy: 513, 37
+  xy: 1, 1
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 icons/pin-data-output
   rotate: false
-  xy: 579, 37
+  xy: 2717, 290
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 icons/pin-flow
   rotate: false
-  xy: 645, 37
+  xy: 2911, 516
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 icons/pin-flow-linked
   rotate: false
-  xy: 711, 37
+  xy: 2977, 582
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 libgdx
   rotate: false
-  xy: 1, 38
+  xy: 1, 67
   size: 378, 63
   orig: 378, 63
   offset: 0, 0
   index: -1
 noise-bg
   rotate: false
-  xy: 1, 4
+  xy: 2717, 356
   size: 150, 32
   orig: 150, 32
   offset: 0, 0
   index: -1
 pixel
   rotate: false
-  xy: 1, 1
+  xy: 381, 129
   size: 1, 1
   orig: 1, 1
   offset: 0, 0

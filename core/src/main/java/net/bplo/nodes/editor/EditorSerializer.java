@@ -105,10 +105,6 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
         json.writeArrayEnd();
     }
 
-    //
-    // *** TODO(brian): this is incomplete... need to review ---------------------------------------------
-    //
-
     @Override
     public NodeList read(Json json, JsonValue jsonData, Class clazz) {
         var nodes = new NodeList();
