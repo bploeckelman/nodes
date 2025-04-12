@@ -78,6 +78,7 @@ public class ImGuiColors {
     public static final Value lightGray   = new Value("#afafafff");
     public static final Value medGray     = new Value("#8f8f8fff");
     public static final Value darkGray    = new Value("#4f4f4fff");
+    public static final Value darkerGray  = new Value("#2f2f2fff");
 
     public static final Value lightRed    = new Value("#ffd1d0ff");
     public static final Value medRed      = new Value("#ffa39eff");

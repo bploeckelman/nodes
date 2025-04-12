@@ -49,7 +49,6 @@ public class Main extends ApplicationAdapter {
             Gdx.app.exit();
         }
 
-        var delta = Gdx.graphics.getDeltaTime();
         var batch = assets.batch;
         var image = assets.gdx;
         var imgWidth = image.getRegionWidth();
@@ -63,7 +62,7 @@ public class Main extends ApplicationAdapter {
         batch.end();
 
         imgui.startFrame();
-        editor.update(delta);
+        editor.update();
         editor.render();
         imgui.endFrame();
     }

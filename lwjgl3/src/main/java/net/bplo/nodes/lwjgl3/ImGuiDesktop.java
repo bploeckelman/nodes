@@ -8,6 +8,7 @@ import imgui.ImFont;
 import imgui.ImFontConfig;
 import imgui.ImFontGlyphRangesBuilder;
 import imgui.ImGui;
+import imgui.flag.ImGuiConfigFlags;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
 import net.bplo.nodes.imgui.FontAwesomeIcons;
@@ -92,7 +93,15 @@ public class ImGuiDesktop implements ImGuiPlatform {
     }
 
     private void initDocking() {
-        // TODO(brian): initialize docking support
+        // enable docking
+        var io = ImGui.getIO();
+        io.setConfigFlags(io.getConfigFlags() | ImGuiConfigFlags.DockingEnable);
+        io.setConfigDockingWithShift(false);
+
+        // enable viewports
+//        io.setConfigFlags(io.getConfigFlags() | ImGuiConfigFlags.ViewportsEnable);
+//        io.setConfigViewportsNoAutoMerge(true);
+//        io.setConfigViewportsNoTaskBarIcon(true);
     }
 
     private void initFonts() {

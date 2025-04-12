@@ -41,4 +41,5 @@ public abstract class Prop extends EditorObject {
     }
 
     public abstract void render();
+    public void renderInfoPane() {}
 }

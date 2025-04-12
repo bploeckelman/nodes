@@ -28,6 +28,8 @@ public class Node extends EditorObject {
     public final List<Link> outgoingLinks = new ArrayList<>();
     public final ImVec2 position          = new ImVec2(0, 0);
 
+    public String headerText = "Node Header";
+
     private final Bounds bounds = new Bounds();
 
     public Node() {
@@ -171,7 +173,7 @@ public class Node extends EditorObject {
                 ImGui.setNextItemAllowOverlap();
                 ImGui.dummy(textColumnSize);
                 ImGui.setCursorPos(cursor);
-                ImGui.textColored(ImGuiColors.white.asInt(), "Node Header");
+                ImGui.textColored(ImGuiColors.white.asInt(), headerText);
 
                 ImGui.popFont();
             }
