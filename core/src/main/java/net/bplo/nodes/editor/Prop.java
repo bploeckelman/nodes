@@ -13,6 +13,8 @@ public abstract class Prop extends EditorObject {
     public final Node node;
     public final List<Pin> pins;
 
+    public String name = "";
+
     public Prop(Node node) {
         super(Type.PROP);
         this.node = node;

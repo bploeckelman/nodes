@@ -59,9 +59,21 @@ public class EditorInfoPane extends EditorPane {
                 ImGui.dummy(0, 2);
 
                 for (var node : selectedNodes) {
-                    // TODO(brian): only the first node's editable text prop is populated for some reason
-                    node.props.forEach(Prop::renderInfoPane);
+                    ImGui.pushFont(EditorUtil.Fonts.nodeHeader);
+                    ImGui.pushStyleColor(ImGuiCol.Text, ImGuiColors.cyan.asInt());
+                    ImGui.text("Node %d: %s".formatted(node.id, node.headerText));
+                    ImGui.popStyleColor();
+                    ImGui.popFont();
                     ImGui.separator();
+
+                    // TODO(brian): when selecting multiple nodes with PropEditableText props
+                    //  only the first node's editable text prop is populated for some reason
+                    node.props.forEach(prop -> {
+                        ImGui.textColored(ImGuiColors.teal.asInt(), "%s (%s)".formatted(prop.getClass().getSimpleName(), prop.label()));
+                        ImGui.dummy(0, 1);
+                        prop.renderInfoPane();
+                        ImGui.dummy(0, 4);
+                    });
                 }
             }
 

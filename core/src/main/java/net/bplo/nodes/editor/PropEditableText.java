@@ -181,8 +181,6 @@ public class PropEditableText extends Prop {
 
     @Override
     public void renderInfoPane() {
-        ImGui.text("%s (%s %s):".formatted(node.headerText, node.label(), label()));
-
         // show multiline text editor for this prop in info pane,
         // because multiline input doesn't work in a node context
         var avail = ImGui.getContentRegionAvail();
