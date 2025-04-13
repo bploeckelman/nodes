@@ -3,8 +3,8 @@
 	id: 1
 	width: 200
 	position: {
-		x: -253
-		y: -453
+		x: -621
+		y: -691
 	}
 	pins: [
 		{
@@ -21,105 +21,112 @@
 	props: [
 		{
 			id: 4
-			class: net.bplo.nodes.editor.Editor$TestProperty
-			pins: [
-				{
-					id: 5
-					kind: INPUT
-					type: DATA
-				}
-				{
-					id: 6
-					kind: OUTPUT
-					type: DATA
-				}
-			]
+			class: net.bplo.nodes.editor.PropEditableText
+			data: "For a complete implementation, we'd also need:\n\n- Add serialization support in EditorSerializer.java\n- Create a factory method in Editor.java for creating dialogue nodes\n- Add missing imports (for ImGuiCond and ImGuiFocusedFlags)\n\nWould you like me to explain any specific aspect of this implementation or discuss alternatives to the approach I've taken?\n"
+			pins: []
 		}
 	]
-	incomingLinks: [
-		{
-			id: 16
-			srcPinId: 12
-			dstPinId: 5
-		}
-		{
-			id: 18
-			srcPinId: 9
-			dstPinId: 2
-		}
-	]
+	incomingLinks: []
 	outgoingLinks: [
 		{
 			id: 17
 			srcPinId: 3
-			dstPinId: 8
-		}
-		{
-			id: 19
-			srcPinId: 6
 			dstPinId: 11
 		}
 	]
 }
 {
-	id: 7
+	id: 5
 	width: 200
 	position: {
-		x: -253
-		y: -293
+		x: -275
+		y: -691
 	}
 	pins: [
 		{
-			id: 8
+			id: 6
 			kind: INPUT
 			type: FLOW
 		}
 		{
-			id: 9
+			id: 7
 			kind: OUTPUT
 			type: FLOW
 		}
 	]
 	props: [
 		{
-			id: 10
-			class: net.bplo.nodes.editor.Editor$TestProperty
+			id: 8
+			class: net.bplo.nodes.editor.PropEditableText
+			data: "There's nothing really in this one, certainly not separate from the others\n\nI do want to figure out the 'pin per section' bit though too"
+			pins: []
+		}
+	]
+	incomingLinks: [
+		{
+			id: 18
+			srcPinId: 12
+			dstPinId: 6
+		}
+	]
+	outgoingLinks: []
+}
+{
+	id: 10
+	width: 200
+	position: {
+		x: -451
+		y: -501
+	}
+	pins: [
+		{
+			id: 11
+			kind: INPUT
+			type: FLOW
+		}
+		{
+			id: 12
+			kind: OUTPUT
+			type: FLOW
+		}
+	]
+	props: [
+		{
+			id: 13
+			class: net.bplo.nodes.editor.PropTest
+			data: null
 			pins: [
 				{
-					id: 11
+					id: 14
 					kind: INPUT
 					type: DATA
 				}
 				{
-					id: 12
+					id: 15
 					kind: OUTPUT
 					type: DATA
 				}
 			]
+		}
+		{
+			id: 16
+			class: net.bplo.nodes.editor.PropEditableText
+			data: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pretium, purus nec ullamcorper dictum,\nfelis purus accumsan enim, ac tristique tellus orci id dolor.\n\nPraesent id felis sit amet magna varius congue at ac felis. Vivamus elit sapien, imperdiet id sem blandit,\nsodales tincidunt velit. Nulla blandit, lorem in maximus ullamcorper, dolor justo interdum elit,\nvitae pretium eros nibh a est.\n"
+			pins: []
 		}
 	]
 	incomingLinks: [
 		{
 			id: 17
 			srcPinId: 3
-			dstPinId: 8
-		}
-		{
-			id: 19
-			srcPinId: 6
 			dstPinId: 11
 		}
 	]
 	outgoingLinks: [
 		{
-			id: 16
-			srcPinId: 12
-			dstPinId: 5
-		}
-		{
 			id: 18
-			srcPinId: 9
-			dstPinId: 2
+			srcPinId: 12
+			dstPinId: 6
 		}
 	]
 }

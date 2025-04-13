@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Timer;
 import imgui.ImColor;
 import imgui.ImGui;
@@ -48,6 +49,16 @@ public class Editor implements Disposable {
 
         TestProperty(long savedId, Node node) {
             super(savedId, node);
+        }
+
+        @Override
+        public Object getData() {
+            return null;
+        }
+
+        @Override
+        public void setData(Json json, JsonValue dataValue) {
+            // no-op, test prop doesn't have data
         }
 
         @Override
@@ -360,16 +371,15 @@ public class Editor implements Disposable {
         node.headerText = "Dialogue";
         new Pin(node, PinKind.INPUT, PinType.FLOW);
         new Pin(node, PinKind.OUTPUT, PinType.FLOW);
-//        new TestProperty(node);
+        new PropTest(node);
         var editableText = new PropEditableText(node);
         editableText.setText("""
-        For a complete implementation, we'd also need:
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pretium, purus nec ullamcorper dictum,
+        felis purus accumsan enim, ac tristique tellus orci id dolor.
 
-        - Add serialization support in EditorSerializer.java
-        - Create a factory method in Editor.java for creating dialogue nodes
-        - Add missing imports (for ImGuiCond and ImGuiFocusedFlags)
-
-        Would you like me to explain any specific aspect of this implementation or discuss alternatives to the approach I've taken?
+        Praesent id felis sit amet magna varius congue at ac felis. Vivamus elit sapien, imperdiet id sem blandit,
+        sodales tincidunt velit. Nulla blandit, lorem in maximus ullamcorper, dolor justo interdum elit,
+        vitae pretium eros nibh a est.
         """);
 
         return node;

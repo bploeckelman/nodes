@@ -1,5 +1,8 @@
 package net.bplo.nodes.editor;
 
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -27,6 +30,9 @@ public abstract class Prop extends EditorObject {
         this.pins = new ArrayList<>();
         node.props.add(this);
     }
+
+    public abstract Object getData();
+    public abstract void setData(Json json, JsonValue dataValue);
 
     public Stream<Pin> inputPins() {
         return getPins(Pin::isInput);

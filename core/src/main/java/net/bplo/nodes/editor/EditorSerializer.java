@@ -60,6 +60,9 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
                 json.writeObjectStart();
                 json.writeValue("id", prop.id);
                 json.writeValue("class", prop.getClass().getName());
+                // TODO(brian): verify if this will work for all prop types
+                //  or if we need to take the 'data' type into account for serde
+                json.writeValue("data", prop.getData());
 
                 // Write prop pins
                 json.writeArrayStart("pins");
@@ -158,9 +161,7 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
                 for (var propValue = propsArray.child; propValue != null; propValue = propValue.next) {
                     var propId    = propValue.getLong("id");
                     var propClassName = propValue.getString("class");
-
-                    // TODO(brian): return to this once we have some concrete prop types,
-                    //  depending how they're setup it could be trickier than this to deserialize
+                    var propDataValue = propValue.get("data");
 
                     // Create prop instance based on type
                     Prop prop;
@@ -168,6 +169,11 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
                         var propClass   = Class.forName(propClassName);
                         var constructor = propClass.getDeclaredConstructor(long.class, Node.class);
                         prop = (Prop) constructor.newInstance(propId, node);
+
+                        // TODO(brian): return to this once we have more concrete prop types,
+                        //  depending how they're setup it could be trickier than this to deserialize
+                        prop.setData(json, propDataValue);
+
                         // Don't need to add to node as constructor already does this
                         Util.log(TAG, "Prop created: %s".formatted(prop.label()));
 
@@ -189,7 +195,9 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
                             }
                         }
                     } catch (Exception e) {
-                        Util.log(TAG, "Failed to instantiate prop: %s, error: %s".formatted(propClassName, e));
+                        var message = "Failed to instantiate prop: %s, error: %s".formatted(propClassName, e);
+                        Util.log(TAG, message);
+                        throw new GdxRuntimeException(message, e);
                     }
                 }
             }

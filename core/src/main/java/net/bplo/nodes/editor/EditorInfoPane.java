@@ -33,7 +33,7 @@ public class EditorInfoPane extends EditorPane {
     public void select(List<Node> nodes) {
         clear();
         selectedNodes.addAll(nodes);
-        selectedNodes.sort(Comparator.comparing(EditorObject::label));
+        selectedNodes.sort(Comparator.comparingLong(node -> node.id));
     }
 
     @Override

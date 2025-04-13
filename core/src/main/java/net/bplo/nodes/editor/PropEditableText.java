@@ -1,5 +1,7 @@
 package net.bplo.nodes.editor;
 
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiCol;
@@ -7,6 +9,7 @@ import imgui.flag.ImGuiInputTextFlags;
 import imgui.flag.ImGuiStyleVar;
 import imgui.type.ImInt;
 import imgui.type.ImString;
+import net.bplo.nodes.Util;
 import net.bplo.nodes.imgui.ImGuiColors;
 import net.bplo.nodes.imgui.ImGuiLayout;
 import net.bplo.nodes.imgui.ImGuiWidgetBounds;
@@ -34,15 +37,30 @@ public class PropEditableText extends Prop {
         init(initialText);
     }
 
-    PropEditableText(long savedId, Node node, String initialText) {
+    PropEditableText(long savedId, Node node) {
         super(savedId, node);
-        init(initialText);
+        init(null);
     }
 
     private void init(String initialText) {
         this.text.set(initialText != null ? initialText : "");
         this.text.inputData.isResizable = true;
         updatePreviewLines();
+    }
+
+    @Override
+    public Object getData() {
+        return getText();
+    }
+
+    @Override
+    public void setData(Json json, JsonValue dataValue) {
+        var data = dataValue.asString();
+        if (data instanceof String string) {
+            setText(string);
+        } else {
+            Util.log(TAG, "Unexpected data value type for %s: %s".formatted(TAG, dataValue));
+        }
     }
 
     public String getText() {
