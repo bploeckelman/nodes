@@ -8,16 +8,15 @@ import imgui.extension.nodeditor.flag.NodeEditorStyleColor;
 import imgui.extension.nodeditor.flag.NodeEditorStyleVar;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiCond;
-import imgui.flag.ImGuiDockNodeFlags;
 import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImLong;
-import net.bplo.nodes.Util;
 import net.bplo.nodes.editor.utils.PinKind;
 import net.bplo.nodes.imgui.ImGuiColors;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class EditorNodePane extends EditorPane {
 
@@ -31,14 +30,12 @@ public class EditorNodePane extends EditorPane {
 
     private final ContextMenu contextMenu;
 
-    long[] selectedObjectIds;
-    int selectedObjectCount;
+    private long[] selectedObjectIds;
 
     public EditorNodePane(Editor editor) {
         super(editor);
         this.contextMenu = new ContextMenu();
         this.selectedObjectIds = new long[0];
-        this.selectedObjectCount = 0;
     }
 
     @Override
@@ -246,42 +243,20 @@ public class EditorNodePane extends EditorPane {
     }
 
     private void handleSelectionChanges() {
-        var prevSelectedObjectCount = selectedObjectCount;
-        selectedObjectCount = NodeEditor.getSelectedObjectCount();
-        int selectedNodeCount = 0;
-
-        // early out if the selections didn't change
-        var isSameCountAsPrev = (selectedObjectCount == prevSelectedObjectCount);
-        var isSomethingSelected = (selectedObjectCount != 0);
-        if (isSomethingSelected && isSameCountAsPrev) {
-            // even if the counts didn't change, the selected nodes might have...
-            var currentlySelectedObjectIds = new long[selectedObjectCount];
-            selectedNodeCount = NodeEditor.getSelectedNodes(currentlySelectedObjectIds, selectedObjectCount);
-            if (selectedNodeCount != 0) {
-                // check if the selected nodes are the same as before
-                Arrays.sort(selectedObjectIds);
-                Arrays.sort(currentlySelectedObjectIds);
-                var isSameSelection = Arrays.equals(currentlySelectedObjectIds, selectedObjectIds);
-                if (isSameSelection) {
-                    return;
-                }
-            } else {
-                return;
-            }
-            selectedObjectIds = currentlySelectedObjectIds;
+        var selectedObjectCount = NodeEditor.getSelectedObjectCount();
+        if (selectedObjectCount != selectedObjectIds.length) {
+            selectedObjectIds = new long[selectedObjectCount];
         }
 
-        if (selectedNodeCount != 0) {
-            if (selectedNodeCount == 1) {
-                var selectedNodeId = selectedObjectIds[0];
-//                Util.log(TAG, "handleSelectionChanges(): selected=" + selectedNodeId);
-                editor.findNode(selectedNodeId).ifPresent(node -> editor.infoPane.selectedNode = node);
-            } else {
-                var ids = Arrays.stream(selectedObjectIds).mapToObj(Long::toString).toList();
-//                Util.log(TAG, "handleSelectionChanges(): count=%d, ids=%s".formatted(selectedNodeCount, ids));
-            }
+        var selectedNodesCount = NodeEditor.getSelectedNodes(selectedObjectIds, selectedObjectCount);
+        if (selectedNodesCount == 0) {
+            editor.infoPane.clear();
         } else {
-//            Util.log(TAG, "handleSelectionChanges(): no nodes selected");
+            var selectedNodes = Arrays.stream(selectedObjectIds)
+                .mapToObj(editor::findNode)
+                .flatMap(Optional::stream)
+                .toList();
+            editor.infoPane.select(selectedNodes);
         }
     }
 

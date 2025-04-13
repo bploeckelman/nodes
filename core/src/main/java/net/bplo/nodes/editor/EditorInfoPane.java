@@ -2,20 +2,38 @@ package net.bplo.nodes.editor;
 
 import imgui.ImGui;
 import imgui.ImVec2;
+import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiCond;
+import net.bplo.nodes.imgui.ImGuiColors;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public class EditorInfoPane extends EditorPane {
 
-    Node selectedNode;
-    Prop focusedProp;
-
+    private final List<Node> selectedNodes = new ArrayList<>();
     private final ImVec2 undockedSize = new ImVec2();
     private boolean wasDocked = false;
 
+
     public EditorInfoPane(Editor editor) {
         super(editor);
-        this.selectedNode = null;
-        this.focusedProp = null;
+    }
+
+    public void clear() {
+        selectedNodes.clear();
+    }
+
+    public void select(Node node) {
+        clear();
+        selectedNodes.add(node);
+    }
+
+    public void select(List<Node> nodes) {
+        clear();
+        selectedNodes.addAll(nodes);
+        selectedNodes.sort(Comparator.comparing(EditorObject::label));
     }
 
     @Override
@@ -23,14 +41,28 @@ public class EditorInfoPane extends EditorPane {
         setInitialPositionAndSize();
 
         if (ImGui.begin("Properties")) {
-            if (selectedNode == null) {
-                ImGui.textDisabled("No node selected");
+            if (selectedNodes.isEmpty()) {
+                ImGui.textDisabled("No nodes selected");
             } else {
-                // Show node info
-                ImGui.text("Selected Node: #" + selectedNode.id);
+                var plural = selectedNodes.size() > 1 ? "s" : "";
+                ImGui.pushFont(EditorUtil.Fonts.nodeHeader);
+                ImGui.text("Selected Node%s:".formatted(plural));
+                ImGui.popFont();
 
-                // render node properties in the info pane
-                selectedNode.props.forEach(Prop::renderInfoPane);
+                ImGui.pushFont(EditorUtil.Fonts.small);
+                ImGui.pushStyleColor(ImGuiCol.Text, ImGuiColors.goldenrod.asInt());
+                selectedNodes.forEach(node -> ImGui.bulletText(node.label()));
+                ImGui.popStyleColor();
+                ImGui.popFont();
+
+                ImGui.separator();
+                ImGui.dummy(0, 2);
+
+                for (var node : selectedNodes) {
+                    // TODO(brian): only the first node's editable text prop is populated for some reason
+                    node.props.forEach(Prop::renderInfoPane);
+                    ImGui.separator();
+                }
             }
 
             if (ImGui.isWindowDocked()) {

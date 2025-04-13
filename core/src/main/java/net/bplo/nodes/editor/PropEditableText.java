@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 public class PropEditableText extends Prop {
 
+    private static final String TAG = PropEditableText.class.getSimpleName();
     private static final int MAX_VISIBLE_LINES = 5;
 
     private final ImString text = new ImString(4096);
@@ -23,7 +24,6 @@ public class PropEditableText extends Prop {
 
     private String[] previewLines = new String[0];
     private int totalLines = 0;
-    private boolean firstRender = true;
 
     public PropEditableText(Node node) {
         this(node, "");
@@ -50,17 +50,12 @@ public class PropEditableText extends Prop {
     }
 
     public void setText(String newText) {
-        this.text.set(newText != null ? newText : "");
+        text.set(newText != null ? newText : "");
         updatePreviewLines();
     }
 
     @Override
     public void render() {
-        if (firstRender) {
-            firstRender = false;
-            updatePreviewLines();
-        }
-
         ImGui.beginGroup();
         {
             var contentWidth = node.width + 16f;
@@ -168,17 +163,16 @@ public class PropEditableText extends Prop {
 
     @Override
     public void renderInfoPane() {
-        ImGui.pushID("editabletext_" + id);
-        ImGui.separator();
-        ImGui.text("Edit Text");
+        ImGui.text("%s (%s %s):".formatted(node.headerText, node.label(), label()));
 
-        // Full-sized multiline text editor in info pane
+        // show multiline text editor for this prop in info pane,
+        // because multiline input doesn't work in a node context
         var avail = ImGui.getContentRegionAvail();
         var flags = ImGuiInputTextFlags.AllowTabInput;
-        if (ImGui.inputTextMultiline("##content", text, avail.x, avail.y - 30, flags)) {
+        var label = "##%s_%s".formatted(label(), "editable_text");
+        if (ImGui.inputTextMultiline(label, text, avail.x, avail.y - 30, flags)) {
             setText(text.get());
         }
-        ImGui.popID();
     }
 
     private void updatePreviewLines() {
