@@ -373,6 +373,7 @@ public class Editor implements Disposable {
         new Pin(node, PinKind.OUTPUT, PinType.FLOW);
         new PropTest(node);
         new PropInteger(node);
+        new PropFloat(node);
         var editableText = new PropEditableText(node);
         editableText.setText("""
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pretium, purus nec ullamcorper dictum,
