@@ -289,14 +289,14 @@ public class Editor implements Disposable {
             objectsById.put(node.id, node);
 
             pins.addAll(node.pins);
-            pins.forEach(pin -> objectsById.put(pin.id, pin));
+            node.pins.forEach(pin -> objectsById.put(pin.id, pin));
 
             props.addAll(node.props);
-            props.forEach(prop -> {
+            node.props.forEach(prop -> {
                 objectsById.put(prop.id, prop);
 
                 pins.addAll(prop.pins);
-                pins.forEach(pin -> objectsById.put(pin.id, pin));
+                prop.pins.forEach(pin -> objectsById.put(pin.id, pin));
             });
 
             node.incomingLinks.forEach(link -> {
@@ -375,6 +375,7 @@ public class Editor implements Disposable {
         new PropInteger(node);
         new PropFloat(node);
         var editableText = new PropEditableText(node);
+        editableText.name = "Text";
         editableText.setText("""
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pretium, purus nec ullamcorper dictum,
         felis purus accumsan enim, ac tristique tellus orci id dolor.

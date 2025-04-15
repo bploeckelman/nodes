@@ -74,11 +74,19 @@ public class PropEditableText extends Prop {
 
     @Override
     public void render() {
+        var drawList = ImGui.getWindowDrawList();
+
         ImGui.beginGroup();
         {
             var contentWidth = node.width + 16f;
             ImGuiLayout.beginColumn(contentWidth);
             {
+                if (!name.isBlank()) {
+                    ImGui.pushFont(EditorUtil.Fonts.nodeContent);
+                    ImGui.text(name);
+                    ImGui.popFont();
+                }
+
                 // Draw text box background with border
                 var lineHeight = ImGui.getTextLineHeightWithSpacing();
                 var visibleLines = Math.min(totalLines, MAX_VISIBLE_LINES);
@@ -97,9 +105,6 @@ public class PropEditableText extends Prop {
                     var startPos = ImGui.getCursorScreenPos();
                     ImGui.dummy(contentWidth, boxHeight);
                     var endPos = new ImVec2(startPos.x + contentWidth, startPos.y + boxHeight);
-
-                    // We'll use the draw list to draw both the background and the text
-                    var drawList = ImGui.getWindowDrawList();
 
                     // Draw background
                     drawList.addRectFilled(

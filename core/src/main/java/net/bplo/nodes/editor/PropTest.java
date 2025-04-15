@@ -17,17 +17,15 @@ public class PropTest extends Prop {
 
     public PropTest(Node node) {
         super(node);
-        init();
+        new Pin(this, PinKind.INPUT,  PinType.DATA);
+        new Pin(this, PinKind.OUTPUT, PinType.DATA);
     }
 
     PropTest(long savedId, Node node) {
         super(savedId, node);
-        init();
-    }
-
-    private void init() {
-        new Pin(this, PinKind.INPUT,  PinType.DATA);
-        new Pin(this, PinKind.OUTPUT, PinType.DATA);
+        // NOTE(brian): 'internally created pins' for a prop are a quirk for deserialization,
+        //  they can't be created in ctor because they require the saved id on construction.
+        //  so don't instantiate them here, instead deserialization instantiates/attaches them
     }
 
     @Override

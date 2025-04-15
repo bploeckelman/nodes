@@ -2,6 +2,7 @@ package net.bplo.nodes.editor;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import imgui.ImGui;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,5 +50,7 @@ public abstract class Prop extends EditorObject {
     }
 
     public abstract void render();
-    public void renderInfoPane() {}
+    public void renderInfoPane() {
+        ImGui.textDisabled("no data");
+    }
 }

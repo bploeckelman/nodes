@@ -2,9 +2,10 @@
 {
 	id: 1
 	width: 200
+	headerText: Dialogue
 	position: {
-		x: -621
-		y: -691
+		x: 29
+		y: -659
 	}
 	pins: [
 		{
@@ -21,62 +22,65 @@
 	props: [
 		{
 			id: 4
+			name: ""
+			class: net.bplo.nodes.editor.PropTest
+			data: null
+			pins: [
+				{
+					id: 5
+					kind: INPUT
+					type: DATA
+				}
+				{
+					id: 6
+					kind: OUTPUT
+					type: DATA
+				}
+			]
+		}
+		{
+			id: 7
+			name: Number
+			class: net.bplo.nodes.editor.PropInteger
+			data: 2
+			pins: []
+		}
+		{
+			id: 8
+			name: Number
+			class: net.bplo.nodes.editor.PropFloat
+			data: -0.5
+			pins: []
+		}
+		{
+			id: 9
+			name: Dialogue Text
 			class: net.bplo.nodes.editor.PropEditableText
-			data: "For a complete implementation, we'd also need:\n\n- Add serialization support in EditorSerializer.java\n- Create a factory method in Editor.java for creating dialogue nodes\n- Add missing imports (for ImGuiCond and ImGuiFocusedFlags)\n\nWould you like me to explain any specific aspect of this implementation or discuss alternatives to the approach I've taken?\n"
+			data: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pretium, purus nec ullamcorper dictum,\nfelis purus accumsan enim, ac tristique tellus orci id dolor.\n\nPraesent id felis sit amet magna varius congue at ac felis. Vivamus elit sapien, imperdiet id sem blandit,\nsodales tincidunt velit. Nulla blandit, lorem in maximus ullamcorper, dolor justo interdum elit,\nvitae pretium eros nibh a est.\n"
 			pins: []
 		}
 	]
 	incomingLinks: []
 	outgoingLinks: [
 		{
-			id: 17
+			id: 19
 			srcPinId: 3
 			dstPinId: 11
 		}
-	]
-}
-{
-	id: 5
-	width: 200
-	position: {
-		x: -275
-		y: -691
-	}
-	pins: [
 		{
-			id: 6
-			kind: INPUT
-			type: FLOW
-		}
-		{
-			id: 7
-			kind: OUTPUT
-			type: FLOW
+			id: 20
+			srcPinId: 6
+			dstPinId: 14
 		}
 	]
-	props: [
-		{
-			id: 8
-			class: net.bplo.nodes.editor.PropEditableText
-			data: "There's nothing really in this one, certainly not separate from the others\n\nI do want to figure out the 'pin per section' bit though too"
-			pins: []
-		}
-	]
-	incomingLinks: [
-		{
-			id: 18
-			srcPinId: 12
-			dstPinId: 6
-		}
-	]
-	outgoingLinks: []
 }
 {
 	id: 10
 	width: 200
+	headerText: Dialogue
 	position: {
-		x: -451
-		y: -501
+		x: 323
+		y: -659
 	}
 	pins: [
 		{
@@ -93,6 +97,7 @@
 	props: [
 		{
 			id: 13
+			name: ""
 			class: net.bplo.nodes.editor.PropTest
 			data: null
 			pins: [
@@ -110,24 +115,38 @@
 		}
 		{
 			id: 16
+			name: Number
+			class: net.bplo.nodes.editor.PropInteger
+			data: -5
+			pins: []
+		}
+		{
+			id: 17
+			name: Number
+			class: net.bplo.nodes.editor.PropFloat
+			data: 0.70000005
+			pins: []
+		}
+		{
+			id: 18
+			name: Dialogue Text
 			class: net.bplo.nodes.editor.PropEditableText
-			data: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pretium, purus nec ullamcorper dictum,\nfelis purus accumsan enim, ac tristique tellus orci id dolor.\n\nPraesent id felis sit amet magna varius congue at ac felis. Vivamus elit sapien, imperdiet id sem blandit,\nsodales tincidunt velit. Nulla blandit, lorem in maximus ullamcorper, dolor justo interdum elit,\nvitae pretium eros nibh a est.\n"
+			data: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pretium, purus nec ullamcorper dictum,\nfelis purus accumsan enim, ac tristique tellus orci id dolor.\nFoobar...\nPraesent id felis sit amet magna varius congue at ac felis. Vivamus elit sapien, imperdiet id sem blandit,\nsodales tincidunt velit. Nulla blandit, lorem in maximus ullamcorper, dolor justo interdum elit,\nvitae pretium eros nibh a est.\n"
 			pins: []
 		}
 	]
 	incomingLinks: [
 		{
-			id: 17
+			id: 19
 			srcPinId: 3
 			dstPinId: 11
 		}
-	]
-	outgoingLinks: [
 		{
-			id: 18
-			srcPinId: 12
-			dstPinId: 6
+			id: 20
+			srcPinId: 6
+			dstPinId: 14
 		}
 	]
+	outgoingLinks: []
 }
 ]

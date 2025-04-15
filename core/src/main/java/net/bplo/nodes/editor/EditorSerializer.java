@@ -41,6 +41,7 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
             // Write node properties
             json.writeValue("id", node.id);
             json.writeValue("width", node.width);
+            json.writeValue("headerText", node.headerText);
             json.writeValue("position", NodeEditor.getNodePosition(node.id));
 
             // Write node pins
@@ -59,6 +60,7 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
             for (Prop prop : node.props) {
                 json.writeObjectStart();
                 json.writeValue("id", prop.id);
+                json.writeValue("name", prop.name);
                 json.writeValue("class", prop.getClass().getName());
                 // TODO(brian): verify if this will work for all prop types
                 //  or if we need to take the 'data' type into account for serde
@@ -124,8 +126,9 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
             var node = new Node(id);
             Util.log(TAG, "Node created: %s".formatted(node.label()));
 
-            // Set node width
+            // Set node metadata
             node.width = nodeValue.getFloat("width", Node.DEFAULT_WIDTH);
+            node.headerText = nodeValue.getString("headerText", "");
 
             // Set node position
             // NOTE(brian): required to maintain saved node positions on load,
@@ -160,6 +163,7 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
             if (propsArray != null) {
                 for (var propValue = propsArray.child; propValue != null; propValue = propValue.next) {
                     var propId    = propValue.getLong("id");
+                    var propName  = propValue.getString("name", "");
                     var propClassName = propValue.getString("class");
                     var propDataValue = propValue.get("data");
 
@@ -169,6 +173,7 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
                         var propClass   = Class.forName(propClassName);
                         var constructor = propClass.getDeclaredConstructor(long.class, Node.class);
                         prop = (Prop) constructor.newInstance(propId, node);
+                        prop.name = propName;
 
                         // TODO(brian): return to this once we have more concrete prop types,
                         //  depending how they're setup it could be trickier than this to deserialize
@@ -187,7 +192,13 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
                                 var kind = PinKind.valueOf(pinValue.getString("kind"));
                                 var type = PinType.valueOf(pinValue.getString("type"));
 
-                                var pin = new Pin(pinId, prop, kind, type);
+                                Pin pin;
+                                if (PropTest.class == propClass) {
+                                    pin = new Pin(pinId, prop, kind, type);
+                                } else {
+                                    pin = new Pin(pinId, prop, kind, type);
+                                }
+
                                 // Don't need to add to prop.pins as constructor already does this
                                 Util.log(TAG, "Prop Pin created: %s".formatted(pin.label()));
 
