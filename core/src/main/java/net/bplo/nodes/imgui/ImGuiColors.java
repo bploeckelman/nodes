@@ -48,6 +48,8 @@ public class ImGuiColors {
     public static final Value sky         = new Value("#87ceebff");
     public static final Value cyan        = new Value("#00ffffff");
     public static final Value teal        = new Value("#007f7fff");
+    public static final Value imBlue      = new Value("#4296faff");
+    public static final Value imBlueDark  = new Value("#344662ff");
 
     public static final Value green       = new Value("#00ff00ff");
     public static final Value chartreuse  = new Value("#7fff00ff");

@@ -374,6 +374,7 @@ public class Editor implements Disposable {
         new PropTest(node);
         new PropInteger(node);
         new PropFloat(node);
+        new PropSelect(node, new PropSelect.Data(0, List.of("Foo", "Bar", "Baz")));
         var editableText = new PropEditableText(node);
         editableText.name = "Text";
         editableText.setText("""

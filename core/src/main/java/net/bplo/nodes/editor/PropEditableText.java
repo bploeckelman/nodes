@@ -55,12 +55,7 @@ public class PropEditableText extends Prop {
 
     @Override
     public void setData(Json json, JsonValue dataValue) {
-        var data = dataValue.asString();
-        if (data instanceof String string) {
-            setText(string);
-        } else {
-            Util.log(TAG, "Unexpected data value type for %s: %s".formatted(TAG, dataValue));
-        }
+        setText(dataValue.asString());
     }
 
     public String getText() {

@@ -69,8 +69,10 @@ public class EditorInfoPane extends EditorPane {
                     // TODO(brian): when selecting multiple nodes with PropEditableText props
                     //  only the first node's editable text prop is populated for some reason
                     node.props.forEach(prop -> {
-                        ImGui.textColored(ImGuiColors.teal.asInt(), "%s (%s)".formatted(prop.getClass().getSimpleName(), prop.label()));
-                        ImGui.dummy(0, 1);
+                        if (Prop.SHOW_INFO_PANE_LABELS) {
+                            ImGui.textColored(ImGuiColors.teal.asInt(), "%s (%s)".formatted(prop.getClass().getSimpleName(), prop.label()));
+                            ImGui.dummy(0, 1);
+                        }
                         prop.renderInfoPane();
                         ImGui.dummy(0, 4);
                     });

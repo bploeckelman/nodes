@@ -11,6 +11,8 @@ import java.util.stream.Stream;
 
 public abstract class Prop extends EditorObject {
 
+    public static boolean SHOW_INFO_PANE_LABELS = false;
+
     public final Node node;
     public final List<Pin> pins;
 
@@ -51,6 +53,8 @@ public abstract class Prop extends EditorObject {
 
     public abstract void render();
     public void renderInfoPane() {
-        ImGui.textDisabled("no data");
+        if (SHOW_INFO_PANE_LABELS) {
+            ImGui.textDisabled("no data");
+        }
     }
 }
