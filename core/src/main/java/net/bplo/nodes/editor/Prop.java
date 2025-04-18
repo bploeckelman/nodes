@@ -52,6 +52,9 @@ public abstract class Prop extends EditorObject {
     }
 
     public abstract void render();
+
+    public void renderPopup() {/* override if a popup is needed */}
+
     public void renderInfoPane() {
         if (SHOW_INFO_PANE_LABELS) {
             ImGui.textDisabled("no data");

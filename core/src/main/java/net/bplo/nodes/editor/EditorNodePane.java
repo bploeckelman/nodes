@@ -56,6 +56,16 @@ public class EditorNodePane extends EditorPane {
             editor.nodes.forEach(Node::render);
             editor.links.forEach(Link::render);
 
+            // imgui-node-editor doesn't support a subset of imgui widgets within a node context,
+            // props can emulate some of those by using a popup rendered outside a node context
+            NodeEditor.suspend();
+            for (var node : editor.nodes) {
+                for (var prop : node.props) {
+                    prop.renderPopup();
+                }
+            }
+            NodeEditor.resume();
+
             handleCreateLink();
             handleDeleteObject();
             handleContextMenus();
