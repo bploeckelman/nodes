@@ -3,6 +3,7 @@ package net.bplo.nodes.editor;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import imgui.ImGui;
+import net.bplo.nodes.imgui.ImGuiWidgetBounds;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,8 @@ import java.util.stream.Stream;
 public abstract class Prop extends EditorObject {
 
     public static boolean SHOW_INFO_PANE_LABELS = false;
+
+    public final ImGuiWidgetBounds bounds = new ImGuiWidgetBounds();
 
     public final Node node;
     public final List<Pin> pins;
@@ -55,8 +58,8 @@ public abstract class Prop extends EditorObject {
 
     public void renderPopup() {/* override if a popup is needed */}
 
-    public void renderInfoPane() {
-        if (SHOW_INFO_PANE_LABELS) {
+    public void renderInfoPane(Editor editor) {
+        if (editor.nodePane.showIds) {
             ImGui.textDisabled("no data");
         }
     }

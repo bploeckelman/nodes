@@ -30,7 +30,7 @@ public class Node extends EditorObject {
 
     public String headerText = "Node Header";
 
-    private final Bounds bounds = new Bounds();
+    final Bounds bounds = new Bounds();
 
     public Node() {
         super(Type.NODE);
@@ -98,6 +98,12 @@ public class Node extends EditorObject {
         NodeEditor.endNode();
 
         renderAfterNode();
+    }
+
+    public void renderIds() {
+        EditorWidget.renderObjectId(this);
+        props.forEach(EditorWidget::renderObjectId);
+        // TODO(brian): pins, links
     }
 
     @Override
@@ -198,7 +204,7 @@ public class Node extends EditorObject {
         bounds.content.update();
     }
 
-    private static class Bounds {
+    static class Bounds {
         public final ImGuiWidgetBounds header           = new ImGuiWidgetBounds();
         public final ImGuiWidgetBounds content          = new ImGuiWidgetBounds();
         public final ImGuiWidgetBounds node             = new ImGuiWidgetBounds();

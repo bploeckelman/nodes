@@ -9,10 +9,8 @@ import imgui.flag.ImGuiInputTextFlags;
 import imgui.flag.ImGuiStyleVar;
 import imgui.type.ImInt;
 import imgui.type.ImString;
-import net.bplo.nodes.Util;
 import net.bplo.nodes.imgui.ImGuiColors;
 import net.bplo.nodes.imgui.ImGuiLayout;
-import net.bplo.nodes.imgui.ImGuiWidgetBounds;
 
 import java.util.ArrayList;
 
@@ -22,7 +20,6 @@ public class PropEditableText extends Prop {
     private static final int MAX_VISIBLE_LINES = 5;
 
     private final ImString text = new ImString(4096);
-    private final ImGuiWidgetBounds bounds = new ImGuiWidgetBounds();
     private final ImInt scrollPos = new ImInt(0);
 
     private String[] previewLines = new String[0];
@@ -180,7 +177,7 @@ public class PropEditableText extends Prop {
     }
 
     @Override
-    public void renderInfoPane() {
+    public void renderInfoPane(Editor editor) {
         // show multiline text editor for this prop in info pane,
         // because multiline input doesn't work in a node context
         var avail = ImGui.getContentRegionAvail();

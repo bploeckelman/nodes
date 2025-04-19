@@ -8,12 +8,10 @@ import imgui.extension.nodeditor.NodeEditor;
 import net.bplo.nodes.editor.utils.PinKind;
 import net.bplo.nodes.editor.utils.PinType;
 import net.bplo.nodes.imgui.ImGuiLayout;
-import net.bplo.nodes.imgui.ImGuiWidgetBounds;
 
 public class PropTest extends Prop {
 
     private final int backgroundColor = ImColor.rgba("#00004f2f");
-    private final ImGuiWidgetBounds bounds = new ImGuiWidgetBounds();
 
     public PropTest(Node node) {
         super(node);

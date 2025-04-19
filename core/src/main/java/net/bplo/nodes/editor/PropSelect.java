@@ -117,6 +117,7 @@ public class PropSelect extends Prop {
             ImGui.popStyleColor(3);
         }
         ImGuiLayout.endColumn();
+        bounds.update();
     }
 
     @Override
@@ -146,11 +147,6 @@ public class PropSelect extends Prop {
                     data.selectedIndex = i;
                     ImGui.closeCurrentPopup();
                 }
-
-                // Set item focus but not selection
-                //if (selected && ImGui.isWindowAppearing()) {
-                //    ImGui.setItemDefaultFocus();
-                //}
             }
 
             ImGui.endPopup();
@@ -161,7 +157,7 @@ public class PropSelect extends Prop {
     }
 
     @Override
-    public void renderInfoPane() {
+    public void renderInfoPane(Editor editor) {
         if (ImGui.beginCombo("%s##%s-info-pane".formatted(name, label()), previewValue())) {
             // draw items
             for (int i = 0; i < data.options.length; i++) {

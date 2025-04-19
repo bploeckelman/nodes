@@ -32,6 +32,8 @@ public class EditorNodePane extends EditorPane {
 
     private long[] selectedObjectIds;
 
+    public boolean showIds = false;
+
     public EditorNodePane(Editor editor) {
         super(editor);
         this.contextMenu = new ContextMenu();
@@ -47,6 +49,7 @@ public class EditorNodePane extends EditorPane {
             // render editor menubar widgets
                               EditorWidget.renderSaveButton(editor);
             ImGui.sameLine(); EditorWidget.renderLoadButton(editor);
+            ImGui.sameLine(); EditorWidget.renderShowIdsToggle(editor);
             ImGui.sameLine(); EditorWidget.renderSetContentPathButton(editor);
             ImGui.sameLine(); EditorWidget.renderContentCombo(editor);
 
@@ -55,6 +58,10 @@ public class EditorNodePane extends EditorPane {
 
             editor.nodes.forEach(Node::render);
             editor.links.forEach(Link::render);
+
+            if (showIds) {
+                editor.nodes.forEach(Node::renderIds);
+            }
 
             // imgui-node-editor doesn't support a subset of imgui widgets within a node context,
             // props can emulate some of those by using a popup rendered outside a node context

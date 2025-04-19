@@ -51,15 +51,20 @@ public class PropFloat extends Prop {
 
     @Override
     public void render() {
-        var nameWidth = ImGui.calcTextSizeX(name);
-        ImGui.setNextItemWidth(node.width - nameWidth);
+        ImGui.beginGroup();
+        {
+            var nameWidth = ImGui.calcTextSizeX(name);
+            ImGui.setNextItemWidth(node.width - nameWidth);
 
-        var label = "%s##%s_%s_%s".formatted(name, node.label(), label(), TAG.toLowerCase());
-        ImGui.inputFloat(label, value, step, stepFast, "%.1f");
+            var label = "%s##%s_%s_%s".formatted(name, node.label(), label(), TAG.toLowerCase());
+            ImGui.inputFloat(label, value, step, stepFast, "%.1f");
+        }
+        ImGui.endGroup();
+        bounds.update();
     }
 
     @Override
-    public void renderInfoPane() {
+    public void renderInfoPane(Editor editor) {
         render();
     }
 }

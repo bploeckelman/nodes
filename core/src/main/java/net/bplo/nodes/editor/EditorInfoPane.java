@@ -61,7 +61,7 @@ public class EditorInfoPane extends EditorPane {
                 for (var node : selectedNodes) {
                     ImGui.pushFont(EditorUtil.Fonts.nodeHeader);
                     ImGui.pushStyleColor(ImGuiCol.Text, ImGuiColors.cyan.asInt());
-                    ImGui.text("Node %d: %s".formatted(node.id, node.headerText));
+                    ImGui.text("%s (%s)".formatted(node.headerText, node.label()));
                     ImGui.popStyleColor();
                     ImGui.popFont();
                     ImGui.separator();
@@ -69,11 +69,12 @@ public class EditorInfoPane extends EditorPane {
                     // TODO(brian): when selecting multiple nodes with PropEditableText props
                     //  only the first node's editable text prop is populated for some reason
                     node.props.forEach(prop -> {
-                        if (Prop.SHOW_INFO_PANE_LABELS) {
-                            ImGui.textColored(ImGuiColors.teal.asInt(), "%s (%s)".formatted(prop.getClass().getSimpleName(), prop.label()));
+                        if (editor.nodePane.showIds) {
+                            var propType = prop.getClass().getSimpleName().replaceFirst("Prop", "");
+                            ImGui.textColored(ImGuiColors.teal.asInt(), "%s (%s)".formatted(propType, prop.label()));
                             ImGui.dummy(0, 1);
                         }
-                        prop.renderInfoPane();
+                        prop.renderInfoPane(editor);
                         ImGui.dummy(0, 4);
                     });
                 }

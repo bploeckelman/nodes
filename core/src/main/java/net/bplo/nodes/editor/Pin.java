@@ -78,6 +78,13 @@ public class Pin extends EditorObject {
         this.pinRectBounds = new ImGuiWidgetBounds();
     }
 
+    public Node getNode() {
+        return switch (attachment) {
+            case PinAttachment.NodeType nodeAttachment -> nodeAttachment.node();
+            case PinAttachment.PropType propAttachment -> propAttachment.prop().node;
+        };
+    }
+
     @Override
     public void render() {
         NodeEditor.beginPin(id, kind.value);

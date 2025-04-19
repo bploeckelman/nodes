@@ -48,15 +48,20 @@ public class PropInteger extends Prop {
 
     @Override
     public void render() {
-        var nameWidth = ImGui.calcTextSizeX(name);
-        ImGui.setNextItemWidth(node.width - nameWidth);
+        ImGui.beginGroup();
+        {
+            var nameWidth = ImGui.calcTextSizeX(name);
+            ImGui.setNextItemWidth(node.width - nameWidth);
 
-        var label = "%s##%s_%s_%s".formatted(name, node.label(), label(), TAG.toLowerCase());
-        ImGui.inputInt(label, value);
+            var label = "%s##%s_%s_%s".formatted(name, node.label(), label(), TAG.toLowerCase());
+            ImGui.inputInt(label, value);
+        }
+        ImGui.endGroup();
+        bounds.update();
     }
 
     @Override
-    public void renderInfoPane() {
+    public void renderInfoPane(Editor editor) {
         render();
     }
 }
