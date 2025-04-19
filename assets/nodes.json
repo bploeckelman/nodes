@@ -4,8 +4,8 @@
 	width: 200
 	headerText: Dialogue
 	position: {
-		x: 29
-		y: -659
+		x: 1503
+		y: -542
 	}
 	pins: [
 		{
@@ -49,104 +49,243 @@
 			id: 8
 			name: Number
 			class: net.bplo.nodes.editor.PropFloat
-			data: -0.5
+			data: 0.20000002
 			pins: []
 		}
 		{
 			id: 9
-			name: Dialogue Text
+			name: Select
+			class: net.bplo.nodes.editor.PropSelect
+			data: {
+				options: [
+					Foo
+					Bar
+					Baz
+					Buzz
+					Booze
+					Quux
+				]
+				selectedIndex: 1
+			}
+			pins: []
+		}
+		{
+			id: 10
+			name: Text
 			class: net.bplo.nodes.editor.PropEditableText
-			data: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pretium, purus nec ullamcorper dictum,\nfelis purus accumsan enim, ac tristique tellus orci id dolor.\n\nPraesent id felis sit amet magna varius congue at ac felis. Vivamus elit sapien, imperdiet id sem blandit,\nsodales tincidunt velit. Nulla blandit, lorem in maximus ullamcorper, dolor justo interdum elit,\nvitae pretium eros nibh a est.\n"
+			data: This is node 1
 			pins: []
 		}
 	]
-	incomingLinks: []
+	incomingLinks: [
+		{
+			id: 34
+			srcPinId: 25
+			dstPinId: 2
+		}
+	]
 	outgoingLinks: [
 		{
-			id: 19
+			id: 21
 			srcPinId: 3
-			dstPinId: 11
+			dstPinId: 12
 		}
 		{
-			id: 20
+			id: 22
 			srcPinId: 6
-			dstPinId: 14
+			dstPinId: 15
 		}
 	]
 }
 {
-	id: 10
+	id: 11
 	width: 200
 	headerText: Dialogue
 	position: {
-		x: 323
-		y: -659
+		x: 1793
+		y: -543
 	}
 	pins: [
 		{
-			id: 11
+			id: 12
 			kind: INPUT
 			type: FLOW
 		}
 		{
-			id: 12
+			id: 13
 			kind: OUTPUT
 			type: FLOW
 		}
 	]
 	props: [
 		{
-			id: 13
+			id: 14
 			name: ""
 			class: net.bplo.nodes.editor.PropTest
 			data: null
 			pins: [
 				{
-					id: 14
+					id: 15
 					kind: INPUT
 					type: DATA
 				}
 				{
-					id: 15
+					id: 16
 					kind: OUTPUT
 					type: DATA
 				}
 			]
 		}
 		{
-			id: 16
-			name: Number
-			class: net.bplo.nodes.editor.PropInteger
-			data: -5
-			pins: []
-		}
-		{
 			id: 17
 			name: Number
-			class: net.bplo.nodes.editor.PropFloat
-			data: 0.70000005
+			class: net.bplo.nodes.editor.PropInteger
+			data: -2
 			pins: []
 		}
 		{
 			id: 18
-			name: Dialogue Text
+			name: Number
+			class: net.bplo.nodes.editor.PropFloat
+			data: -0.20000002
+			pins: []
+		}
+		{
+			id: 19
+			name: Select
+			class: net.bplo.nodes.editor.PropSelect
+			data: {
+				options: [
+					Foo
+					Bar
+					Baz
+					Buzz
+					Booze
+					Quux
+				]
+				selectedIndex: 2
+			}
+			pins: []
+		}
+		{
+			id: 20
+			name: Text
 			class: net.bplo.nodes.editor.PropEditableText
-			data: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pretium, purus nec ullamcorper dictum,\nfelis purus accumsan enim, ac tristique tellus orci id dolor.\nFoobar...\nPraesent id felis sit amet magna varius congue at ac felis. Vivamus elit sapien, imperdiet id sem blandit,\nsodales tincidunt velit. Nulla blandit, lorem in maximus ullamcorper, dolor justo interdum elit,\nvitae pretium eros nibh a est.\n"
+			data: This is node 11\n
 			pins: []
 		}
 	]
 	incomingLinks: [
 		{
-			id: 19
+			id: 21
 			srcPinId: 3
-			dstPinId: 11
+			dstPinId: 12
 		}
 		{
-			id: 20
+			id: 22
 			srcPinId: 6
-			dstPinId: 14
+			dstPinId: 15
 		}
 	]
-	outgoingLinks: []
+	outgoingLinks: [
+		{
+			id: 33
+			srcPinId: 13
+			dstPinId: 24
+		}
+	]
+}
+{
+	id: 23
+	width: 200
+	headerText: Dialogue
+	position: {
+		x: 1651
+		y: -883
+	}
+	pins: [
+		{
+			id: 24
+			kind: INPUT
+			type: FLOW
+		}
+		{
+			id: 25
+			kind: OUTPUT
+			type: FLOW
+		}
+	]
+	props: [
+		{
+			id: 26
+			name: ""
+			class: net.bplo.nodes.editor.PropTest
+			data: null
+			pins: [
+				{
+					id: 27
+					kind: INPUT
+					type: DATA
+				}
+				{
+					id: 28
+					kind: OUTPUT
+					type: DATA
+				}
+			]
+		}
+		{
+			id: 29
+			name: Number
+			class: net.bplo.nodes.editor.PropInteger
+			data: 1
+			pins: []
+		}
+		{
+			id: 30
+			name: Number
+			class: net.bplo.nodes.editor.PropFloat
+			data: 1.0000001
+			pins: []
+		}
+		{
+			id: 31
+			name: Select
+			class: net.bplo.nodes.editor.PropSelect
+			data: {
+				options: [
+					Foo
+					Bar
+					Baz
+					Buzz
+					Booze
+					Quux
+				]
+				selectedIndex: 0
+			}
+			pins: []
+		}
+		{
+			id: 32
+			name: Text
+			class: net.bplo.nodes.editor.PropEditableText
+			data: "This is node 23...\n\nWow, we're going to run into ids in the hundreds much quicker than I originally thought."
+			pins: []
+		}
+	]
+	incomingLinks: [
+		{
+			id: 33
+			srcPinId: 13
+			dstPinId: 24
+		}
+	]
+	outgoingLinks: [
+		{
+			id: 34
+			srcPinId: 25
+			dstPinId: 2
+		}
+	]
 }
 ]

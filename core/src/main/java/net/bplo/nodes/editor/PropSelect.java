@@ -9,7 +9,6 @@ import imgui.flag.ImGuiDir;
 import imgui.flag.ImGuiStyleVar;
 import net.bplo.nodes.imgui.ImGuiLayout;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PropSelect extends Prop {
@@ -139,19 +138,19 @@ public class PropSelect extends Prop {
 
         if (ImGui.beginPopup(popupId())) {
             // Draw options
-            for (int i = 0; i < data.options.size(); i++) {
-                var option = data.options.get(i);
+            for (int i = 0; i < data.options.length; i++) {
+                var option = data.options[i];
+                var selected = data.selectedIndex == i;
 
-                // Don't pass selected=true to selectable to avoid permanent highlighting
-                if (ImGui.selectable(option, data.selectedIndex == i)) {
+                if (ImGui.selectable(option, selected)) {
                     data.selectedIndex = i;
                     ImGui.closeCurrentPopup();
                 }
 
                 // Set item focus but not selection
-//                if (data.selectedIndex == i && ImGui.isWindowAppearing()) {
-//                    ImGui.setItemDefaultFocus();
-//                }
+                //if (selected && ImGui.isWindowAppearing()) {
+                //    ImGui.setItemDefaultFocus();
+                //}
             }
 
             ImGui.endPopup();
@@ -161,59 +160,12 @@ public class PropSelect extends Prop {
         ImGui.popStyleColor();
     }
 
-//    @Override
-//    public void renderPopup() {
-//        if (showPopup) {
-//            ImGui.openPopup(popupId());
-//            showPopup = false;
-//        }
-//
-//        // Set popup style to match the standard imgui combo box style
-//        var style = ImGui.getStyle();
-//        ImGui.pushStyleVar(ImGuiStyleVar.WindowBorderSize, 1.0f);
-//        ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 8f, 8f);
-//        ImGui.pushStyleColor(ImGuiCol.PopupBg, style.getColor(ImGuiCol.PopupBg));
-//        ImGui.pushStyleColor(ImGuiCol.Border, style.getColor(ImGuiCol.Border));
-//
-//        // Set the popup width to match the widget width
-//        var contentWidth = node.width + 16f;
-//        ImGui.setNextWindowSizeConstraints(
-//            contentWidth, 0,
-//            contentWidth, 300);
-//
-//        if (ImGui.beginPopup(popupId())) {
-//            // Draw combo box options as 'selectable' items
-//            for (int i = 0; i < data.options.size(); i++) {
-//                var option = data.options.get(i);
-//                var selected = data.selectedIndex == i;
-//
-//                // NOTE: since this isn't a normal combo box, we pass 'false' for selected state
-//                //  otherwise the selected item would always stay highlighted when the popup is open
-//                if (ImGui.selectable(option, false, 0, contentWidth, 0)) {
-//                    data.selectedIndex = i;
-//                    ImGui.closeCurrentPopup();
-//                }
-//
-//                // Manually set the initial focus to the selected item,
-//                // allowing keyboard nav to start from the selected item
-//                if (selected && ImGui.isWindowAppearing()) {
-//                    ImGui.setItemDefaultFocus();
-//                }
-//            }
-//
-//            ImGui.endPopup();
-//        }
-//
-//        ImGui.popStyleVar(2);
-//        ImGui.popStyleColor(2);
-//    }
-
     @Override
     public void renderInfoPane() {
         if (ImGui.beginCombo("%s##%s-info-pane".formatted(name, label()), previewValue())) {
             // draw items
-            for (int i = 0; i < data.options.size(); i++) {
-                var option   = data.options.get(i);
+            for (int i = 0; i < data.options.length; i++) {
+                var option   = data.options[i];
                 var selected = data.selectedIndex == i;
                 if (ImGui.selectable(option, selected)) {
                     data.selectedIndex = i;
@@ -236,14 +188,14 @@ public class PropSelect extends Prop {
     }
 
     public static class Data {
-        public List<String> options = new ArrayList<>();
+        public String[] options = new String[0];
         public int selectedIndex = -1;
 
         public Data() {}
 
         public Data(int selectedIndex, List<String> options) {
             this.selectedIndex = selectedIndex;
-            this.options = options;
+            this.options = options.toArray(new String[0]);
         }
 
         public void set(Data newData) {
@@ -252,8 +204,8 @@ public class PropSelect extends Prop {
         }
 
         public String getSelectedOption() {
-            if (!options.isEmpty() && selectedIndex >= 0 && selectedIndex < options.size()) {
-                return options.get(selectedIndex);
+            if (options.length > 0 && selectedIndex >= 0 && selectedIndex < options.length) {
+                return options[selectedIndex];
             }
             return "";
         }
