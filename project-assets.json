@@ -1,0 +1,65 @@
+{
+  assetRoots: [
+    {path: ./sprites/characters, type: texture},
+    {path: ./sprites/characters/anims, type: animation}
+  ],
+  assetTypes: [
+    {
+      type: texture,
+      id: textures,
+      name: Textures,
+      entries: [
+        {id: man-idle, name: Man (Idle), file: ./man-idle.png}
+      ]
+    },
+    {
+      type: character,
+      id: characters,
+      name: Characters,
+      entries: [
+        {
+          id: player,
+          name: Player,
+          portraitId: textures.man-idle,
+          stats: {
+            charm: 10,
+            intelligence: 8
+          }
+        }
+      ]
+    }
+  ],
+  nodeTypes: [
+    {
+      id: dialogue,
+      name: Dialogue,
+      inputs: 1,
+      outputs: 1,
+      propTypes: [
+        {
+          type: select,
+          id: dialog-character-select,
+          name: Character,
+          category: characters
+        },
+        {
+          type: thumbnail,
+          id: dialogue-character-portrait-preview,
+          name: Portrait,
+          category: textures,
+          linkTo: character.portraitId
+        },
+        {
+          type: text,
+          id: dialogue-character-name-override,
+          name: Name Override
+        },
+        {
+          type: text-multiline
+          id: dialogue-text
+          name: Dialogue
+        }
+      ]
+    }
+  ]
+}

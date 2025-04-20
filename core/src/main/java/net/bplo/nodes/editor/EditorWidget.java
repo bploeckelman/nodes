@@ -1,14 +1,19 @@
 package net.bplo.nodes.editor;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import imgui.ImGui;
 import imgui.extension.nodeditor.NodeEditor;
 import imgui.flag.ImGuiStyleVar;
 import net.bplo.nodes.Util;
+import net.bplo.nodes.editor.meta.AssetMetadata;
 import net.bplo.nodes.imgui.FontAwesomeIcons;
 import net.bplo.nodes.imgui.ImGuiColors;
 import net.bplo.nodes.imgui.ImGuiWidgetBounds;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.nio.file.Paths;
 
 public class EditorWidget {
 
@@ -42,6 +47,32 @@ public class EditorWidget {
         var label = icon + text;
         if (ImGui.checkbox(label, editor.nodePane.showIds)) {
             editor.nodePane.showIds = !editor.nodePane.showIds;
+        }
+
+        ImGui.popFont();
+    }
+
+    static void renderLoadAssetMetadataButton(Editor editor) {
+        ImGui.pushFont(EditorUtil.Fonts.icons);
+
+        if (ImGui.button(FontAwesomeIcons.fileImport + " Load Asset Metadata")) {
+            var fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Select Asset Metadata File");
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fileChooser.setFileFilter(new FileNameExtensionFilter("JSON files", "json"));
+            // TODO(brian): persist and restore last directory
+            fileChooser.setCurrentDirectory(Paths.get(".").toAbsolutePath().toFile());
+
+            if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(null)) {
+                var selectedFile = fileChooser.getSelectedFile();
+                var filePath = selectedFile.toPath().toAbsolutePath().toString();
+                var fileHandle = Gdx.files.absolute(filePath);
+                if (!fileHandle.exists() || fileHandle.isDirectory()) {
+                    throw new GdxRuntimeException("Invalid file: " + filePath);
+                }
+                var metadata = AssetMetadata.load(fileHandle);
+                Util.log(TAG, "Loaded asset metadata from file: %s".formatted(filePath));
+            }
         }
 
         ImGui.popFont();
