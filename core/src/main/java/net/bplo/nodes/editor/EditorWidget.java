@@ -5,8 +5,6 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import imgui.ImGui;
 import imgui.extension.nodeditor.NodeEditor;
 import imgui.flag.ImGuiStyleVar;
-import net.bplo.nodes.Util;
-import net.bplo.nodes.editor.meta.AssetMetadata;
 import net.bplo.nodes.imgui.FontAwesomeIcons;
 import net.bplo.nodes.imgui.ImGuiColors;
 import net.bplo.nodes.imgui.ImGuiWidgetBounds;
@@ -70,8 +68,8 @@ public class EditorWidget {
                 if (!fileHandle.exists() || fileHandle.isDirectory()) {
                     throw new GdxRuntimeException("Invalid file: " + filePath);
                 }
-                var metadata = AssetMetadata.load(fileHandle);
-                Util.log(TAG, "Loaded asset metadata from file: %s".formatted(filePath));
+
+                editor.loadAssetMetadata(fileHandle);
             }
         }
 

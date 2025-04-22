@@ -1,13 +1,12 @@
 package net.bplo.nodes.editor;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Timer;
-import imgui.ImColor;
 import imgui.ImGui;
 import imgui.extension.nodeditor.NodeEditor;
 import imgui.extension.nodeditor.NodeEditorConfig;
@@ -16,11 +15,10 @@ import imgui.flag.ImGuiDockNodeFlags;
 import imgui.flag.ImGuiStyleVar;
 import net.bplo.nodes.Main;
 import net.bplo.nodes.Util;
+import net.bplo.nodes.editor.meta.AssetMetadata;
 import net.bplo.nodes.editor.utils.PinKind;
 import net.bplo.nodes.editor.utils.PinType;
-import net.bplo.nodes.imgui.ImGuiLayout;
 import net.bplo.nodes.imgui.ImGuiPlatform;
-import net.bplo.nodes.imgui.ImGuiWidgetBounds;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -36,69 +34,6 @@ public class Editor implements Disposable {
     public static final String SETTINGS_FILE = "editor.json";
     public static final String DEFAULT_FONT = "play-regular.ttf";
 
-    public static class TestProperty extends Prop {
-
-        private final int backgroundColor = ImColor.rgba("#00004f2f");
-        private final ImGuiWidgetBounds bounds = new ImGuiWidgetBounds();
-
-        public TestProperty(Node node) {
-            super(node);
-            new Pin(this, PinKind.INPUT,  PinType.DATA);
-            new Pin(this, PinKind.OUTPUT, PinType.DATA);
-        }
-
-        TestProperty(long savedId, Node node) {
-            super(savedId, node);
-        }
-
-        @Override
-        public Object getData() {
-            return null;
-        }
-
-        @Override
-        public void setData(Json json, JsonValue dataValue) {
-            // no-op, test prop doesn't have data
-        }
-
-        @Override
-        public void render() {
-            ImGui.beginGroup();
-            {
-                var contentWidth = node.width - 2 * Pin.SIZE;
-
-                ImGuiLayout.beginColumn(Pin.SIZE);
-                {
-                    inputPins().forEach(Pin::render);
-                }
-                ImGuiLayout.nextColumn(contentWidth);
-                {
-                    // NOTE: same approach as in Node.render() to ensure a fixed column width
-                    //  when the only widget in the column is text, which collapses to fit the string
-                    var cursorPos = ImGui.getCursorPos();
-                    ImGui.setNextItemAllowOverlap();
-                    ImGui.dummy(contentWidth, Pin.SIZE);
-                    ImGui.setCursorPos(cursorPos);
-                    ImGui.text("prop");
-                }
-                ImGuiLayout.nextColumn(Pin.SIZE);
-                {
-                    outputPins().forEach(Pin::render);
-                }
-                ImGuiLayout.endColumn();
-            }
-            ImGui.endGroup();
-            bounds.update();
-        }
-
-        @Override
-        public void renderAfterNode() {
-            var draw = NodeEditor.getNodeBackgroundDrawList(node.id);
-            var rounding = NodeEditor.getStyle().getNodeRounding();
-            draw.addRectFilled(bounds.min(), bounds.max(), backgroundColor, rounding);
-        }
-    }
-
     private final Json json;
     private final NodeEditorContext editorContext;
 
@@ -111,6 +46,8 @@ public class Editor implements Disposable {
 
     final EditorInfoPane infoPane;
     final EditorNodePane nodePane;
+
+    AssetMetadata assetMetadata;
 
     public Editor() {
         EditorContent.refresh();
@@ -227,6 +164,15 @@ public class Editor implements Disposable {
             case null, default ->
                 throw new GdxRuntimeException("Cannot remove editor object with null value or unsupported type");
         }
+    }
+
+    void loadAssetMetadata(FileHandle fileHandle) {
+        assetMetadata = AssetMetadata.load(fileHandle);
+        nodePane.nodeTypes.clear();
+        for (var nodeType : assetMetadata.nodeTypes) {
+            nodePane.nodeTypes.put(nodeType.name, nodeType);
+        }
+        Util.log(TAG, "Loaded asset metadata from file: %s".formatted(fileHandle.path()));
     }
 
     void save() {

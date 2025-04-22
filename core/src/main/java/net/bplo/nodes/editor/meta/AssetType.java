@@ -5,9 +5,9 @@ import com.badlogic.gdx.utils.ObjectMap;
 
 public class AssetType {
 
-    public String type;
     public String id;
     public String name;
+    public String path;
     public Array<Entry> entries = new Array<>();
 
     public static class Entry extends ObjectMap<String, Object> {

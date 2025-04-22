@@ -7,13 +7,12 @@ public class NodeType {
     public String name;
     public int inputs;
     public int outputs;
-    public Array<PropType> propTypes = new Array<>();
+    public Array<PropDef> props = new Array<>();
 
-    public static class PropType {
+    public static class PropDef {
         public String type;
         public String id;
         public String name;
-        public String category;
-        public String linkTo;
+        public String assetEntry;
     }
 }

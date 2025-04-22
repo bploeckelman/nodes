@@ -1,5 +1,6 @@
 package net.bplo.nodes.editor;
 
+import com.badlogic.gdx.utils.ObjectMap;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.ImVec4;
@@ -31,6 +32,9 @@ public class EditorNodePane extends EditorPane {
     private final ContextMenu contextMenu;
 
     private long[] selectedObjectIds;
+
+    // TODO(brian): this should be ordered, and match insertion order in the 'create node' context menu
+    final ObjectMap<String, NodeType> nodeTypes = new ObjectMap<>();
 
     public boolean showIds = false;
 
@@ -204,43 +208,58 @@ public class EditorNodePane extends EditorPane {
             ImGui.pushFont(EditorUtil.Fonts.nodeHeader);
             ImGui.textColored(ImGuiColors.cyan.asVec4(), POPUP_CREATE_NODE);
             ImGui.popFont();
+            if (nodeTypes.isEmpty()) {
+                ImGui.separator();
+                ImGui.textDisabled("""
+                    No asset metadata loaded,
+                    showing test node types.
+                    """);
+            }
 
             ImGui.separator();
             ImGui.dummy(0, 2);
 
             // spawn a node if user selects a type from the popup
             Node newNode = null;
-            // TODO(brian): TEMP *** -----------------------------
-            var separatorPrefix = "---";
-            var nodeTypes = List.of(
-                separatorPrefix + "Normal"
-                , "Node A"
-                , "Node B"
-                , separatorPrefix + "Fancy"
-                , "Node C"
-            );
-            // TODO(brian): TEMP *** -----------------------------
-            for (int i = 0; i < nodeTypes.size(); i++) {
-                var type = nodeTypes.get(i);
-                if (type.startsWith(separatorPrefix)) {
-                    if (i != 0) {
-                        ImGui.dummy(0, 2);
+            if (nodeTypes.isEmpty()) {
+                // TODO(brian): TEMP *** -----------------------------
+                var separatorPrefix = "---";
+                var nodeTypes = List.of(
+                    separatorPrefix + "Normal"
+                    , "Node A"
+                    , "Node B"
+                    , separatorPrefix + "Fancy"
+                    , "Node C"
+                );
+                // TODO(brian): TEMP *** -----------------------------
+                for (int i = 0; i < nodeTypes.size(); i++) {
+                    var type = nodeTypes.get(i);
+                    if (type.startsWith(separatorPrefix)) {
+                        if (i != 0) {
+                            ImGui.dummy(0, 2);
+                        }
+                        var separatorText = type.substring(separatorPrefix.length());
+                        if (separatorText.isBlank()) {
+                            ImGui.separator();
+                        } else {
+                            ImGui.pushStyleColor(ImGuiCol.Text, ImGuiColors.medGray.asInt());
+                            ImGui.pushFont(EditorUtil.Fonts.small);
+                            ImGui.separatorText(separatorText);
+                            ImGui.popFont();
+                            ImGui.popStyleColor();
+                        }
+                        continue;
                     }
-                    var separatorText = type.substring(separatorPrefix.length());
-                    if (separatorText.isBlank()) {
-                        ImGui.separator();
-                    } else {
-                        ImGui.pushStyleColor(ImGuiCol.Text, ImGuiColors.medGray.asInt());
-                        ImGui.pushFont(EditorUtil.Fonts.small);
-                        ImGui.separatorText(separatorText);
-                        ImGui.popFont();
-                        ImGui.popStyleColor();
-                    }
-                    continue;
-                }
 
-                if (ImGui.menuItem(type)) {
-                    newNode = editor.createTestNode();
+                    if (ImGui.menuItem(type)) {
+                        newNode = editor.createTestNode();
+                    }
+                }
+            } else {
+                for (var nodeTypeEntry : nodeTypes.entries()) {
+                    if (ImGui.menuItem(nodeTypeEntry.key)) {
+                        newNode = NodeFactory.createNode(editor, nodeTypeEntry.value);
+                    }
                 }
             }
             ImGui.dummy(0, 2);
