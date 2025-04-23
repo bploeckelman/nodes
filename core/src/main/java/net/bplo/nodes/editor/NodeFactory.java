@@ -1,5 +1,6 @@
 package net.bplo.nodes.editor;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import net.bplo.nodes.Util;
 import net.bplo.nodes.editor.utils.PinKind;
@@ -51,13 +52,26 @@ public class NodeFactory {
         try {
             var ctor = propClass.getDeclaredConstructor(Node.class);
             var prop = (Prop) ctor.newInstance(node);
+
             if (propDef.name != null) {
                 prop.name = propDef.name;
             }
-            if (propDef.assetEntry != null) {
-                Util.log(TAG, "Prop " + propDef.id + " has asset entry: " + propDef.assetEntry);
-                // TODO(brian): depending on prop type, set prop values by resolving assetEntry, if exists
-                // var assetEntry = assetMetadata.resolveAssetEntry(prop.assetEntry);
+
+            if (propDef.assetEntry != null && editor.assetMetadata != null) {
+                var asset = editor.assetMetadata.resolveAssetEntry(propDef.assetEntry);
+                Util.log(TAG, "Prop %s asset entry %s: %s".formatted(propDef.id, propDef.assetEntry, asset));
+
+                // update prop data with resolved asset based on prop and asset types
+                var propData = prop.getData();
+                if (prop instanceof PropSelect select) {
+                    var selectData = (PropSelect.Data) propData;
+                    //noinspection unchecked
+                    var options = (Array<String>) asset.value();
+                    selectData.options = options.toArray(String.class);
+                    selectData.selectedIndex = 0;
+                } else {
+                    Util.log(TAG, "AssetEntry handling for prop type '%s' yet implemented".formatted(propDef.id));
+                }
             }
         } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new GdxRuntimeException(e);

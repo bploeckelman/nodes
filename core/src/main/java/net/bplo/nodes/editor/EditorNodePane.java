@@ -257,8 +257,12 @@ public class EditorNodePane extends EditorPane {
                 }
             } else {
                 for (var nodeTypeEntry : nodeTypes.entries()) {
-                    if (ImGui.menuItem(nodeTypeEntry.key)) {
-                        newNode = NodeFactory.createNode(editor, nodeTypeEntry.value);
+                    var nodeName = nodeTypeEntry.key;
+                    var nodeType = nodeTypeEntry.value;
+
+                    if (ImGui.menuItem(nodeName)) {
+                        newNode = NodeFactory.createNode(editor, nodeType);
+                        break;
                     }
                 }
             }

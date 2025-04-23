@@ -173,6 +173,8 @@ public class Editor implements Disposable {
             nodePane.nodeTypes.put(nodeType.name, nodeType);
         }
         Util.log(TAG, "Loaded asset metadata from file: %s".formatted(fileHandle.path()));
+        Util.log(TAG, "- %d asset types: %s".formatted(assetMetadata.assetTypes.size, assetMetadata.assetTypesStr()));
+        Util.log(TAG, "- %d node types:  %s".formatted(assetMetadata.nodeTypes.size, assetMetadata.nodeTypesStr()));
     }
 
     void save() {

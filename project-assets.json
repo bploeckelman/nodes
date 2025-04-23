@@ -5,7 +5,9 @@
       name: Textures
       path: ./sprites/characters
       entries: [
-        {id: man-idle name: Man (Idle), path: man-idle.png}
+        {id: man-idle, name: Man (Idle), path: man-idle.png}
+        {id: man-talk, name: Man (Talk), path: man-talk.png}
+        {id: man-show, name: Man (Show), path: man-show.png}
       ]
     }
     {
@@ -13,7 +15,7 @@
       name: Animations
       path: ./sprites/characters/anims
       entries: [
-        {id: man-walk name: Man (Walk), path: man-walk}
+        {id: man-walk, name: Man (Walk), path: man-walk}
       ]
     }
     {
@@ -27,6 +29,24 @@
           stats: {
             charm: 10
             intelligence: 8
+          }
+        }
+        {
+          id: talker
+          name: Talker
+          portrait: textures.man-talk
+          stats: {
+            charm: 20
+            intelligence: 4
+          }
+        }
+        {
+          id: shower
+          name: Shower
+          portrait: textures.man-show
+          stats: {
+            charm: 2
+            intelligence: 10
           }
         }
       ]
@@ -56,7 +76,7 @@
           type: net.bplo.nodes.editor.PropSelect
           id: node-test-select
           name: Character
-          assetEntry: characters.name
+          assetEntry: "characters[].name"
         }
         {
           type: net.bplo.nodes.editor.PropEditableText
@@ -75,13 +95,13 @@
           type: net.bplo.nodes.editor.PropSelect
           id: node-dialog-character-select
           name: Character
-          assetEntry: characters.id
+          assetEntry: "characters[].name"
         }
         {
           type: net.bplo.nodes.editor.PropThumbnail
           id: node-dialogue-character-portrait
           name: Portrait
-          assetEntry: characters.portrait
+          assetEntry: "characters[].portrait"
         }
         {
           type: net.bplo.nodes.editor.PropInputText

@@ -49,18 +49,7 @@ public class Main extends ApplicationAdapter {
             Gdx.app.exit();
         }
 
-        var batch = assets.batch;
-        var image = assets.gdx;
-        var imgWidth = image.getRegionWidth();
-        var imgHeight = image.getRegionHeight();
-        var winWidth = windowCamera.viewportWidth;
-        var winHeight = windowCamera.viewportHeight;
-
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
-        batch.begin();
-        batch.draw(image, (winWidth - imgWidth) / 2, (winHeight - imgHeight) / 2);
-        batch.end();
-
         imgui.startFrame();
         editor.update();
         editor.render();
