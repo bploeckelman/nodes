@@ -58,8 +58,7 @@ public class EditorNodePane extends EditorPane {
             ImGui.sameLine(); EditorWidget.renderShowIdsToggle(editor);
             ImGui.sameLine(); EditorWidget.renderShowThumbnailsToggle(editor);
             ImGui.sameLine(); EditorWidget.renderLoadMetadataButton(editor);
-//            ImGui.sameLine(); EditorWidget.renderSetContentPathButton(editor);
-//            ImGui.sameLine(); EditorWidget.renderContentCombo(editor);
+            ImGui.sameLine(); EditorWidget.renderDragSlider(editor);
 
             NodeEditor.begin("Editor");
             pushStyles();

@@ -6,7 +6,9 @@ import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.extension.nodeditor.NodeEditor;
 import imgui.flag.ImGuiCol;
+import imgui.flag.ImGuiSliderFlags;
 import imgui.flag.ImGuiStyleVar;
+import net.bplo.nodes.Util;
 import net.bplo.nodes.imgui.FontAwesomeIcons;
 import net.bplo.nodes.imgui.ImGuiColors;
 import net.bplo.nodes.imgui.ImGuiWidgetBounds;
@@ -118,6 +120,27 @@ public class EditorWidget {
             }
         }
 
+        ImGui.popFont();
+    }
+
+    static void renderDragSlider(Editor editor) {
+        //ImGui::DragInt("drag int 0..100", &i2, 1, 0, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);
+        ImGui.pushFont(EditorUtil.Fonts.icons);
+
+        ImGui.pushStyleVar(ImGuiStyleVar.FramePadding, 10f, 5f);
+        ImGui.pushStyleVar(ImGuiStyleVar.GrabMinSize, 10f);
+        ImGui.setNextItemWidth(ImGui.getContentRegionAvailX());
+
+        float[] value = {50f}; // this value needs to be saved somewhere and called.
+        var step = .1f;
+        var min = 0f;
+        var max = 100f;
+
+        if (ImGui.dragFloat("##drag-slider", value, step, min, max, "%.2f", ImGuiSliderFlags.AlwaysClamp)) {
+            Util.log(TAG, "drag slider value: " + value[0]);
+        }
+
+        ImGui.popStyleVar(2);
         ImGui.popFont();
     }
 
