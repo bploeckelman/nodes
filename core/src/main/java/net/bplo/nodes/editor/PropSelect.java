@@ -36,6 +36,11 @@ public class PropSelect extends Prop {
     }
 
     @Override
+    public String defaultName() {
+        return "Select";
+    }
+
+    @Override
     public Object getData() {
         return data;
     }

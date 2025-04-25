@@ -1,7 +1,6 @@
 package net.bplo.nodes.editor;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
@@ -16,6 +15,7 @@ import imgui.flag.ImGuiStyleVar;
 import net.bplo.nodes.Main;
 import net.bplo.nodes.Util;
 import net.bplo.nodes.editor.meta.AssetMetadata;
+import net.bplo.nodes.editor.meta.MetadataRegistry;
 import net.bplo.nodes.editor.utils.PinKind;
 import net.bplo.nodes.editor.utils.PinType;
 import net.bplo.nodes.imgui.ImGuiPlatform;
@@ -47,7 +47,8 @@ public class Editor implements Disposable {
     final EditorInfoPane infoPane;
     final EditorNodePane nodePane;
 
-    AssetMetadata assetMetadata;
+    AssetMetadata assetMetadata; // TODO(brian): remove me
+    MetadataRegistry metadataRegistry;
 
     public Editor() {
         EditorContent.refresh();
@@ -166,15 +167,11 @@ public class Editor implements Disposable {
         }
     }
 
-    void loadAssetMetadata(FileHandle fileHandle) {
-        assetMetadata = AssetMetadata.load(fileHandle);
-        nodePane.nodeTypes.clear();
-        for (var nodeType : assetMetadata.nodeTypes) {
+    void loadAssetMetadata(String filePath) {
+        metadataRegistry = new MetadataRegistry(filePath);
+        for (var nodeType : metadataRegistry.getNodeTypes()) {
             nodePane.nodeTypes.put(nodeType.name, nodeType);
         }
-        Util.log(TAG, "Loaded asset metadata from file: %s".formatted(fileHandle.path()));
-        Util.log(TAG, "- %d asset types: %s".formatted(assetMetadata.assetTypes.size, assetMetadata.assetTypesStr()));
-        Util.log(TAG, "- %d node types:  %s".formatted(assetMetadata.nodeTypes.size, assetMetadata.nodeTypesStr()));
     }
 
     void save() {

@@ -27,6 +27,11 @@ public class PropTest extends Prop {
     }
 
     @Override
+    public String defaultName() {
+        return "Test";
+    }
+
+    @Override
     public Object getData() { return null; }
 
     @Override

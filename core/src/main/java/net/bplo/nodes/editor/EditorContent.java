@@ -26,7 +26,7 @@ public class EditorContent {
     public static String selectedMetadataKey = rootPath.path();
 
     //
-    // TODO(brian): add categories to filter what's shown in particular node properties
+    // TODO(brian): add categories to filter what's shown in particular node props
     //
 
     public record Metadata(

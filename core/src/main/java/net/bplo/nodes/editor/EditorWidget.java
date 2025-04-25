@@ -1,7 +1,6 @@
 package net.bplo.nodes.editor;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.graphics.Texture;
 import imgui.ImGui;
 import imgui.extension.nodeditor.NodeEditor;
 import imgui.flag.ImGuiStyleVar;
@@ -53,9 +52,9 @@ public class EditorWidget {
     static void renderLoadAssetMetadataButton(Editor editor) {
         ImGui.pushFont(EditorUtil.Fonts.icons);
 
-        if (ImGui.button(FontAwesomeIcons.fileImport + " Load Asset Metadata")) {
+        if (ImGui.button(FontAwesomeIcons.fileImport + " Load Metadata")) {
             var fileChooser = new JFileChooser();
-            fileChooser.setDialogTitle("Select Asset Metadata File");
+            fileChooser.setDialogTitle("Select Metadata File");
             fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
             fileChooser.setFileFilter(new FileNameExtensionFilter("JSON files", "json"));
             // TODO(brian): persist and restore last directory
@@ -64,12 +63,7 @@ public class EditorWidget {
             if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(null)) {
                 var selectedFile = fileChooser.getSelectedFile();
                 var filePath = selectedFile.toPath().toAbsolutePath().toString();
-                var fileHandle = Gdx.files.absolute(filePath);
-                if (!fileHandle.exists() || fileHandle.isDirectory()) {
-                    throw new GdxRuntimeException("Invalid file: " + filePath);
-                }
-
-                editor.loadAssetMetadata(fileHandle);
+                editor.loadAssetMetadata(filePath);
             }
         }
 
@@ -151,5 +145,9 @@ public class EditorWidget {
             xMin + ((xMax - xMin) - textSize.x) / 2f,
             yMin + ((yMax - yMin) - textSize.y) / 2f,
             info.color.asInt(), String.valueOf(object.id));
+    }
+
+    static void renderThumbnail(Editor editor, Texture texture, boolean showPreview) {
+
     }
 }

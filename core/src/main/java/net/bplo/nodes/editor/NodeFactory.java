@@ -1,6 +1,5 @@
 package net.bplo.nodes.editor;
 
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import net.bplo.nodes.Util;
 import net.bplo.nodes.editor.utils.PinKind;
@@ -66,9 +65,9 @@ public class NodeFactory {
                 if (prop instanceof PropSelect select) {
                     var selectData = (PropSelect.Data) propData;
                     //noinspection unchecked
-                    var options = (Array<String>) asset.value();
-                    selectData.options = options.toArray(String.class);
-                    selectData.selectedIndex = 0;
+//                    var options = (Array<String>) asset.value();
+//                    selectData.options = options.toArray(String.class);
+//                    selectData.selectedIndex = 0;
                 } else {
                     Util.log(TAG, "AssetEntry handling for prop type '%s' yet implemented".formatted(propDef.id));
                 }

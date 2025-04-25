@@ -76,7 +76,7 @@
           type: net.bplo.nodes.editor.PropSelect
           id: node-test-select
           name: Character
-          assetEntry: "characters[].name"
+          assetEntry: "characters"
         }
         {
           type: net.bplo.nodes.editor.PropEditableText

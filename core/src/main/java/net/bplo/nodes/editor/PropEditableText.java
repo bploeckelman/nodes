@@ -46,6 +46,11 @@ public class PropEditableText extends Prop {
     }
 
     @Override
+    public String defaultName() {
+        return "Text";
+    }
+
+    @Override
     public Object getData() {
         return getText();
     }

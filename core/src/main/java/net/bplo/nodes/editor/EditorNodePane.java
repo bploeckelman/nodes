@@ -12,6 +12,7 @@ import imgui.flag.ImGuiCond;
 import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImLong;
+import net.bplo.nodes.editor.meta.Metadata;
 import net.bplo.nodes.editor.utils.PinKind;
 import net.bplo.nodes.imgui.ImGuiColors;
 
@@ -34,7 +35,7 @@ public class EditorNodePane extends EditorPane {
     private long[] selectedObjectIds;
 
     // TODO(brian): this should be ordered, and match insertion order in the 'create node' context menu
-    final ObjectMap<String, NodeType> nodeTypes = new ObjectMap<>();
+    final ObjectMap<String, Metadata.NodeType> nodeTypes = new ObjectMap<>();
 
     public boolean showIds = false;
 
@@ -261,7 +262,7 @@ public class EditorNodePane extends EditorPane {
                     var nodeType = nodeTypeEntry.value;
 
                     if (ImGui.menuItem(nodeName)) {
-                        newNode = NodeFactory.createNode(editor, nodeType);
+                        newNode = NodeFactory2.createNode(editor, nodeType);
                         break;
                     }
                 }

@@ -40,6 +40,11 @@ public class PropFloat extends Prop {
     }
 
     @Override
+    public String defaultName() {
+        return "Number";
+    }
+
+    @Override
     public Object getData() {
         return value.get();
     }

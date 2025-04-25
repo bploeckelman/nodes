@@ -38,7 +38,7 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
         for (var node : nodeList) {
             json.writeObjectStart();
 
-            // Write node properties
+            // Write node props
             json.writeValue("id", node.id);
             json.writeValue("width", node.width);
             json.writeValue("headerText", node.headerText);

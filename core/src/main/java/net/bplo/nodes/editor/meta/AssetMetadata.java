@@ -176,12 +176,11 @@ public class AssetMetadata {
         }
 
         asset = switch (assetTypeId) {
-            case "textures" -> new Asset(getTexture(assetType, assetEntry), Texture.class);
+            case "textures"   -> new Asset(getTexture(assetType, assetEntry), Texture.class);
             case "animations" -> new Asset(getAnimation(assetType, assetEntry), Animation.class);
             case "characters" -> new Asset(getMap(assetType, assetEntry), ObjectMap.class);
             default -> null;
         };
-
         if (asset == null) {
             Util.log(TAG, "Unable to resolve asset entry: " + entryName);
             return null;

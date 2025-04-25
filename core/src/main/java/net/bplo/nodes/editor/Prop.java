@@ -39,6 +39,8 @@ public abstract class Prop extends EditorObject {
         node.props.add(this);
     }
 
+    public abstract String defaultName();
+
     public abstract Object getData();
     public abstract void setData(Json json, JsonValue dataValue);
 

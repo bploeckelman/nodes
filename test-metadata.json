@@ -1,0 +1,82 @@
+{
+  assetTypes: [
+    {
+      id: image
+      name: Image
+      items: [
+        {id: hero-portrait,    name: Hero Portrait,    path: characters/hero/portrait.png}
+        {id: hero-idle,        name: Hero Idle,        path: characters/hero/idle.png}
+        {id: hero-attack,      name: Hero Attack,      path: characters/hero/attack.png}
+        {id: villain-portrait, name: Villain Portrait, path: characters/villain/portrait.png}
+        {id: villain-idle,     name: Villain Idle,     path: characters/villain/idle.png}
+        {id: villain-attack,   name: Villain Attack,   path: characters/villain/attack.png}
+      ]
+    }
+    {
+      id: character
+      name: Character
+      items: [
+        {
+          id: hero
+          name: Hero
+          properties: {
+            portrait: {type: image, id: hero-portrait, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
+            poses: [
+              {type: image, id: hero-idle, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
+              {type: image, id: hero-attack, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
+            ]
+          }
+        }
+        {
+          id: villain
+          name: Villain
+          properties: {
+            portrait: {type: image, id: villain-portrait, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
+            poses: [
+              {type: image, id: villain-idle, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
+              {type: image, id: villain-attack, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
+            ]
+          }
+        }
+      ]
+    }
+  ]
+  nodeTypes: [
+    {
+      id: test
+      name: Test
+      inputs: 1
+      outputs: 1
+      props: [
+        {
+          type: input-text
+          id: character-name
+          name: Override Name
+          display: "#{value}.name"
+        }
+        {
+          type: select
+          id: character
+          name: Character
+          assetType: character
+          display: "#{value}.portrait"
+        }
+        {
+          type: integer
+          id: integer
+          name: Number
+        }
+        {
+          type: float
+          id: float
+          name: Number
+        }
+        {
+          type: input-text-multiline
+          id: dialogue-text
+          name: Text
+        }
+      ]
+    }
+  ]
+}
