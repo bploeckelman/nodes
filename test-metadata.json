@@ -49,17 +49,23 @@
       outputs: 1
       props: [
         {
-          type: input-text
-          id: character-name
-          name: Override Name
-          display: "#{value}.name"
-        }
-        {
           type: select
           id: character
           name: Character
           assetType: character
+          display: "#{value}.name"
+        }
+        {
+          type: thumbnail
+          id: character-portrait
+          name: Portrait
+          assetType: character
           display: "#{value}.portrait"
+        }
+        {
+          type: input-text
+          id: character-name-override
+          name: Override Name
         }
         {
           type: integer

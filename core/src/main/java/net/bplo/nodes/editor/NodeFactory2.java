@@ -35,7 +35,7 @@ public class NodeFactory2 {
     private static void createProp(Editor editor, Node node, Metadata.PropType propType) {
         var propClass = getPropClass(propType);
         if (propClass == null) {
-            Util.log(TAG, "Unsupported prop type: " + propType.type);
+            Util.log(TAG, "*** Unsupported prop type: " + propType.type);
             return;
         }
 
@@ -43,8 +43,31 @@ public class NodeFactory2 {
             var ctor = propClass.getDeclaredConstructor(Node.class);
             var prop = (Prop) ctor.newInstance(node);
             prop.name = Objects.requireNonNullElse(propType.name, prop.defaultName());
-            // TODO(brian): get prop data by resolving 'propType.display' field
+
             Util.log(TAG, "Created prop: name='%s' id='%s' type='%s'".formatted(prop.name, propType.id, propType.type));
+
+            var hasAssetType = propType.assetType != null;
+            var hasDisplay   = propType.display   != null;
+            if (hasAssetType && hasDisplay) {
+                var display = new Metadata.Display(propType.display);
+
+                // resolve and set prop data based on prop type
+                if (prop instanceof PropSelect select) {
+                    var selectData = (PropSelect.Data) select.getData();
+                    var assetType = editor.metadataRegistry.findAssetType(propType.assetType);
+                    if (assetType.isEmpty()) {
+                        Util.log(TAG, "Failed to find asset type: " + propType.assetType);
+                        return;
+                    }
+
+                    var options = assetType.get().getItemFieldValues(display.field, String.class);
+                    Util.log(TAG, "Resolved %d options for select prop '%s' from display value '%s': %s"
+                        .formatted(options.size(), propType.name, propType.display, options.stream().collect(Util.join())));
+
+                    selectData.options = options.toArray(new String[0]);
+                    selectData.selectedIndex = options.isEmpty() ? -1 : 0;
+                }
+            }
         } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
             throw new GdxRuntimeException(e);
         }
