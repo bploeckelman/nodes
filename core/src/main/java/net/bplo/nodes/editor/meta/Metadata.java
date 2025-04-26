@@ -15,6 +15,7 @@ public class Metadata {
     public static class AssetType {
         public String id;
         public String name;
+        public String basePath;
         public Array<AssetItem> items = new Array<>();
 
         public Optional<AssetItem> findItem(String itemId) {

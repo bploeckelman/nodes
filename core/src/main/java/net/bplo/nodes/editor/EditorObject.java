@@ -9,6 +9,9 @@ public abstract class EditorObject {
 
     public enum Type { NODE, PIN, LINK, PROP }
 
+    // TODO(brian): (temp?) workaround for Editor usage from an EditorObject context
+    public static Editor editor;
+
     private static long NEXT_ID = 1L;
 
     public final Type objectType;

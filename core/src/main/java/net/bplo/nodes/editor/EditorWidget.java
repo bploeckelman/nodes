@@ -1,7 +1,9 @@
 package net.bplo.nodes.editor;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import imgui.ImGui;
+import imgui.ImVec2;
 import imgui.extension.nodeditor.NodeEditor;
 import imgui.flag.ImGuiStyleVar;
 import net.bplo.nodes.imgui.FontAwesomeIcons;
@@ -147,7 +149,41 @@ public class EditorWidget {
             info.color.asInt(), String.valueOf(object.id));
     }
 
-    static void renderThumbnail(Editor editor, Texture texture, boolean showPreview) {
+    public record Image(int id, ImVec2 size, ImVec2 uv1, ImVec2 uv2) {
+        public static Image from(TextureRegion region) {
+            return new Image(
+                region.getTexture().getTextureObjectHandle(),
+                new ImVec2(region.getRegionWidth(), region.getRegionHeight()),
+                new ImVec2(region.getU(), region.getV()),
+                new ImVec2(region.getU2(), region.getV2())
+            );
+        }
 
+        public static Image from(TextureRegion region, float width, float height) {
+            return new Image(
+                region.getTexture().getTextureObjectHandle(),
+                new ImVec2(width, height),
+                new ImVec2(region.getU(), region.getV()),
+                new ImVec2(region.getU2(), region.getV2())
+            );
+        }
+
+        public static Image from(Texture texture) {
+            return new Image(
+                texture.getTextureObjectHandle(),
+                new ImVec2(texture.getWidth(), texture.getHeight()),
+                new ImVec2(0, 0),
+                new ImVec2(1, 1)
+            );
+        }
+
+        public static Image from(Texture texture, float width, float height) {
+            return new Image(
+                texture.getTextureObjectHandle(),
+                new ImVec2(width, height),
+                new ImVec2(0, 0),
+                new ImVec2(1, 1)
+            );
+        }
     }
 }

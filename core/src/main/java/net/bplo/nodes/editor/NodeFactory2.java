@@ -67,6 +67,25 @@ public class NodeFactory2 {
                     selectData.options = options.toArray(new String[0]);
                     selectData.selectedIndex = options.isEmpty() ? -1 : 0;
                 }
+                else if (prop instanceof PropThumbnail thumbnail) {
+                    var assetType = editor.metadataRegistry.findAssetType(propType.assetType);
+                    if (assetType.isEmpty()) {
+                        Util.log(TAG, "Failed to find asset type: " + propType.assetType);
+                        return;
+                    }
+
+                    // TODO(brian): testing, resolve one assetType item ref
+                    // TODO(brian): need to finalize asset ref lookups (loading/caching), and property dependencies
+                    //   eg. 'portrait' prop assetRef depends on current selection from character select prop
+                    //   - add optional 'dependsOn' field to PropType to indicate which prop (by id) the dependent prop references
+                    var portraits = assetType.get().getItemFieldValues(display.field, Metadata.AssetItemRef.class);
+                    if (portraits.isEmpty()) {
+                        Util.log(TAG, "Expected 1 portrait asset item ref for thumbnail prop '%s' from display value '%s', got %d"
+                            .formatted(propType.name, propType.display, portraits.size()));
+                        return;
+                    }
+                    thumbnail.assetRef = portraits.getFirst();
+                }
             }
         } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
             throw new GdxRuntimeException(e);
@@ -78,6 +97,7 @@ public class NodeFactory2 {
             case "float" -> PropFloat.class;
             case "integer" -> PropInteger.class;
             case "select" -> PropSelect.class;
+            case "thumbnail" -> PropThumbnail.class;
             // TODO(brian): create separate single/multi line editable text prop types
             case "input-text", "input-text-multiline" -> PropEditableText.class;
             default -> null;

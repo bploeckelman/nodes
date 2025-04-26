@@ -3,11 +3,12 @@
     {
       id: image
       name: Image
+      basePath: ./sprites
       items: [
-        {id: hero-portrait,    name: Hero Portrait,    path: characters/hero/portrait.png}
+        {id: hero-portrait,    name: Hero Portrait,    path: characters/man-idle.png}
         {id: hero-idle,        name: Hero Idle,        path: characters/hero/idle.png}
         {id: hero-attack,      name: Hero Attack,      path: characters/hero/attack.png}
-        {id: villain-portrait, name: Villain Portrait, path: characters/villain/portrait.png}
+        {id: villain-portrait, name: Villain Portrait, path: characters/man-shove.png}
         {id: villain-idle,     name: Villain Idle,     path: characters/villain/idle.png}
         {id: villain-attack,   name: Villain Attack,   path: characters/villain/attack.png}
       ]

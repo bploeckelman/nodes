@@ -51,6 +51,7 @@ public class Editor implements Disposable {
     MetadataRegistry metadataRegistry;
 
     public Editor() {
+        EditorObject.editor = this;
         EditorContent.refresh();
 
         var config = new NodeEditorConfig();
