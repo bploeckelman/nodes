@@ -29,6 +29,29 @@ public class NodeFactory2 {
             createProp(editor, node, propType);
         }
 
+        // wire up prop dependencies now that all props are instantiated
+        // TODO(brian): this works for the test metadata, but its more complicated than I'd like
+        node.props.stream().filter(prop -> prop.dependsOn != null)
+            .forEach(dstProp -> {
+                node.findProp(dstProp.dependsOn).ifPresentOrElse(srcProp -> {
+                    var srcPropType = nodeType.findPropType(srcProp.propTypeId);
+                    var dstPropType = nodeType.findPropType(dstProp.propTypeId);
+                    if (srcPropType.isEmpty() || dstPropType.isEmpty()) {
+                        Util.log(TAG, "Failed to resolve prop types for dependency: %s -> %s"
+                            .formatted(dstProp.propTypeId, dstProp.dependsOn));
+                        return;
+                    }
+
+                    // setup change callback
+                    srcProp.onChange = (newValue) -> updateDependentProp(
+                        editor, dstProp, srcProp, newValue, dstPropType.get(), srcPropType.get());
+
+                    // trigger initial update based on current value
+                    updateDependentProp(editor, dstProp, srcProp, srcProp.getData(), dstPropType.get(), srcPropType.get());
+                }, () -> Util.log(TAG, "Failed to find prop dependency: %s -> %s"
+                    .formatted(dstProp.propTypeId, dstProp.dependsOn)));
+            });
+
         return node;
     }
 
@@ -43,6 +66,8 @@ public class NodeFactory2 {
             var ctor = propClass.getDeclaredConstructor(Node.class);
             var prop = (Prop) ctor.newInstance(node);
             prop.name = Objects.requireNonNullElse(propType.name, prop.defaultName());
+            prop.propTypeId = propType.id;
+            prop.dependsOn = propType.dependsOn;
 
             Util.log(TAG, "Created prop: name='%s' id='%s' type='%s'".formatted(prop.name, propType.id, propType.type));
 
@@ -102,5 +127,73 @@ public class NodeFactory2 {
             case "input-text", "input-text-multiline" -> PropEditableText.class;
             default -> null;
         };
+    }
+
+    private static void updateDependentProp(Editor editor, Prop dstProp, Prop srcProp, Object value, Metadata.PropType dstPropType, Metadata.PropType srcPropType) {
+        if (dstProp instanceof PropThumbnail thumbnail && srcProp instanceof PropSelect select) {
+            updateThumbnailFromSelect(editor, thumbnail, select, dstPropType, srcPropType);
+        }
+//        if (dstProp instanceof PropSelect dstSelect && srcProp instanceof PropSelect srcSelect) {
+//             TODO(brian): add select chaining for character select -> character pose select
+//        }
+        // ... add more combinations as needed...
+    }
+    private static void updateThumbnailFromSelect(Editor editor, PropThumbnail thumbnail, PropSelect select, Metadata.PropType thumbnailPropType, Metadata.PropType selectPropType) {
+        if (thumbnailPropType.display == null || selectPropType.assetType == null) {
+            return;
+        }
+
+        // Parse the display path for the thumbnail
+        Metadata.Display display = new Metadata.Display(thumbnailPropType.display);
+        if (!"#{value}".equals(display.type)) {
+            Util.log(TAG, "Only #{value}.field format is supported for display paths, got: " + display.type);
+            return;
+        }
+
+        // Get the selected item ID/name
+        var selectData = (PropSelect.Data) select.getData();
+        var selectedOption = selectData.getSelectedOption();
+        if (selectedOption.isEmpty()) {
+            // Clear the thumbnail if nothing is selected
+            thumbnail.assetRef = null;
+            return;
+        }
+
+        // Find the asset item for the selected option
+        var registry = editor.metadataRegistry;
+        var assetType = registry.findAssetType(selectPropType.assetType);
+        if (assetType.isEmpty()) {
+            Util.log(TAG, "Asset type not found: " + selectPropType.assetType);
+            return;
+        }
+
+        // Find the asset item by name
+        var assetItems = assetType.get().items;
+        var selectedItem = Util.asList(assetItems).stream()
+            .filter(item -> item.name.equals(selectedOption))
+            .findFirst();
+        if (selectedItem.isEmpty()) {
+            Util.log(TAG, "Asset item not found with name: " + selectedOption);
+            return;
+        }
+
+        // Get the field from the selected item (like 'portrait')
+        var itemProperties = selectedItem.get().properties;
+        if (!itemProperties.containsKey(display.field)) {
+            Util.log(TAG, "Property not found in asset item: " + display.field);
+            return;
+        }
+
+        var fieldValue = itemProperties.get(display.field);
+        if (!(fieldValue instanceof Metadata.AssetItemRef)) {
+            Util.log(TAG, "Expected AssetItemRef for field: " + display.field);
+            return;
+        }
+
+        // Set the asset reference on the thumbnail
+        thumbnail.assetRef = (Metadata.AssetItemRef) fieldValue;
+
+        // Force a refresh of the thumbnail
+        thumbnail.clearImage();
     }
 }

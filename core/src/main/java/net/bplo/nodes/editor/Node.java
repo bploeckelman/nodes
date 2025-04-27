@@ -44,6 +44,10 @@ public class Node extends EditorObject {
         super(Type.NODE, savedId);
     }
 
+    public Optional<Prop> findProp(String propTypeId) {
+        return props.stream().filter(prop -> prop.propTypeId.equals(propTypeId)).findFirst();
+    }
+
     //
     // TODO(brian): thinking about whether to use these add(...) methods
     //  or just add pins/props to the node directly in their constructors

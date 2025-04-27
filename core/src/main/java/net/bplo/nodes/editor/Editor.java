@@ -48,7 +48,7 @@ public class Editor implements Disposable {
     final EditorNodePane nodePane;
 
     AssetMetadata assetMetadata; // TODO(brian): remove me
-    MetadataRegistry metadataRegistry;
+    public MetadataRegistry metadataRegistry;
 
     public Editor() {
         EditorObject.editor = this;

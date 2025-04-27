@@ -18,16 +18,23 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
+import net.bplo.nodes.Util;
 import net.bplo.nodes.assets.framework.AssetContainer;
+import net.bplo.nodes.editor.Editor;
+import net.bplo.nodes.editor.meta.Metadata;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class Assets implements Disposable {
 
+    private static final String TAG = Assets.class.getSimpleName();
     public static final String PREFERENCES_NAME = "net.bplo.nodes";
 
     public final ObjectMap<Class<? extends AssetContainer<?, ?>>, AssetContainer<?, ?>> containers;
+    public final ObjectMap<String, Object> cache = new ObjectMap<>();
 
     public final List<Disposable> disposables;
     public final AssetManager mgr;
@@ -134,8 +141,54 @@ public class Assets implements Disposable {
         return atlas;
     }
 
+    public <T> Optional<T> resolveAssetRef(Editor editor, Metadata.AssetItemRef assetRef, Class<T> type) {
+        var assetType = editor.metadataRegistry.findAssetType(assetRef.type);
+        if (assetType.isEmpty()) {
+            Util.log(TAG, "Unknown asset type: " + assetRef.type);
+            return Optional.empty();
+        }
+
+        var assetItem = assetType.get().findItem(assetRef.id);
+        if (assetItem.isEmpty()) {
+            Util.log(TAG, "Unknown asset item: " + assetRef.id);
+            return Optional.empty();
+        }
+
+        var metadataRootPath = Gdx.files.absolute(editor.metadataRegistry.filePath).parent().path();
+        var assetTypeBasePath = Objects.requireNonNullElse(assetType.get().basePath, ".");
+        var assetPath = metadataRootPath + "/" + assetTypeBasePath + "/" + assetItem.get().path;
+
+        T asset = null;
+        if (type == Texture.class) {
+            var texture = cache.get(assetRef.cacheKey());
+            if (texture == null) {
+                texture = new Texture(Gdx.files.absolute(assetPath));
+                Util.log(TAG, "Cache miss for %s asset '%s', adding to cache: %s"
+                    .formatted(type.getSimpleName(), assetRef.cacheKey(), assetPath));
+                cache.put(assetRef.cacheKey(), texture);
+            } else {
+                Util.log(TAG, "Cache hit for %s asset '%s'".formatted(type.getSimpleName(), assetRef.cacheKey()));
+            }
+            asset = type.cast(texture);
+        } else {
+            Util.log(TAG, "Unsupported asset type: " + type);
+        }
+
+        return Optional.ofNullable(asset);
+    }
+
+    public void clearCache() {
+        for (var item : cache.values()) {
+            if (item instanceof Disposable disposable) {
+                disposable.dispose();
+            }
+        }
+        cache.clear();
+    }
+
     @Override
     public void dispose() {
         disposables.forEach(Disposable::dispose);
+        clearCache();
     }
 }

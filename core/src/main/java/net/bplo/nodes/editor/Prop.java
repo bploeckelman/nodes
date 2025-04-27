@@ -14,6 +14,16 @@ public abstract class Prop extends EditorObject {
 
     public static boolean SHOW_INFO_PANE_LABELS = false;
 
+    @FunctionalInterface
+    public interface OnChange {
+        void changed(Object newValue);
+    }
+    private static final OnChange NO_OP_ON_CHANGE = newValue -> {};
+
+    public String propTypeId;
+    public String dependsOn;
+    public OnChange onChange = NO_OP_ON_CHANGE;
+
     public final ImGuiWidgetBounds bounds = new ImGuiWidgetBounds();
 
     public final Node node;

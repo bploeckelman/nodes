@@ -51,7 +51,7 @@
       props: [
         {
           type: select
-          id: character
+          id: character-select
           name: Character
           assetType: character
           display: "#{value}.name"
@@ -62,6 +62,7 @@
           name: Portrait
           assetType: character
           display: "#{value}.portrait"
+          dependsOn: character-select
         }
         {
           type: input-text

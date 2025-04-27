@@ -77,6 +77,10 @@ public class Metadata {
 
             return item;
         }
+
+        public String cacheKey() {
+            return type + "." + id;
+        }
     }
 
     public static class NodeType {
@@ -85,6 +89,15 @@ public class Metadata {
         public int inputs;
         public int outputs;
         public Array<PropType> props = new Array<>();
+
+        public Optional<PropType> findPropType(String id) {
+            for (var prop : props) {
+                if (prop.id.equals(id)) {
+                    return Optional.of(prop);
+                }
+            }
+            return Optional.empty();
+        }
     }
 
     public static class PropType {
@@ -93,6 +106,7 @@ public class Metadata {
         public String name;
         public String assetType;
         public String display;
+        public String dependsOn;
     }
 
     public static class Display {

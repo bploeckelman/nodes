@@ -1,14 +1,10 @@
 package net.bplo.nodes.editor;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import imgui.ImGui;
-import net.bplo.nodes.Util;
 import net.bplo.nodes.editor.meta.Metadata;
-
-import java.util.Objects;
 
 public class PropThumbnail extends Prop {
 
@@ -47,20 +43,9 @@ public class PropThumbnail extends Prop {
     public void render() {
         if (image == null && assetRef != null) {
             // try to resolve the referenced asset and use it to create the thumbnail image
-            editor.metadataRegistry.findAssetType(assetRef.type)
-                .ifPresent(assetType -> {
-                    assetType.findItem(assetRef.id)
-                        .ifPresent(assetItem -> {
-                            // TODO(brian): resolve through Assets in order to handle caching
-                            var metadataRootPath = Gdx.files.absolute(editor.metadataRegistry.filePath).parent().path();
-                            var assetTypeBasePath = Objects.requireNonNullElse(assetType.basePath, ".");
-                            var assetPath = metadataRootPath + "/" + assetTypeBasePath + "/" + assetItem.path;
-                            var texture = new Texture(Gdx.files.absolute(assetPath));
-                            // TODO(brian): allow override of thumbnail size for property
-                            image = EditorWidget.Image.from(texture);
-                            Util.log(TAG, "Loaded texture from asset reference: " + assetPath);
-                        });
-                });
+            editor.app.assets.resolveAssetRef(editor, assetRef, Texture.class)
+                // TODO(brian): allow override of thumbnail size for property
+                .ifPresent(texture -> image = EditorWidget.Image.from(texture));
         }
 
         ImGui.beginGroup();
@@ -77,5 +62,10 @@ public class PropThumbnail extends Prop {
         }
         ImGui.endGroup();
         bounds.update();
+    }
+
+    public void clearImage() {
+        if (image == null) return;
+        image = null;
     }
 }

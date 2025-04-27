@@ -151,6 +151,7 @@ public class PropSelect extends Prop {
                 if (ImGui.selectable(option, selected)) {
                     data.selectedIndex = i;
                     ImGui.closeCurrentPopup();
+                    onChange.changed(data.getSelectedOption());
                 }
             }
 
@@ -170,6 +171,7 @@ public class PropSelect extends Prop {
                 var selected = data.selectedIndex == i;
                 if (ImGui.selectable(option, selected)) {
                     data.selectedIndex = i;
+                    onChange.changed(data.getSelectedOption());
                 }
             }
 
