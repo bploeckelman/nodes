@@ -1,0 +1,190 @@
+[
+{
+	id: 1
+	width: 200
+	headerText: Test
+	position: {
+		x: 1507
+		y: -931
+	}
+	pins: [
+		{
+			id: 2
+			kind: INPUT
+			type: FLOW
+		}
+		{
+			id: 3
+			kind: OUTPUT
+			type: FLOW
+		}
+	]
+	props: [
+		{
+			id: 4
+			name: Character
+			class: net.bplo.nodes.editor.PropSelect
+			data: {
+				options: [
+					Hero
+					Villain
+				]
+				selectedIndex: 1
+			}
+			propTypeId: character-select
+			dependsOn: null
+			pins: []
+		}
+		{
+			id: 5
+			name: Portrait
+			class: net.bplo.nodes.editor.PropThumbnail
+			data: {
+				type: image
+				id: villain-portrait
+			}
+			propTypeId: character-portrait
+			dependsOn: character-select
+			pins: []
+		}
+		{
+			id: 6
+			name: Override Name
+			class: net.bplo.nodes.editor.PropEditableText
+			data: name1
+			propTypeId: character-name-override
+			dependsOn: null
+			pins: []
+		}
+		{
+			id: 7
+			name: Number
+			class: net.bplo.nodes.editor.PropInteger
+			data: 1
+			propTypeId: integer
+			dependsOn: null
+			pins: []
+		}
+		{
+			id: 8
+			name: Number
+			class: net.bplo.nodes.editor.PropFloat
+			data: 0.1
+			propTypeId: float
+			dependsOn: null
+			pins: []
+		}
+		{
+			id: 9
+			name: Text
+			class: net.bplo.nodes.editor.PropEditableText
+			data: text1
+			propTypeId: dialogue-text
+			dependsOn: null
+			pins: []
+		}
+	]
+	incomingLinks: []
+	outgoingLinks: [
+		{
+			id: 19
+			srcPinId: 3
+			dstPinId: 11
+		}
+	]
+}
+{
+	id: 10
+	width: 200
+	headerText: Test
+	position: {
+		x: 1795
+		y: -931
+	}
+	pins: [
+		{
+			id: 11
+			kind: INPUT
+			type: FLOW
+		}
+		{
+			id: 12
+			kind: OUTPUT
+			type: FLOW
+		}
+	]
+	props: [
+		{
+			id: 13
+			name: Character
+			class: net.bplo.nodes.editor.PropSelect
+			data: {
+				options: [
+					Hero
+					Villain
+				]
+				selectedIndex: 0
+			}
+			propTypeId: character-select
+			dependsOn: null
+			pins: []
+		}
+		{
+			id: 14
+			name: Portrait
+			class: net.bplo.nodes.editor.PropThumbnail
+			data: {
+				type: image
+				id: hero-portrait
+			}
+			propTypeId: character-portrait
+			dependsOn: character-select
+			pins: []
+		}
+		{
+			id: 15
+			name: Override Name
+			class: net.bplo.nodes.editor.PropEditableText
+			data: name2
+			propTypeId: character-name-override
+			dependsOn: null
+			pins: []
+		}
+		{
+			id: 16
+			name: Number
+			class: net.bplo.nodes.editor.PropInteger
+			data: -2
+			propTypeId: integer
+			dependsOn: null
+			pins: []
+		}
+		{
+			id: 17
+			name: Number
+			class: net.bplo.nodes.editor.PropFloat
+			data: -0.2
+			propTypeId: float
+			dependsOn: null
+			pins: []
+		}
+		{
+			id: 18
+			name: Text
+			class: net.bplo.nodes.editor.PropEditableText
+			data: text2
+			propTypeId: dialogue-text
+			dependsOn: null
+			pins: []
+		}
+	]
+	incomingLinks: [
+		{
+			id: 19
+			srcPinId: 3
+			dstPinId: 11
+		}
+	]
+	outgoingLinks: []
+}
+]

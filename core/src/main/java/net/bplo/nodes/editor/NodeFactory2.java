@@ -1,6 +1,7 @@
 package net.bplo.nodes.editor;
 
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.ObjectMap;
 import net.bplo.nodes.Util;
 import net.bplo.nodes.editor.meta.Metadata;
 import net.bplo.nodes.editor.utils.PinKind;
@@ -105,8 +106,8 @@ public class NodeFactory2 {
                     //   - add optional 'dependsOn' field to PropType to indicate which prop (by id) the dependent prop references
                     var portraits = assetType.get().getItemFieldValues(display.field, Metadata.AssetItemRef.class);
                     if (portraits.isEmpty()) {
-                        Util.log(TAG, "Expected 1 portrait asset item ref for thumbnail prop '%s' from display value '%s', got %d"
-                            .formatted(propType.name, propType.display, portraits.size()));
+                        Util.log(TAG, "Expected 1 portrait asset item ref for thumbnail prop '%s' from display value '%s', none found"
+                            .formatted(propType.name, propType.display));
                         return;
                     }
                     thumbnail.assetRef = portraits.getFirst();
@@ -129,71 +130,94 @@ public class NodeFactory2 {
         };
     }
 
-    private static void updateDependentProp(Editor editor, Prop dstProp, Prop srcProp, Object value, Metadata.PropType dstPropType, Metadata.PropType srcPropType) {
-        if (dstProp instanceof PropThumbnail thumbnail && srcProp instanceof PropSelect select) {
-            updateThumbnailFromSelect(editor, thumbnail, select, dstPropType, srcPropType);
+    public static void updateDependentProp(Editor editor, Prop dstProp, Prop srcProp, Object value, Metadata.PropType dstPropType, Metadata.PropType srcPropType) {
+        if (dstPropType.display == null) return;
+
+        // parse the display path, eg: '#{value}.{field}'
+        var display = new Metadata.Display(dstPropType.display);
+        if (!"#{value}".equals(display.type)) return;
+
+        // get the source value
+        var srcData = srcProp.getData();
+        var srcValue = srcProp instanceof PropSelect ? ((PropSelect.Data) srcData).getSelectedOption() : String.valueOf(srcData);
+        if (srcValue.isEmpty()) {
+            clearPropValue(dstProp);
+            return;
         }
-//        if (dstProp instanceof PropSelect dstSelect && srcProp instanceof PropSelect srcSelect) {
-//             TODO(brian): add select chaining for character select -> character pose select
-//        }
-        // ... add more combinations as needed...
+
+        // resolve the reference based on the source value and field path
+        resolvePropertyReference(editor, dstProp, srcPropType.assetType, srcValue, display.field);
     }
-    private static void updateThumbnailFromSelect(Editor editor, PropThumbnail thumbnail, PropSelect select, Metadata.PropType thumbnailPropType, Metadata.PropType selectPropType) {
-        if (thumbnailPropType.display == null || selectPropType.assetType == null) {
-            return;
-        }
 
-        // Parse the display path for the thumbnail
-        Metadata.Display display = new Metadata.Display(thumbnailPropType.display);
-        if (!"#{value}".equals(display.type)) {
-            Util.log(TAG, "Only #{value}.field format is supported for display paths, got: " + display.type);
-            return;
-        }
-
-        // Get the selected item ID/name
-        var selectData = (PropSelect.Data) select.getData();
-        var selectedOption = selectData.getSelectedOption();
-        if (selectedOption.isEmpty()) {
-            // Clear the thumbnail if nothing is selected
-            thumbnail.assetRef = null;
-            return;
-        }
-
-        // Find the asset item for the selected option
+    private static void resolvePropertyReference(Editor editor, Prop dstProp, String assetType, String itemName, String propertyPath) {
         var registry = editor.metadataRegistry;
-        var assetType = registry.findAssetType(selectPropType.assetType);
-        if (assetType.isEmpty()) {
-            Util.log(TAG, "Asset type not found: " + selectPropType.assetType);
-            return;
+        registry.findAssetType(assetType).ifPresent(type -> {
+            // find the item by name
+            var item = Util.asList(type.items).stream()
+                .filter(assetItem -> assetItem.name.equals(itemName))
+                .findFirst();
+
+            if (item.isEmpty()) return;
+
+            // resolve the property path (handle nested paths with dots)
+            var propValue = resolvePropertyPath(item.get(), propertyPath);
+
+            // set the property value based on the prop type
+            setPropValueByType(dstProp, propValue);
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Object resolvePropertyPath(Metadata.AssetItem item, String propertyPath) {
+        var pathParts = propertyPath.split("\\.");
+
+        Object current = item;
+        for (var part : pathParts) {
+            switch (current) {
+                case Metadata.AssetItem assetItem -> {
+                    // try basic properties first
+                    if      ("id".equals(part))   current = assetItem.id;
+                    else if ("name".equals(part)) current = assetItem.name;
+                    else if ("path".equals(part)) current = assetItem.path;
+                    // then check the properties map
+                    else if (assetItem.properties.containsKey(part)) {
+                        current = assetItem.properties.get(part);
+                    } else {
+                        return null; // property not found
+                    }
+                }
+                case ObjectMap<?, ?> objectMap -> {
+                    // navigate through ObjectMap properties
+                    var map = (ObjectMap<String, Object>) current;
+                    if (!map.containsKey(part)) return null;
+                    current = map.get(part);
+                }
+                default -> {
+                    // can't navigate further
+                    return null;
+                }
+            }
         }
+        return current;
+    }
 
-        // Find the asset item by name
-        var assetItems = assetType.get().items;
-        var selectedItem = Util.asList(assetItems).stream()
-            .filter(item -> item.name.equals(selectedOption))
-            .findFirst();
-        if (selectedItem.isEmpty()) {
-            Util.log(TAG, "Asset item not found with name: " + selectedOption);
-            return;
+    private static void setPropValueByType(Prop dstProp, Object value) {
+        if (dstProp instanceof PropThumbnail thumbnail && value instanceof Metadata.AssetItemRef assetRef) {
+            thumbnail.assetRef = assetRef;
+            thumbnail.clearImage();
         }
+//        else if (dstProp instanceof PropSelect select && value instanceof Array<?> array) {
+//            // handle populating a dependent select with options
+//            // ...
+//        }
+        // add more type handlers as needed
+    }
 
-        // Get the field from the selected item (like 'portrait')
-        var itemProperties = selectedItem.get().properties;
-        if (!itemProperties.containsKey(display.field)) {
-            Util.log(TAG, "Property not found in asset item: " + display.field);
-            return;
+    private static void clearPropValue(Prop dstProp) {
+        if (dstProp instanceof PropThumbnail thumbnail) {
+            thumbnail.assetRef = null;
+            thumbnail.clearImage();
         }
-
-        var fieldValue = itemProperties.get(display.field);
-        if (!(fieldValue instanceof Metadata.AssetItemRef)) {
-            Util.log(TAG, "Expected AssetItemRef for field: " + display.field);
-            return;
-        }
-
-        // Set the asset reference on the thumbnail
-        thumbnail.assetRef = (Metadata.AssetItemRef) fieldValue;
-
-        // Force a refresh of the thumbnail
-        thumbnail.clearImage();
+        // add more type handlers as needed
     }
 }

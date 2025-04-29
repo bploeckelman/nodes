@@ -4,7 +4,9 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import imgui.extension.nodeditor.NodeEditor;
+import net.bplo.nodes.Main;
 import net.bplo.nodes.Util;
+import net.bplo.nodes.editor.meta.Metadata;
 import net.bplo.nodes.editor.utils.PinKind;
 import net.bplo.nodes.editor.utils.PinType;
 
@@ -12,6 +14,7 @@ import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeList> {
 
@@ -65,6 +68,8 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
                 // TODO(brian): verify if this will work for all prop types
                 //  or if we need to take the 'data' type into account for serde
                 json.writeValue("data", prop.getData());
+                json.writeValue("propTypeId", prop.propTypeId);
+                json.writeValue("dependsOn", prop.dependsOn);
 
                 // Write prop pins
                 json.writeArrayStart("pins");
@@ -166,6 +171,8 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
                     var propName  = propValue.getString("name", "");
                     var propClassName = propValue.getString("class");
                     var propDataValue = propValue.get("data");
+                    var propTypeIdValue = propValue.getString("propTypeId");
+                    var propDependsOnValue = propValue.getString("dependsOn");
 
                     // Create prop instance based on type
                     Prop prop;
@@ -174,6 +181,9 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
                         var constructor = propClass.getDeclaredConstructor(long.class, Node.class);
                         prop = (Prop) constructor.newInstance(propId, node);
                         prop.name = propName;
+                        prop.propTypeId = propTypeIdValue;
+                        prop.dependsOn = propDependsOnValue;
+                        // TODO(brian): restore OnChange based on prop type and dependsOn
 
                         // TODO(brian): return to this once we have more concrete prop types,
                         //  depending how they're setup it could be trickier than this to deserialize
@@ -255,6 +265,44 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
             }
         }
 
+        // restore prop dependencies and 'onChange' handler
+        var editor = Main.app.editor;
+        for (var node : nodes) {
+            for (var dstProp : node.props) {
+                if (dstProp.dependsOn == null) continue;
+
+                var srcProp = node.findProp(dstProp.dependsOn).orElse(null);
+                if (srcProp == null) continue;
+
+                var nodeType = findNodeTypeForProps(srcProp, dstProp).orElse(null);
+                if (nodeType == null) continue;
+
+                var srcPropType = nodeType.findPropType(srcProp.propTypeId);
+                var dstPropType = nodeType.findPropType(dstProp.propTypeId);
+                if (srcPropType.isPresent() && dstPropType.isPresent()) {
+                    // recreate onChange handler
+                    srcProp.onChange = (newValue) -> NodeFactory2.updateDependentProp(
+                        editor, dstProp, srcProp, newValue, dstPropType.get(), srcPropType.get());
+
+                    // trigger initial update
+                    NodeFactory2.updateDependentProp(editor, dstProp, srcProp, srcProp.getData(), dstPropType.get(), srcPropType.get());
+                }
+            }
+        }
+
         return nodes;
+    }
+
+    /**
+     * Finds the node type that defines the given props.
+     * NOTE: could be removed by writing nodeTypeId to serialized nodes
+     */
+    private Optional<Metadata.NodeType> findNodeTypeForProps(Prop srcProp, Prop dstProp) {
+        var registry = Main.app.editor.metadataRegistry;
+        return registry.getNodeTypes().stream()
+            .filter(nodeType ->
+                       nodeType.findPropType(srcProp.propTypeId).isPresent()
+                    && nodeType.findPropType(dstProp.propTypeId).isPresent())
+            .findFirst();
     }
 }
