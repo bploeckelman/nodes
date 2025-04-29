@@ -124,8 +124,8 @@ public class NodeFactory2 {
             case "integer" -> PropInteger.class;
             case "select" -> PropSelect.class;
             case "thumbnail" -> PropThumbnail.class;
-            // TODO(brian): create separate single/multi line editable text prop types
-            case "input-text", "input-text-multiline" -> PropEditableText.class;
+            case "input-text" -> PropInputText.class;
+            case "input-text-multiline" -> PropInputTextMultiline.class;
             default -> null;
         };
     }

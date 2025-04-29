@@ -4,8 +4,8 @@
 	width: 200
 	headerText: Test
 	position: {
-		x: 1507
-		y: -931
+		x: 1363
+		y: -1043
 	}
 	pins: [
 		{
@@ -29,7 +29,7 @@
 					Hero
 					Villain
 				]
-				selectedIndex: 1
+				selectedIndex: 0
 			}
 			propTypeId: character-select
 			dependsOn: null
@@ -41,7 +41,7 @@
 			class: net.bplo.nodes.editor.PropThumbnail
 			data: {
 				type: image
-				id: villain-portrait
+				id: hero-portrait
 			}
 			propTypeId: character-portrait
 			dependsOn: character-select
@@ -50,8 +50,8 @@
 		{
 			id: 6
 			name: Override Name
-			class: net.bplo.nodes.editor.PropEditableText
-			data: name1
+			class: net.bplo.nodes.editor.PropInputText
+			data: Cool Dude
 			propTypeId: character-name-override
 			dependsOn: null
 			pins: []
@@ -77,8 +77,8 @@
 		{
 			id: 9
 			name: Text
-			class: net.bplo.nodes.editor.PropEditableText
-			data: text1
+			class: net.bplo.nodes.editor.PropInputTextMultiline
+			data: "Very cool dude, who does some cool stuff,\nsometimes,\nbut also other times does dumb stuff"
 			propTypeId: dialogue-text
 			dependsOn: null
 			pins: []
@@ -98,8 +98,8 @@
 	width: 200
 	headerText: Test
 	position: {
-		x: 1795
-		y: -931
+		x: 1651
+		y: -1043
 	}
 	pins: [
 		{
@@ -123,7 +123,7 @@
 					Hero
 					Villain
 				]
-				selectedIndex: 0
+				selectedIndex: 1
 			}
 			propTypeId: character-select
 			dependsOn: null
@@ -135,7 +135,7 @@
 			class: net.bplo.nodes.editor.PropThumbnail
 			data: {
 				type: image
-				id: hero-portrait
+				id: villain-portrait
 			}
 			propTypeId: character-portrait
 			dependsOn: character-select
@@ -144,8 +144,8 @@
 		{
 			id: 15
 			name: Override Name
-			class: net.bplo.nodes.editor.PropEditableText
-			data: name2
+			class: net.bplo.nodes.editor.PropInputText
+			data: Bad Dude
 			propTypeId: character-name-override
 			dependsOn: null
 			pins: []
@@ -171,8 +171,8 @@
 		{
 			id: 18
 			name: Text
-			class: net.bplo.nodes.editor.PropEditableText
-			data: text2
+			class: net.bplo.nodes.editor.PropInputTextMultiline
+			data: "A dude who is bad...\n\nAnd therefore does bad stuff\n\nbut occassionally does ok stuff,\nbecause no one is entirely good or bad."
 			propTypeId: dialogue-text
 			dependsOn: null
 			pins: []

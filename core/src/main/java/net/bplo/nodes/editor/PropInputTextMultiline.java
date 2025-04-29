@@ -14,9 +14,9 @@ import net.bplo.nodes.imgui.ImGuiLayout;
 
 import java.util.ArrayList;
 
-public class PropEditableText extends Prop {
+public class PropInputTextMultiline extends Prop {
 
-    private static final String TAG = PropEditableText.class.getSimpleName();
+    private static final String TAG = PropInputTextMultiline.class.getSimpleName();
     private static final int MAX_VISIBLE_LINES = 5;
 
     private final ImString text = new ImString(4096);
@@ -25,16 +25,16 @@ public class PropEditableText extends Prop {
     private String[] previewLines = new String[0];
     private int totalLines = 0;
 
-    public PropEditableText(Node node) {
+    public PropInputTextMultiline(Node node) {
         this(node, "");
     }
 
-    public PropEditableText(Node node, String initialText) {
+    public PropInputTextMultiline(Node node, String initialText) {
         super(node);
         init(initialText);
     }
 
-    PropEditableText(long savedId, Node node) {
+    PropInputTextMultiline(long savedId, Node node) {
         super(savedId, node);
         init(null);
     }

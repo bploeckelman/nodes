@@ -183,7 +183,7 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
                         prop.name = propName;
                         prop.propTypeId = propTypeIdValue;
                         prop.dependsOn = propDependsOnValue;
-                        // TODO(brian): restore OnChange based on prop type and dependsOn
+                        // NOTE: restoring OnChange based on prop type and dependsOn happens after all nodes are created
 
                         // TODO(brian): return to this once we have more concrete prop types,
                         //  depending how they're setup it could be trickier than this to deserialize

@@ -13,7 +13,7 @@ import java.util.List;
 
 public class PropSelect extends Prop {
 
-    private static final String TAG = PropEditableText.class.getSimpleName();
+    private static final String TAG = PropInputTextMultiline.class.getSimpleName();
 
     private final Data data;
 

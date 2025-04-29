@@ -321,9 +321,9 @@ public class Editor implements Disposable {
         new PropInteger(node);
         new PropFloat(node);
         new PropSelect(node, new PropSelect.Data(0, List.of("Foo", "Bar", "Baz", "Buzz", "Booze", "Quux")));
-        var editableText = new PropEditableText(node);
-        editableText.name = "Text";
-        editableText.setText("""
+        var inputTextMultiline = new PropInputTextMultiline(node);
+        inputTextMultiline.name = "Text";
+        inputTextMultiline.setText("""
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pretium, purus nec ullamcorper dictum,
         felis purus accumsan enim, ac tristique tellus orci id dolor.
 
@@ -331,7 +331,6 @@ public class Editor implements Disposable {
         sodales tincidunt velit. Nulla blandit, lorem in maximus ullamcorper, dolor justo interdum elit,
         vitae pretium eros nibh a est.
         """);
-
         return node;
     }
 }
