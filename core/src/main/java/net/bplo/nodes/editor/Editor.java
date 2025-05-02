@@ -14,7 +14,6 @@ import imgui.flag.ImGuiDockNodeFlags;
 import imgui.flag.ImGuiStyleVar;
 import net.bplo.nodes.Main;
 import net.bplo.nodes.Util;
-import net.bplo.nodes.editor.meta.AssetMetadata;
 import net.bplo.nodes.editor.meta.MetadataRegistry;
 import net.bplo.nodes.editor.utils.PinKind;
 import net.bplo.nodes.editor.utils.PinType;
@@ -47,7 +46,6 @@ public class Editor implements Disposable {
     final EditorInfoPane infoPane;
     final EditorNodePane nodePane;
 
-    AssetMetadata assetMetadata; // TODO(brian): remove me
     public MetadataRegistry metadataRegistry;
 
     public Editor() {
