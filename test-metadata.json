@@ -6,11 +6,11 @@
       basePath: ./sprites
       items: [
         {id: hero-portrait,    name: Hero Portrait,    path: characters/man-idle.png}
-        {id: hero-idle,        name: Hero Idle,        path: characters/hero/idle.png}
-        {id: hero-attack,      name: Hero Attack,      path: characters/hero/attack.png}
+        {id: hero-idle,        name: Hero Idle,        path: characters/man-rope.png}
+        {id: hero-attack,      name: Hero Attack,      path: characters/man-think.png}
         {id: villain-portrait, name: Villain Portrait, path: characters/man-shove.png}
-        {id: villain-idle,     name: Villain Idle,     path: characters/villain/idle.png}
-        {id: villain-attack,   name: Villain Attack,   path: characters/villain/attack.png}
+        {id: villain-idle,     name: Villain Idle,     path: characters/man-down.png}
+        {id: villain-attack,   name: Villain Attack,   path: characters/man-hit.png}
       ]
     }
     {
@@ -63,6 +63,22 @@
           assetType: character
           display: "#{value}.portrait"
           dependsOn: character-select
+        }
+        {
+          type: select
+          id: character-pose-select
+          name: Pose
+          assetType: character
+          display: "#{value}.poses"
+          dependsOn: character-select
+        }
+        {
+          type: thumbnail
+          id: character-pose-thumb
+          name: Portrait
+          assetType: character
+          display: "#{value}.poses"
+          dependsOn: character-pose-select
         }
         {
           type: input-text

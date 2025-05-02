@@ -1,7 +1,9 @@
 package net.bplo.nodes.editor;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectMap;
+import net.bplo.nodes.Main;
 import net.bplo.nodes.Util;
 import net.bplo.nodes.editor.meta.Metadata;
 import net.bplo.nodes.editor.utils.PinKind;
@@ -201,15 +203,28 @@ public class NodeFactory2 {
         return current;
     }
 
+    @SuppressWarnings("unchecked")
     private static void setPropValueByType(Prop dstProp, Object value) {
         if (dstProp instanceof PropThumbnail thumbnail && value instanceof Metadata.AssetItemRef assetRef) {
             thumbnail.assetRef = assetRef;
             thumbnail.clearImage();
         }
-//        else if (dstProp instanceof PropSelect select && value instanceof Array<?> array) {
-//            // handle populating a dependent select with options
-//            // ...
-//        }
+        else if (dstProp instanceof PropSelect select && value instanceof Array<?> array) {
+            var options = new Array<String>();
+            if (!array.isEmpty() && array.get(0) instanceof Metadata.AssetItemRef) {
+                var editor = Main.app.editor;
+                var assets = Main.app.assets;
+                var assetRefs = (Array<Metadata.AssetItemRef>) array;
+                for (var assetRef : assetRefs) {
+                    assets.resolveAssetRef(editor, assetRef, String.class)
+                        .ifPresent(options::add);
+                }
+            }
+            var selectData = (PropSelect.Data) select.getData();
+            selectData.options = options.toArray(String.class);
+            selectData.selectedIndex = 0;
+
+        }
         // add more type handlers as needed
     }
 

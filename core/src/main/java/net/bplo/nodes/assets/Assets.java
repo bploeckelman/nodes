@@ -170,6 +170,19 @@ public class Assets implements Disposable {
                 Util.log(TAG, "Cache hit for %s asset '%s'".formatted(type.getSimpleName(), assetRef.cacheKey()));
             }
             asset = type.cast(texture);
+        } else if (type == String.class) {
+            var string = cache.get(assetRef.cacheKey());
+            if (string == null) {
+                string = assetRef.resolve(editor.metadataRegistry)
+                    .map(item -> item.name)
+                    .orElse("");
+                Util.log(TAG, "Cache miss for %s asset '%s', adding to cache: %s"
+                    .formatted(type.getSimpleName(), assetRef.cacheKey(), assetPath));
+                cache.put(assetRef.cacheKey(), string);
+            } else {
+                Util.log(TAG, "Cache hit for %s asset '%s'".formatted(type.getSimpleName(), assetRef.cacheKey()));
+            }
+            asset = type.cast(string);
         } else {
             Util.log(TAG, "Unsupported asset type: " + type);
         }
