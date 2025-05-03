@@ -2,10 +2,11 @@
 {
 	id: 1
 	width: 200
-	headerText: Dialogue
+	nodeTypeId: test
+	headerText: Test
 	position: {
-		x: 1503
-		y: -542
+		x: 1357
+		y: -611
 	}
 	pins: [
 		{
@@ -22,270 +23,208 @@
 	props: [
 		{
 			id: 4
-			name: ""
-			class: net.bplo.nodes.editor.PropTest
-			data: null
-			pins: [
-				{
-					id: 5
-					kind: INPUT
-					type: DATA
-				}
-				{
-					id: 6
-					kind: OUTPUT
-					type: DATA
-				}
-			]
+			name: Character
+			class: net.bplo.nodes.editor.PropSelect
+			data: {
+				options: [
+					Hero
+					Villain
+				]
+				selectedIndex: 0
+			}
+			propTypeId: character-select
+			pins: []
+		}
+		{
+			id: 5
+			name: Character Image
+			class: net.bplo.nodes.editor.PropThumbnail
+			data: {
+				typeId: image
+				itemId: hero-portrait
+			}
+			propTypeId: character-portrait
+			pins: []
+		}
+		{
+			id: 6
+			name: Pose
+			class: net.bplo.nodes.editor.PropSelect
+			data: {
+				options: [
+					Hero Idle
+					Hero Attack
+				]
+				selectedIndex: 0
+			}
+			propTypeId: character-pose-select
+			pins: []
 		}
 		{
 			id: 7
-			name: Number
-			class: net.bplo.nodes.editor.PropInteger
-			data: 2
+			name: Pose Image
+			class: net.bplo.nodes.editor.PropThumbnail
+			data: {
+				typeId: image
+				itemId: hero-idle
+			}
+			propTypeId: character-pose-thumb
 			pins: []
 		}
 		{
 			id: 8
-			name: Number
-			class: net.bplo.nodes.editor.PropFloat
-			data: 0.20000002
+			name: Override Name
+			class: net.bplo.nodes.editor.PropInputText
+			data: hero
+			propTypeId: character-name-override
 			pins: []
 		}
 		{
 			id: 9
-			name: Select
-			class: net.bplo.nodes.editor.PropSelect
-			data: {
-				options: [
-					Foo
-					Bar
-					Baz
-					Buzz
-					Booze
-					Quux
-				]
-				selectedIndex: 1
-			}
+			name: Number
+			class: net.bplo.nodes.editor.PropInteger
+			data: 1
+			propTypeId: integer
 			pins: []
 		}
 		{
 			id: 10
+			name: Number
+			class: net.bplo.nodes.editor.PropFloat
+			data: 0.1
+			propTypeId: float
+			pins: []
+		}
+		{
+			id: 11
 			name: Text
-			class: net.bplo.nodes.editor.PropEditableText
-			data: This is node 1
+			class: net.bplo.nodes.editor.PropInputTextMultiline
+			data: Text associated with test node 1.
+			propTypeId: dialogue-text
 			pins: []
 		}
 	]
-	incomingLinks: [
-		{
-			id: 34
-			srcPinId: 25
-			dstPinId: 2
-		}
-	]
+	incomingLinks: []
 	outgoingLinks: [
 		{
-			id: 21
+			id: 23
 			srcPinId: 3
-			dstPinId: 12
-		}
-		{
-			id: 22
-			srcPinId: 6
-			dstPinId: 15
+			dstPinId: 13
 		}
 	]
 }
 {
-	id: 11
+	id: 12
 	width: 200
-	headerText: Dialogue
+	nodeTypeId: test
+	headerText: Test
 	position: {
-		x: 1793
-		y: -543
+		x: 1645
+		y: -611
 	}
 	pins: [
 		{
-			id: 12
+			id: 13
 			kind: INPUT
 			type: FLOW
 		}
 		{
-			id: 13
+			id: 14
 			kind: OUTPUT
 			type: FLOW
 		}
 	]
 	props: [
 		{
-			id: 14
-			name: ""
-			class: net.bplo.nodes.editor.PropTest
-			data: null
-			pins: [
-				{
-					id: 15
-					kind: INPUT
-					type: DATA
-				}
-				{
-					id: 16
-					kind: OUTPUT
-					type: DATA
-				}
-			]
+			id: 15
+			name: Character
+			class: net.bplo.nodes.editor.PropSelect
+			data: {
+				options: [
+					Hero
+					Villain
+				]
+				selectedIndex: 1
+			}
+			propTypeId: character-select
+			pins: []
+		}
+		{
+			id: 16
+			name: Character Image
+			class: net.bplo.nodes.editor.PropThumbnail
+			data: {
+				typeId: image
+				itemId: villain-portrait
+			}
+			propTypeId: character-portrait
+			pins: []
 		}
 		{
 			id: 17
-			name: Number
-			class: net.bplo.nodes.editor.PropInteger
-			data: -2
+			name: Pose
+			class: net.bplo.nodes.editor.PropSelect
+			data: {
+				options: [
+					Villain Idle
+					Villain Attack
+				]
+				selectedIndex: 0
+			}
+			propTypeId: character-pose-select
 			pins: []
 		}
 		{
 			id: 18
-			name: Number
-			class: net.bplo.nodes.editor.PropFloat
-			data: -0.20000002
+			name: Pose Image
+			class: net.bplo.nodes.editor.PropThumbnail
+			data: {
+				typeId: image
+				itemId: villain-idle
+			}
+			propTypeId: character-pose-thumb
 			pins: []
 		}
 		{
 			id: 19
-			name: Select
-			class: net.bplo.nodes.editor.PropSelect
-			data: {
-				options: [
-					Foo
-					Bar
-					Baz
-					Buzz
-					Booze
-					Quux
-				]
-				selectedIndex: 2
-			}
+			name: Override Name
+			class: net.bplo.nodes.editor.PropInputText
+			data: villain
+			propTypeId: character-name-override
 			pins: []
 		}
 		{
 			id: 20
-			name: Text
-			class: net.bplo.nodes.editor.PropEditableText
-			data: This is node 11\n
+			name: Number
+			class: net.bplo.nodes.editor.PropInteger
+			data: -2
+			propTypeId: integer
 			pins: []
 		}
-	]
-	incomingLinks: [
 		{
 			id: 21
-			srcPinId: 3
-			dstPinId: 12
+			name: Number
+			class: net.bplo.nodes.editor.PropFloat
+			data: -0.2
+			propTypeId: float
+			pins: []
 		}
 		{
 			id: 22
-			srcPinId: 6
-			dstPinId: 15
-		}
-	]
-	outgoingLinks: [
-		{
-			id: 33
-			srcPinId: 13
-			dstPinId: 24
-		}
-	]
-}
-{
-	id: 23
-	width: 200
-	headerText: Dialogue
-	position: {
-		x: 1651
-		y: -883
-	}
-	pins: [
-		{
-			id: 24
-			kind: INPUT
-			type: FLOW
-		}
-		{
-			id: 25
-			kind: OUTPUT
-			type: FLOW
-		}
-	]
-	props: [
-		{
-			id: 26
-			name: ""
-			class: net.bplo.nodes.editor.PropTest
-			data: null
-			pins: [
-				{
-					id: 27
-					kind: INPUT
-					type: DATA
-				}
-				{
-					id: 28
-					kind: OUTPUT
-					type: DATA
-				}
-			]
-		}
-		{
-			id: 29
-			name: Number
-			class: net.bplo.nodes.editor.PropInteger
-			data: 1
-			pins: []
-		}
-		{
-			id: 30
-			name: Number
-			class: net.bplo.nodes.editor.PropFloat
-			data: 1.0000001
-			pins: []
-		}
-		{
-			id: 31
-			name: Select
-			class: net.bplo.nodes.editor.PropSelect
-			data: {
-				options: [
-					Foo
-					Bar
-					Baz
-					Buzz
-					Booze
-					Quux
-				]
-				selectedIndex: 0
-			}
-			pins: []
-		}
-		{
-			id: 32
 			name: Text
-			class: net.bplo.nodes.editor.PropEditableText
-			data: "This is node 23...\n\nWow, we're going to run into ids in the hundreds much quicker than I originally thought."
+			class: net.bplo.nodes.editor.PropInputTextMultiline
+			data: Text associated with test node 2.
+			propTypeId: dialogue-text
 			pins: []
 		}
 	]
 	incomingLinks: [
 		{
-			id: 33
-			srcPinId: 13
-			dstPinId: 24
+			id: 23
+			srcPinId: 3
+			dstPinId: 13
 		}
 	]
-	outgoingLinks: [
-		{
-			id: 34
-			srcPinId: 25
-			dstPinId: 2
-		}
-	]
+	outgoingLinks: []
 }
 ]

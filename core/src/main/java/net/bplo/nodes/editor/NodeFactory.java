@@ -18,6 +18,7 @@ public class NodeFactory {
 
     public static Node createNode(Editor editor, Metadata.NodeType nodeType) {
         var node = new Node();
+        node.nodeTypeId = nodeType.id;
         node.headerText = nodeType.name;
 
         for (int i = 0; i < nodeType.inputs; i++) {

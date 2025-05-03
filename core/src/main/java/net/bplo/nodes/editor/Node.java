@@ -28,6 +28,7 @@ public class Node extends EditorObject {
     public final List<Link> outgoingLinks = new ArrayList<>();
     public final ImVec2 position          = new ImVec2(0, 0);
 
+    public String nodeTypeId;
     public String headerText = "Node Header";
 
     final Bounds bounds = new Bounds();
