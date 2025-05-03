@@ -20,10 +20,10 @@
           id: hero
           name: Hero
           properties: {
-            portrait: {typeId: image, id: hero-portrait, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
+            portrait: {typeId: image, itemId: hero-portrait, class: net.bplo.nodes.editor.meta.Metadata$AssetRef}
             poses: [
-              {typeId: image, id: hero-idle, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
-              {typeId: image, id: hero-attack, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
+              {typeId: image, itemId: hero-idle, class: net.bplo.nodes.editor.meta.Metadata$AssetRef}
+              {typeId: image, itemId: hero-attack, class: net.bplo.nodes.editor.meta.Metadata$AssetRef}
             ]
           }
         }
@@ -31,10 +31,10 @@
           id: villain
           name: Villain
           properties: {
-            portrait: {typeId: image, id: villain-portrait, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
+            portrait: {typeId: image, itemId: villain-portrait, class: net.bplo.nodes.editor.meta.Metadata$AssetRef}
             poses: [
-              {typeId: image, id: villain-idle, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
-              {typeId: image, id: villain-attack, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
+              {typeId: image, itemId: villain-idle, class: net.bplo.nodes.editor.meta.Metadata$AssetRef}
+              {typeId: image, itemId: villain-attack, class: net.bplo.nodes.editor.meta.Metadata$AssetRef}
             ]
           }
         }
@@ -49,53 +49,45 @@
       outputs: 1
       props: [
         {
-          type: select
+          propClass: net.bplo.nodes.editor.PropSelect
           id: character-select
           name: Character
-          assetType: character
-          display: "#{value}.name"
         }
         {
-          type: thumbnail
+          propClass: net.bplo.nodes.editor.PropThumbnail
           id: character-portrait
           name: Portrait
-          assetType: character
-          display: "#{value}.portrait"
-          dependsOn: character-select
+          binding: {sourceId: character-select, transformer: null}
         }
         {
-          type: select
+          propClass: net.bplo.nodes.editor.PropSelect
           id: character-pose-select
           name: Pose
-          assetType: character
-          display: "#{value}.poses"
-          dependsOn: character-select
+          binding: {sourceId: character-select, transformer: null}
         }
         {
-          type: thumbnail
+          propClass: net.bplo.nodes.editor.PropThumbnail
           id: character-pose-thumb
           name: Portrait
-          assetType: character
-          display: "#{value}.poses"
-          dependsOn: character-pose-select
+          binding: {sourceId: character-pose-select, transformer: null}
         }
         {
-          type: input-text
+          propClass: net.bplo.nodes.editor.PropInputText
           id: character-name-override
           name: Override Name
         }
         {
-          type: integer
+          propClass: net.bplo.nodes.editor.PropInteger
           id: integer
           name: Number
         }
         {
-          type: float
+          propClass: net.bplo.nodes.editor.PropFloat
           id: float
           name: Number
         }
         {
-          type: input-text-multiline
+          propClass: net.bplo.nodes.editor.PropInputTextMultiline
           id: dialogue-text
           name: Text
         }

@@ -65,7 +65,7 @@ public class EditorWidget {
             if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(null)) {
                 var selectedFile = fileChooser.getSelectedFile();
                 var filePath = selectedFile.toPath().toAbsolutePath().toString();
-                editor.loadAssetMetadata(filePath);
+                editor.loadMetadata(filePath);
             }
         }
 

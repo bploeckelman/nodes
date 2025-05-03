@@ -10,9 +10,7 @@ import net.bplo.nodes.Util;
 import net.bplo.nodes.editor.Prop;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -38,8 +36,8 @@ public class Metadata {
         var root = (new JsonReader()).parse(jsonStr);
 
         var json = new Json();
-        var assets = (Array<Metadata.AssetType>) json.readValue("assetTypes", Array.class, Metadata.AssetType.class, root);
-        var nodes  = (Array<Metadata.NodeType>)  json.readValue("nodeTypes",  Array.class, Metadata.NodeType.class, root);
+        var assets = (Array<AssetType>) json.readValue("assetTypes", Array.class, AssetType.class, root);
+        var nodes  = (Array<NodeType>)  json.readValue("nodeTypes",  Array.class, NodeType.class, root);
 
         for (var type : assets) {
             if (assetTypes.containsKey(type.id)) {
@@ -81,33 +79,6 @@ public class Metadata {
             }
             return Optional.empty();
         }
-
-        public <T> List<T> getItemFieldValues(String fieldName, Class<T> fieldType) {
-            return Util.asList(items).stream()
-                .map(item -> {
-                    var fieldValue = switch (fieldName) {
-                        case "id"   -> item.id;
-                        case "name" -> item.name;
-                        case "path" -> item.path;
-                        // if fieldName isn't one of the explicit fields,
-                        // try to find it at the top level of item properties
-                        default -> item.properties.get(fieldName);
-                    };
-                    // validate that the field was found
-                    if (fieldValue == null) {
-                        Util.log(TAG, "Unknown asset item field: '%s' in asset type: '%s'".formatted(fieldName, id));
-                        return null;
-                    }
-                    // validate that the field is the expected type
-                    if (!fieldType.isAssignableFrom(fieldValue.getClass())) {
-                        Util.log(TAG, "Invalid asset item field type: '%s' in asset type: '%s'".formatted(fieldValue.getClass(), id));
-                        return null;
-                    }
-                    return fieldType.cast(fieldValue);
-                })
-                .filter(Objects::nonNull)
-                .toList();
-        }
     }
 
     public static class AssetItem {
@@ -119,14 +90,16 @@ public class Metadata {
     }
 
     public static class AssetRef<T> {
-        public final String typeId;
-        public final String itemId;
+        public String typeId;
+        public String itemId;
 
         public static <T> AssetRef<T> of(String typeId, String itemId) {
             return new AssetRef<>(typeId, itemId);
         }
 
-        private AssetRef(String typeId, String itemId) {
+        public AssetRef() {}
+
+        public AssetRef(String typeId, String itemId) {
             this.typeId = typeId;
             this.itemId = itemId;
         }
@@ -138,18 +111,6 @@ public class Metadata {
         public Optional<T> resolve(AssetResolver resolver, Class<T> type) {
             return resolver.resolve(this, type);
         }
-
-//        public Optional<AssetItem> resolve(MetadataRegistry registry) {
-//            var item = registry.findAssetType(typeId)
-//                .flatMap(assetType -> assetType.findItem(itemId));
-//
-//            if (item.isEmpty()) {
-//                Util.log(TAG, "Invalid asset item: '" + itemId + "' in asset type: '" + typeId + "'");
-//                return Optional.empty();
-//            }
-//
-//            return item;
-//        }
     }
 
     public static class NodeType {
@@ -157,9 +118,9 @@ public class Metadata {
         public String name;
         public int inputs;
         public int outputs;
-        public Array<PropType> props = new Array<>();
+        public Array<PropType<?>> props = new Array<>();
 
-        public Optional<PropType> findPropType(String id) {
+        public Optional<PropType<?>> findPropType(String id) {
             for (var prop : props) {
                 if (prop.id.equals(id)) {
                     return Optional.of(prop);
@@ -170,10 +131,15 @@ public class Metadata {
     }
 
     public static class PropType<T> {
+        public String propClass;
         public String id;
         public String name;
-        public Class<? extends Prop> propClass;
         public PropBinding<T> binding;
+
+        @SuppressWarnings("unchecked")
+        public Class<? extends Prop> getPropClass() throws ClassNotFoundException {
+            return (Class<? extends Prop>) Class.forName(propClass);
+        }
     }
 
     public static class PropBinding<T> {
@@ -184,26 +150,11 @@ public class Metadata {
             return new PropBinding<>(sourceId, transformer);
         }
 
+        public PropBinding() {}
+
         private PropBinding(String sourceId, Function<Object, T> transformer) {
             this.sourceId = sourceId;
             this.transformer = transformer;
-        }
-    }
-
-    public static class Display {
-        public String type;
-        public String field;
-
-        public Display() {}
-
-        public Display(String rawValue) {
-            var parts = rawValue.split("\\.");
-            if (parts.length < 2) {
-                Util.log(TAG, "Invalid display string: " + rawValue);
-            } else {
-                this.type  = parts[0];
-                this.field = parts[1];
-            }
         }
     }
 }

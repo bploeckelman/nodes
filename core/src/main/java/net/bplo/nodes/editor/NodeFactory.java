@@ -1,137 +1,56 @@
 package net.bplo.nodes.editor;
 
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import net.bplo.nodes.Util;
 import net.bplo.nodes.editor.meta.Metadata;
+import net.bplo.nodes.editor.meta.Metadata.PropType;
+import net.bplo.nodes.editor.meta.PropBindingResolver;
+import net.bplo.nodes.editor.utils.PinKind;
+import net.bplo.nodes.editor.utils.PinType;
 
-import static net.bplo.nodes.editor.meta.Metadata.AssetItem;
-import static net.bplo.nodes.editor.meta.Metadata.PropType;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
 
 public class NodeFactory {
 
     private static final String TAG = NodeFactory.class.getSimpleName();
 
     public static Node createNode(Editor editor, Metadata.NodeType nodeType) {
-        Util.log(TAG, "Not yet implemented");
-        return null;
-//        var node = new Node();
-//        node.headerText = nodeType.name;
-//
-//        for (int i = 0; i < nodeType.inputs; i++) {
-//            new Pin(node, PinKind.INPUT, PinType.FLOW);
-//        }
-//
-//        for (int i = 0; i < nodeType.outputs; i++) {
-//            new Pin(node, PinKind.OUTPUT, PinType.FLOW);
-//        }
-//
-//        for (var propType : nodeType.props) {
-//            createProp(editor, node, propType);
-//        }
-//
-//        // wire up prop dependencies now that all props are instantiated
-//        // TODO(brian): this works for the test metadata, but its more complicated than I'd like
-//        node.props.stream().filter(prop -> prop.dependsOn != null)
-//            .forEach(dstProp -> {
-//                node.findProp(dstProp.dependsOn).ifPresentOrElse(srcProp -> {
-//                    var srcPropType = nodeType.findPropType(srcProp.propTypeId);
-//                    var dstPropType = nodeType.findPropType(dstProp.propTypeId);
-//                    if (srcPropType.isEmpty() || dstPropType.isEmpty()) {
-//                        Util.log(TAG, "Failed to resolve prop types for dependency: %s -> %s"
-//                            .formatted(dstProp.propTypeId, dstProp.dependsOn));
-//                        return;
-//                    }
-//
-//                    // setup change callback
-//                    srcProp.onChange = (newValue) -> updateDependentProp(
-//                        editor, dstProp, srcProp, newValue, dstPropType.get(), srcPropType.get());
-//
-//                    // trigger initial update based on current value
-//                    updateDependentProp(editor, dstProp, srcProp, srcProp.getData(), dstPropType.get(), srcPropType.get());
-//                }, () -> Util.log(TAG, "Failed to find prop dependency: %s -> %s"
-//                    .formatted(dstProp.propTypeId, dstProp.dependsOn)));
-//            });
-//
-//        return node;
+        var node = new Node();
+        node.headerText = nodeType.name;
+
+        for (int i = 0; i < nodeType.inputs; i++) {
+            new Pin(node, PinKind.INPUT, PinType.FLOW);
+        }
+
+        for (int i = 0; i < nodeType.outputs; i++) {
+            new Pin(node, PinKind.OUTPUT, PinType.FLOW);
+        }
+
+        for (var propType : nodeType.props) {
+            createProp(node, propType);
+        }
+
+        var bindingResolver = new PropBindingResolver(editor.assetResolver);
+        bindingResolver.resolveBindings(node, nodeType.props);
+
+        return node;
     }
 
-    private static void createProp(Editor editor, Node node, PropType propType) {
-        Util.log(TAG, "Not yet implemented");
-//        var propClass = getPropClass(propType);
-//        if (propClass == null) {
-//            Util.log(TAG, "*** Unsupported prop type: " + propType.type);
-//            return;
-//        }
-//
-//        try {
-//            var ctor = propClass.getDeclaredConstructor(Node.class);
-//            var prop = (Prop) ctor.newInstance(node);
-//            prop.name = Objects.requireNonNullElse(propType.name, prop.defaultName());
-//            prop.propTypeId = propType.id;
-//            prop.dependsOn = propType.dependsOn;
-//
-//            Util.log(TAG, "Created prop: name='%s' id='%s' type='%s'".formatted(prop.name, propType.id, propType.type));
-//
-//            var hasAssetType = propType.assetType != null;
-//            var hasDisplay   = propType.display   != null;
-//            if (hasAssetType && hasDisplay) {
-//                var display = new Display(propType.display);
-//
-//                // resolve and set prop data based on prop type
-//                if (prop instanceof PropSelect select) {
-//                    var selectData = (PropSelect.Data) select.getData();
-//                    var assetType = editor.metadataRegistry.findAssetType(propType.assetType);
-//                    if (assetType.isEmpty()) {
-//                        Util.log(TAG, "Failed to find asset type: " + propType.assetType);
-//                        return;
-//                    }
-//
-//                    var options = assetType.get().getItemFieldValues(display.field, String.class);
-//                    Util.log(TAG, "Resolved %d options for select prop '%s' from display value '%s': %s"
-//                        .formatted(options.size(), propType.name, propType.display, options.stream().collect(Util.join())));
-//
-//                    selectData.options = options.toArray(new String[0]);
-//                    selectData.selectedIndex = options.isEmpty() ? -1 : 0;
-//                }
-//                else if (prop instanceof PropThumbnail thumbnail) {
-//                    var assetType = editor.metadataRegistry.findAssetType(propType.assetType);
-//                    if (assetType.isEmpty()) {
-//                        Util.log(TAG, "Failed to find asset type: " + propType.assetType);
-//                        return;
-//                    }
-//
-//                    // TODO(brian): testing, resolve one assetType item ref
-//                    // TODO(brian): need to finalize asset ref lookups (loading/caching), and property dependencies
-//                    //   eg. 'portrait' prop assetRef depends on current selection from character select prop
-//                    //   - add optional 'dependsOn' field to PropType to indicate which prop (by id) the dependent prop references
-//                    var portraits = assetType.get().getItemFieldValues(display.field, AssetRef.class);
-//                    if (portraits.isEmpty()) {
-//                        Util.log(TAG, "Expected 1 portrait asset item ref for thumbnail prop '%s' from display value '%s', none found"
-//                            .formatted(propType.name, propType.display));
-//                        return;
-//                    }
-//                    thumbnail.assetRef = portraits.getFirst();
-//                }
-//            }
-//        } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
-//            throw new GdxRuntimeException(e);
-//        }
+    private static void createProp(Node node, PropType<?> propType) {
+        try {
+            var ctor = propType.getPropClass().getDeclaredConstructor(Node.class);
+            var prop = (Prop) ctor.newInstance(node);
+            prop.name = Objects.requireNonNullElse(propType.name, prop.defaultName());
+            prop.propTypeId = propType.id;
+
+            Util.log(TAG, "Created prop: name='%s' id='%s' type='%s'".formatted(prop.name, propType.id, propType.propClass));
+        } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+            throw new GdxRuntimeException(e);
+        }
     }
 
-    private static Class<? extends Prop> getPropClass(PropType propType) {
-        return null;
-//        return switch (propType.type) {
-//            case "float" -> PropFloat.class;
-//            case "integer" -> PropInteger.class;
-//            case "select" -> PropSelect.class;
-//            case "thumbnail" -> PropThumbnail.class;
-//            case "input-text" -> PropInputText.class;
-//            case "input-text-multiline" -> PropInputTextMultiline.class;
-//            default -> null;
-//        };
-    }
-
-    public static void updateDependentProp(Editor editor, Prop dstProp, Prop srcProp, Object value, PropType dstPropType, PropType srcPropType) {
-        Util.log(TAG, "Not yet implemented");
+//    public static void updateDependentProp(Editor editor, Prop dstProp, Prop srcProp, Object value, PropType dstPropType, PropType srcPropType) {
 //        if (dstPropType.display == null) return;
 //
 //        // parse the display path, eg: '#{value}.{field}'
@@ -148,10 +67,9 @@ public class NodeFactory {
 //
 //        // resolve the reference based on the source value and field path
 //        resolvePropertyReference(editor, dstProp, srcPropType.assetType, srcValue, display.field);
-    }
+//    }
 
-    private static void resolvePropertyReference(Editor editor, Prop dstProp, String assetType, String itemName, String propertyPath) {
-        Util.log(TAG, "Not yet implemented");
+//    private static void resolvePropertyReference(Editor editor, Prop dstProp, String assetType, String itemName, String propertyPath) {
 //        var registry = editor.metadataRegistry;
 //        registry.findAssetType(assetType).ifPresent(type -> {
 //            // find the item by name
@@ -167,12 +85,10 @@ public class NodeFactory {
 //            // set the property value based on the prop type
 //            setPropValueByType(dstProp, propValue);
 //        });
-    }
+//    }
 
-    @SuppressWarnings("unchecked")
-    private static Object resolvePropertyPath(AssetItem item, String propertyPath) {
-        Util.log(TAG, "Not yet implemented");
-        return null;
+//    @SuppressWarnings("unchecked")
+//    private static Object resolvePropertyPath(AssetItem item, String propertyPath) {
 //        var pathParts = propertyPath.split("\\.");
 //
 //        Object current = item;
@@ -203,11 +119,10 @@ public class NodeFactory {
 //            }
 //        }
 //        return current;
-    }
+//    }
 
-    @SuppressWarnings("unchecked")
-    private static void setPropValueByType(Prop dstProp, Object value) {
-        Util.log(TAG, "Not yet implemented");
+//    @SuppressWarnings("unchecked")
+//    private static void setPropValueByType(Prop dstProp, Object value) {
 //        if (dstProp instanceof PropThumbnail thumbnail && value instanceof AssetRef assetRef) {
 //            thumbnail.assetRef = assetRef;
 //            thumbnail.clearImage();
@@ -229,14 +144,13 @@ public class NodeFactory {
 //
 //        }
 //        // add more type handlers as needed
-    }
+//    }
 
-    private static void clearPropValue(Prop dstProp) {
-        Util.log(TAG, "Not yet implemented");
+//    private static void clearPropValue(Prop dstProp) {
 //        if (dstProp instanceof PropThumbnail thumbnail) {
 //            thumbnail.assetRef = null;
 //            thumbnail.clearImage();
 //        }
 //        // add more type handlers as needed
-    }
+//    }
 }

@@ -4,7 +4,6 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import imgui.extension.nodeditor.NodeEditor;
-import net.bplo.nodes.Main;
 import net.bplo.nodes.Util;
 import net.bplo.nodes.editor.meta.Metadata;
 import net.bplo.nodes.editor.utils.PinKind;
@@ -263,30 +262,31 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
             }
         }
 
+        // TODO(brian): restore some version of this
         // restore prop dependencies and 'onChange' handler
-        var editor = Main.app.editor;
-        for (var node : nodes) {
-            for (var dstProp : node.props) {
-                if (dstProp.dependsOn == null) continue;
-
-                var srcProp = node.findProp(dstProp.dependsOn).orElse(null);
-                if (srcProp == null) continue;
-
-                var nodeType = findNodeTypeForProps(srcProp, dstProp).orElse(null);
-                if (nodeType == null) continue;
-
-                var srcPropType = nodeType.findPropType(srcProp.propTypeId);
-                var dstPropType = nodeType.findPropType(dstProp.propTypeId);
-                if (srcPropType.isPresent() && dstPropType.isPresent()) {
-                    // recreate onChange handler
-                    srcProp.onChange = (newValue) -> NodeFactory.updateDependentProp(
-                        editor, dstProp, srcProp, newValue, dstPropType.get(), srcPropType.get());
-
-                    // trigger initial update
-                    NodeFactory.updateDependentProp(editor, dstProp, srcProp, srcProp.getData(), dstPropType.get(), srcPropType.get());
-                }
-            }
-        }
+//        var editor = Main.app.editor;
+//        for (var node : nodes) {
+//            for (var dstProp : node.props) {
+//                if (dstProp.dependsOn == null) continue;
+//
+//                var srcProp = node.findProp(dstProp.dependsOn).orElse(null);
+//                if (srcProp == null) continue;
+//
+//                var nodeType = findNodeTypeForProps(srcProp, dstProp).orElse(null);
+//                if (nodeType == null) continue;
+//
+//                var srcPropType = nodeType.findPropType(srcProp.propTypeId);
+//                var dstPropType = nodeType.findPropType(dstProp.propTypeId);
+//                if (srcPropType.isPresent() && dstPropType.isPresent()) {
+//                    // recreate onChange handler
+//                    srcProp.onChange = (newValue) -> NodeFactory.updateDependentProp(
+//                        editor, dstProp, srcProp, newValue, dstPropType.get(), srcPropType.get());
+//
+//                    // trigger initial update
+//                    NodeFactory.updateDependentProp(editor, dstProp, srcProp, srcProp.getData(), dstPropType.get(), srcPropType.get());
+//                }
+//            }
+//        }
 
         return nodes;
     }

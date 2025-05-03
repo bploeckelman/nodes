@@ -13,8 +13,7 @@ public class PropThumbnail extends Prop {
     private boolean thumbnailVisible = true;
     private EditorWidget.Image image;
 
-    // TODO(brian): set from metadata PropType by resolving 'display'
-    public Metadata.AssetRef assetRef;
+    public Metadata.AssetRef<Texture> assetRef;
 
     public PropThumbnail(Node node) {
         super(node);
@@ -43,8 +42,8 @@ public class PropThumbnail extends Prop {
     public void render() {
         if (image == null && assetRef != null) {
             // try to resolve the referenced asset and use it to create the thumbnail image
-            editor.app.assets.resolveAssetRef(editor, assetRef, Texture.class)
-                // TODO(brian): allow override of thumbnail size for property
+            // TODO(brian): allow override of thumbnail size for property
+            assetRef.resolve(editor.assetResolver, Texture.class)
                 .ifPresent(texture -> image = EditorWidget.Image.from(texture));
         }
 
