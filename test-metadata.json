@@ -52,6 +52,7 @@
           propClass: net.bplo.nodes.editor.PropSelect
           id: character-select
           name: Character
+          assetType: character
         }
         {
           propClass: net.bplo.nodes.editor.PropThumbnail

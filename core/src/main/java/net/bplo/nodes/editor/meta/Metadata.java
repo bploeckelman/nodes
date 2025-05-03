@@ -134,6 +134,7 @@ public class Metadata {
         public String propClass;
         public String id;
         public String name;
+        public String assetType;
         public PropBinding<T> binding;
 
         @SuppressWarnings("unchecked")
