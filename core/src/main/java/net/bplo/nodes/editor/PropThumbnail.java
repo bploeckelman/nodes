@@ -14,7 +14,7 @@ public class PropThumbnail extends Prop {
     private EditorWidget.Image image;
 
     // TODO(brian): set from metadata PropType by resolving 'display'
-    public Metadata.AssetItemRef assetRef;
+    public Metadata.AssetRef assetRef;
 
     public PropThumbnail(Node node) {
         super(node);

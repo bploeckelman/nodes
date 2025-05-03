@@ -298,11 +298,12 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
      * NOTE: could be removed by writing nodeTypeId to serialized nodes
      */
     private Optional<Metadata.NodeType> findNodeTypeForProps(Prop srcProp, Prop dstProp) {
-        var registry = Main.app.editor.metadataRegistry;
-        return registry.getNodeTypes().stream()
-            .filter(nodeType ->
-                       nodeType.findPropType(srcProp.propTypeId).isPresent()
-                    && nodeType.findPropType(dstProp.propTypeId).isPresent())
-            .findFirst();
+//        var registry = Main.app.editor.metadataRegistry;
+//        return registry.getNodeTypes().stream()
+//            .filter(nodeType ->
+//                       nodeType.findPropType(srcProp.propTypeId).isPresent()
+//                    && nodeType.findPropType(dstProp.propTypeId).isPresent())
+//            .findFirst();
+        return Optional.empty();
     }
 }

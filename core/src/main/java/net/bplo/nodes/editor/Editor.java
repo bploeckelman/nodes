@@ -14,7 +14,6 @@ import imgui.flag.ImGuiDockNodeFlags;
 import imgui.flag.ImGuiStyleVar;
 import net.bplo.nodes.Main;
 import net.bplo.nodes.Util;
-import net.bplo.nodes.editor.meta.MetadataRegistry;
 import net.bplo.nodes.editor.utils.PinKind;
 import net.bplo.nodes.editor.utils.PinType;
 import net.bplo.nodes.imgui.ImGuiPlatform;
@@ -46,7 +45,7 @@ public class Editor implements Disposable {
     final EditorInfoPane infoPane;
     final EditorNodePane nodePane;
 
-    public MetadataRegistry metadataRegistry;
+//    public MetadataRegistry metadataRegistry;
 
     public Editor() {
         EditorObject.editor = this;
@@ -167,10 +166,10 @@ public class Editor implements Disposable {
     }
 
     void loadAssetMetadata(String filePath) {
-        metadataRegistry = new MetadataRegistry(filePath);
-        for (var nodeType : metadataRegistry.getNodeTypes()) {
-            nodePane.nodeTypes.put(nodeType.name, nodeType);
-        }
+//        metadataRegistry = new MetadataRegistry(filePath);
+//        for (var nodeType : metadataRegistry.getNodeTypes()) {
+//            nodePane.nodeTypes.put(nodeType.name, nodeType);
+//        }
     }
 
     void save() {

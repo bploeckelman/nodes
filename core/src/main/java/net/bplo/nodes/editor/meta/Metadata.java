@@ -1,16 +1,72 @@
 package net.bplo.nodes.editor.meta;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.ObjectMap;
 import net.bplo.nodes.Util;
+import net.bplo.nodes.editor.Prop;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
 public class Metadata {
 
     private static final String TAG = Metadata.class.getSimpleName();
+
+    public final String path;
+    public final Map<String, AssetType> assetTypes = new HashMap<>();
+    public final Map<String, NodeType>  nodeTypes = new HashMap<>();
+
+    @SuppressWarnings("unchecked")
+    public Metadata(String path) {
+        this.path = path;
+        Util.log(TAG, "Loading metadata: '%s'".formatted(path));
+
+        var handle = Gdx.files.absolute(path);
+        if (!handle.exists() || handle.isDirectory()) {
+            throw new GdxRuntimeException("Invalid metadata file path: " + path);
+        }
+
+        var jsonStr = handle.readString();
+        var root = (new JsonReader()).parse(jsonStr);
+
+        var json = new Json();
+        var assets = (Array<Metadata.AssetType>) json.readValue("assetTypes", Array.class, Metadata.AssetType.class, root);
+        var nodes  = (Array<Metadata.NodeType>)  json.readValue("nodeTypes",  Array.class, Metadata.NodeType.class, root);
+
+        for (var type : assets) {
+            if (assetTypes.containsKey(type.id)) {
+                Util.log(TAG, "*** Duplicate asset type id: '" + type.id + "', skipping.");
+                continue;
+            }
+            assetTypes.put(type.id, type);
+        }
+
+        for (var type : nodes) {
+            if (nodeTypes.containsKey(type.id)) {
+                Util.log(TAG, "*** Duplicate node type id: '" + type.id + "', skipping.");
+                continue;
+            }
+            nodeTypes.put(type.id, type);
+        }
+
+        Util.log(TAG, "Loaded %d asset types and %d node types".formatted(assetTypes.size(), nodeTypes.size()));
+    }
+
+    public Optional<AssetType> findAssetType(String id) {
+        return Optional.ofNullable(assetTypes.get(id));
+    }
+
+    public Optional<NodeType> findNodeType(String id) {
+        return Optional.ofNullable(nodeTypes.get(id));
+    }
 
     public static class AssetType {
         public String id;
@@ -62,25 +118,38 @@ public class Metadata {
         public ObjectMap<String, Object> properties = new ObjectMap<>();
     }
 
-    public static class AssetItemRef {
-        public String type;
-        public String id;
+    public static class AssetRef<T> {
+        public final String typeId;
+        public final String itemId;
 
-        public Optional<AssetItem> resolve(MetadataRegistry registry) {
-            var item = registry.findAssetType(type)
-                .flatMap(assetType -> assetType.findItem(id));
+        public static <T> AssetRef<T> of(String typeId, String itemId) {
+            return new AssetRef<>(typeId, itemId);
+        }
 
-            if (item.isEmpty()) {
-                Util.log(TAG, "Invalid asset item: '" + id + "' in asset type: '" + type + "'");
-                return Optional.empty();
-            }
-
-            return item;
+        private AssetRef(String typeId, String itemId) {
+            this.typeId = typeId;
+            this.itemId = itemId;
         }
 
         public String cacheKey() {
-            return type + "." + id;
+            return typeId + "." + itemId;
         }
+
+        public Optional<T> resolve(AssetResolver resolver, Class<T> type) {
+            return resolver.resolve(this, type);
+        }
+
+//        public Optional<AssetItem> resolve(MetadataRegistry registry) {
+//            var item = registry.findAssetType(typeId)
+//                .flatMap(assetType -> assetType.findItem(itemId));
+//
+//            if (item.isEmpty()) {
+//                Util.log(TAG, "Invalid asset item: '" + itemId + "' in asset type: '" + typeId + "'");
+//                return Optional.empty();
+//            }
+//
+//            return item;
+//        }
     }
 
     public static class NodeType {
@@ -100,13 +169,25 @@ public class Metadata {
         }
     }
 
-    public static class PropType {
-        public String type;
+    public static class PropType<T> {
         public String id;
         public String name;
-        public String assetType;
-        public String display;
-        public String dependsOn;
+        public Class<? extends Prop> propClass;
+        public PropBinding<T> binding;
+    }
+
+    public static class PropBinding<T> {
+        public String sourceId;
+        public Function<Object, T> transformer;
+
+        public static <T> PropBinding<T> create(String sourceId, Function<Object, T> transformer) {
+            return new PropBinding<>(sourceId, transformer);
+        }
+
+        private PropBinding(String sourceId, Function<Object, T> transformer) {
+            this.sourceId = sourceId;
+            this.transformer = transformer;
+        }
     }
 
     public static class Display {
