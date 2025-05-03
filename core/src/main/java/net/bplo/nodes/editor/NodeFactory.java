@@ -6,9 +6,9 @@ import net.bplo.nodes.editor.meta.Metadata;
 import static net.bplo.nodes.editor.meta.Metadata.AssetItem;
 import static net.bplo.nodes.editor.meta.Metadata.PropType;
 
-public class NodeFactory2 {
+public class NodeFactory {
 
-    private static final String TAG = NodeFactory2.class.getSimpleName();
+    private static final String TAG = NodeFactory.class.getSimpleName();
 
     public static Node createNode(Editor editor, Metadata.NodeType nodeType) {
         Util.log(TAG, "Not yet implemented");

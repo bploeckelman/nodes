@@ -60,18 +60,17 @@ public class Metadata {
         Util.log(TAG, "Loaded %d asset types and %d node types".formatted(assetTypes.size(), nodeTypes.size()));
     }
 
-    public Optional<AssetType> findAssetType(String id) {
-        return Optional.ofNullable(assetTypes.get(id));
+    public Optional<AssetType> findAssetType(String assetTypeId) {
+        return Optional.ofNullable(assetTypes.get(assetTypeId));
     }
 
-    public Optional<NodeType> findNodeType(String id) {
-        return Optional.ofNullable(nodeTypes.get(id));
+    public Optional<NodeType> findNodeType(String nodeTypeId) {
+        return Optional.ofNullable(nodeTypes.get(nodeTypeId));
     }
 
     public static class AssetType {
         public String id;
         public String name;
-        public String basePath;
         public Array<AssetItem> items = new Array<>();
 
         public Optional<AssetItem> findItem(String itemId) {
@@ -112,6 +111,7 @@ public class Metadata {
     }
 
     public static class AssetItem {
+        public String typeId;
         public String id;
         public String name;
         public String path;

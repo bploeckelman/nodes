@@ -3,14 +3,13 @@
     {
       id: image
       name: Image
-      basePath: ./sprites
       items: [
-        {id: hero-portrait,    name: Hero Portrait,    path: characters/man-idle.png}
-        {id: hero-idle,        name: Hero Idle,        path: characters/man-rope.png}
-        {id: hero-attack,      name: Hero Attack,      path: characters/man-think.png}
-        {id: villain-portrait, name: Villain Portrait, path: characters/man-shove.png}
-        {id: villain-idle,     name: Villain Idle,     path: characters/man-down.png}
-        {id: villain-attack,   name: Villain Attack,   path: characters/man-hit.png}
+        {typeId: image, id: hero-portrait,    name: Hero Portrait,    path: ./sprites/characters/man-idle.png}
+        {typeId: image, id: hero-idle,        name: Hero Idle,        path: ./sprites/characters/man-rope.png}
+        {typeId: image, id: hero-attack,      name: Hero Attack,      path: ./sprites/characters/man-think.png}
+        {typeId: image, id: villain-portrait, name: Villain Portrait, path: ./sprites/characters/man-shove.png}
+        {typeId: image, id: villain-idle,     name: Villain Idle,     path: ./sprites/characters/man-down.png}
+        {typeId: image, id: villain-attack,   name: Villain Attack,   path: ./sprites/characters/man-hit.png}
       ]
     }
     {
@@ -21,10 +20,10 @@
           id: hero
           name: Hero
           properties: {
-            portrait: {type: image, id: hero-portrait, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
+            portrait: {typeId: image, id: hero-portrait, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
             poses: [
-              {type: image, id: hero-idle, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
-              {type: image, id: hero-attack, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
+              {typeId: image, id: hero-idle, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
+              {typeId: image, id: hero-attack, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
             ]
           }
         }
@@ -32,10 +31,10 @@
           id: villain
           name: Villain
           properties: {
-            portrait: {type: image, id: villain-portrait, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
+            portrait: {typeId: image, id: villain-portrait, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
             poses: [
-              {type: image, id: villain-idle, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
-              {type: image, id: villain-attack, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
+              {typeId: image, id: villain-idle, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
+              {typeId: image, id: villain-attack, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
             ]
           }
         }

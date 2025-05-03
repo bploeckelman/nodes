@@ -262,7 +262,7 @@ public class EditorNodePane extends EditorPane {
                     var nodeType = nodeTypeEntry.value;
 
                     if (ImGui.menuItem(nodeName)) {
-                        newNode = NodeFactory2.createNode(editor, nodeType);
+                        newNode = NodeFactory.createNode(editor, nodeType);
                         break;
                     }
                 }

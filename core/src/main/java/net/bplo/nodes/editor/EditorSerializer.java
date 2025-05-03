@@ -65,8 +65,6 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
                 json.writeValue("id", prop.id);
                 json.writeValue("name", prop.name);
                 json.writeValue("class", prop.getClass().getName());
-                // TODO(brian): verify if this will work for all prop types
-                //  or if we need to take the 'data' type into account for serde
                 json.writeValue("data", prop.getData());
                 json.writeValue("propTypeId", prop.propTypeId);
                 json.writeValue("dependsOn", prop.dependsOn);
@@ -281,11 +279,11 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
                 var dstPropType = nodeType.findPropType(dstProp.propTypeId);
                 if (srcPropType.isPresent() && dstPropType.isPresent()) {
                     // recreate onChange handler
-                    srcProp.onChange = (newValue) -> NodeFactory2.updateDependentProp(
+                    srcProp.onChange = (newValue) -> NodeFactory.updateDependentProp(
                         editor, dstProp, srcProp, newValue, dstPropType.get(), srcPropType.get());
 
                     // trigger initial update
-                    NodeFactory2.updateDependentProp(editor, dstProp, srcProp, srcProp.getData(), dstPropType.get(), srcPropType.get());
+                    NodeFactory.updateDependentProp(editor, dstProp, srcProp, srcProp.getData(), dstPropType.get(), srcPropType.get());
                 }
             }
         }

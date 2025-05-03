@@ -38,6 +38,8 @@ public class Assets implements Disposable {
     public GlyphLayout layout;
     public TextureAtlas atlas;
 
+    public static Texture fallback;
+
     public Texture pixel;
     public TextureRegion pixelRegion;
     public TextureRegion gdx;
@@ -80,6 +82,8 @@ public class Assets implements Disposable {
         {
             mgr.load("sprites/sprites.atlas", TextureAtlas.class);
 
+            mgr.load("zakir.png", Texture.class);
+
             for (var container : containers.values()) {
                 container.load(this);
             }
@@ -100,6 +104,8 @@ public class Assets implements Disposable {
         // initialize containers and fetch asset references
         {
             atlas = mgr.get("sprites/sprites.atlas", TextureAtlas.class);
+
+            fallback = mgr.get("zakir.png", Texture.class);
 
             gdx = atlas.findRegion("libgdx");
 
