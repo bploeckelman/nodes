@@ -10,7 +10,7 @@ public class PropThumbnail extends Prop {
 
     private static final String TAG = PropThumbnail.class.getSimpleName();
 
-    private boolean thumbnailVisible = true;
+    public boolean thumbnailVisible = true;
     private EditorWidget.Image image;
 
     public Metadata.AssetRef<Texture> assetRef;

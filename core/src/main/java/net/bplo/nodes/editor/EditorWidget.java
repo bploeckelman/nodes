@@ -52,6 +52,26 @@ public class EditorWidget {
         ImGui.popFont();
     }
 
+    static void renderShowThumbnailsToggle(Editor editor) {
+        ImGui.pushFont(EditorUtil.Fonts.icons);
+
+        var icon = editor.nodePane.showThumbnails ? FontAwesomeIcons.eye : FontAwesomeIcons.eyeSlash;
+        var text = editor.nodePane.showThumbnails ? " Thumbnails Visible" : " Thumbnails Hidden";
+        var label = icon + text;
+        if (ImGui.checkbox(label, editor.nodePane.showThumbnails)) {
+            editor.nodePane.showThumbnails = !editor.nodePane.showThumbnails;
+
+            // TODO(brian): should the current global setting apply to new nodes/thumbnails too?
+            editor.nodes.stream()
+                .flatMap(node -> node.props.stream())
+                .filter(PropThumbnail.class::isInstance)
+                .map(PropThumbnail.class::cast)
+                .forEach(thumbnail -> thumbnail.thumbnailVisible = editor.nodePane.showThumbnails);
+        }
+
+        ImGui.popFont();
+    }
+
     static void renderLoadMetadataButton(Editor editor) {
         var isMetadataLoaded = (editor.metadata != null);
         var buttonColor        = isMetadataLoaded ? ImGuiColors.lime.asInt()       : ImGuiColors.orange.asInt();
