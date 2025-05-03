@@ -32,29 +32,54 @@ public class PropBindingResolver {
             propMap.put(prop.propTypeId, prop);
         }
 
-        // setup bindings
+        // create transformers
         for (var propType : propTypes) {
             if (propType.binding == null) continue;
+            propType.binding.transformer = createTransformer(propType.binding, propMap);
+        }
 
-            var targetProp = propMap.get(propType.id);
-            var sourceProp = propMap.get(propType.binding.sourceId);
+        // group bindings by source prop
+        var boundPropsBySource = new HashMap<String, Array<Metadata.PropType<?>>>();
+        for (var propType : propTypes) {
+            if (propType.binding == null) continue;
+            var sourceId = propType.binding.sourceId;
+            boundPropsBySource.putIfAbsent(sourceId, new Array<>());
+            boundPropsBySource.get(sourceId).add(propType);
+        }
 
-            if (targetProp == null || sourceProp == null) {
-                Util.log(TAG, "Failed to resolve prop binding: %s -> %s".formatted(propType.id, propType.binding.sourceId));
+        // setup change handlers and apply initial values
+        for (var sourceId : boundPropsBySource.keySet()) {
+            var sourceProp = propMap.get(sourceId);
+            if (sourceProp == null) {
+                Util.log(TAG, "Failed to resolve prop binding with source: '%s'".formatted(sourceId));
                 continue;
             }
 
-            propType.binding.transformer = createTransformer(propType.binding, propMap);
+            var boundPropTypes = boundPropsBySource.get(sourceId);
 
-            // set change listener
+            // set change handler to apply changes for all bindings that have this prop source
             sourceProp.onChange = newValue -> {
-                var transformed = propType.binding.transformer.apply(newValue);
-                applyTransformedValue(targetProp, transformed);
+                for (var boundPropType : boundPropTypes) {
+                    var targetProp = propMap.get(boundPropType.id);
+                    if (targetProp == null) {
+                        Util.log(TAG, "Failed to resolve prop binding for target: '%s'".formatted(boundPropType.id));
+                        continue;
+                    }
+
+                    var binding = boundPropType.binding;
+                    if (binding.transformer == null) {
+                        Util.log(TAG, "No transformer found for binding: %s(%s) -> %s"
+                            .formatted(binding.sourceId, binding.transformType, boundPropType.id));
+                        continue;
+                    }
+
+                    var transformed = binding.transformer.apply(newValue);
+                    applyTransformedValue(targetProp, transformed);
+                }
             };
 
             // apply initial value
-            var initialValue = propType.binding.transformer.apply(sourceProp.getData());
-            applyTransformedValue(targetProp, initialValue);
+            sourceProp.onChange.changed(sourceProp.getData());
         }
     }
 
@@ -77,7 +102,9 @@ public class PropBindingResolver {
         return switch (binding.transformType) {
             case extract_ref -> (value) -> {
                 if (!(value instanceof PropSelect.Data data)) return null;
-                return getPropertyFromSelection(data.getSelectedOption(), binding.propertyPath);
+                var property = getPropertyFromSelection(data.getSelectedOption(), binding.propertyPath);
+                Util.log(TAG, "Selected: %s, property: %s".formatted(data.getSelectedOption(), property));
+                return property;
             };
 
             case extract_array_names -> (value) -> {
@@ -141,10 +168,6 @@ public class PropBindingResolver {
             }
             return assetRef.itemId;
         }
-//        if (ref instanceof ObjectMap<?, ?> map) {
-//            var itemId = map.get("itemId");
-//            if (itemId != null) return itemId.toString();
-//        }
         return "Unknown";
     }
 }
