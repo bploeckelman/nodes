@@ -32,7 +32,7 @@ public class NodeFactory {
             createProp(node, propType);
         }
 
-        var bindingResolver = new PropBindingResolver(editor.assetResolver);
+        var bindingResolver = new PropBindingResolver(editor);
         bindingResolver.resolveBindings(node, nodeType.props);
 
         return node;

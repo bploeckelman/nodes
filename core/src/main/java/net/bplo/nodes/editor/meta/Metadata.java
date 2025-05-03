@@ -150,7 +150,7 @@ public class Metadata {
         public String additionalSourceId;
         public String propertyPath;
         public TransformType transformType;
-        public Function<Object, T> transformer;
+        public transient Function<Object, ?> transformer;
 
         public static <T> PropBinding<T> create(String sourceId, Function<Object, T> transformer) {
             return new PropBinding<>(sourceId, transformer);

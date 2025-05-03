@@ -4,12 +4,12 @@
       id: image
       name: Image
       items: [
-        {typeId: image, id: hero-portrait,    name: Hero Portrait,    path: ./sprites/characters/man-idle.png}
-        {typeId: image, id: hero-idle,        name: Hero Idle,        path: ./sprites/characters/man-rope.png}
-        {typeId: image, id: hero-attack,      name: Hero Attack,      path: ./sprites/characters/man-think.png}
-        {typeId: image, id: villain-portrait, name: Villain Portrait, path: ./sprites/characters/man-shove.png}
-        {typeId: image, id: villain-idle,     name: Villain Idle,     path: ./sprites/characters/man-down.png}
-        {typeId: image, id: villain-attack,   name: Villain Attack,   path: ./sprites/characters/man-hit.png}
+        {typeId: image, id: hero-portrait,    name: Hero Portrait,    path: sprites/characters/man-idle.png}
+        {typeId: image, id: hero-idle,        name: Hero Idle,        path: sprites/characters/man-rope.png}
+        {typeId: image, id: hero-attack,      name: Hero Attack,      path: sprites/characters/man-think.png}
+        {typeId: image, id: villain-portrait, name: Villain Portrait, path: sprites/characters/man-shove.png}
+        {typeId: image, id: villain-idle,     name: Villain Idle,     path: sprites/characters/man-down.png}
+        {typeId: image, id: villain-attack,   name: Villain Attack,   path: sprites/characters/man-hit.png}
       ]
     }
     {
@@ -59,8 +59,8 @@
           id: character-portrait
           name: Portrait
           binding: {
-            sourceId: character-select,
-            propertyPath: portrait,
+            sourceId: character-select
+            propertyPath: portrait
             transformType: extract_ref
           }
         }
@@ -68,13 +68,21 @@
           propClass: net.bplo.nodes.editor.PropSelect
           id: character-pose-select
           name: Pose
-          binding: {sourceId: character-select, transformer: null}
+          binding: {
+            sourceId: character-select
+            propertyPath: poses
+            transformType: extract_array_names
+          }
         }
         {
           propClass: net.bplo.nodes.editor.PropThumbnail
           id: character-pose-thumb
           name: Portrait
-          binding: {sourceId: character-pose-select, transformer: null}
+          binding: {
+            sourceId: character-pose-select
+            propertyPath: poses
+            transformType: resolve_from_array
+          }
         }
         {
           propClass: net.bplo.nodes.editor.PropInputText

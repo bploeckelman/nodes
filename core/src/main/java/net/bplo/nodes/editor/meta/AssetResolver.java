@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectMap;
 import net.bplo.nodes.Util;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -52,7 +53,9 @@ public class AssetResolver {
     }
 
     private Texture loadTexture(AssetItem item) {
-        return new Texture(item.path);
+        var basePath = Paths.get(metadata.path).getParent();
+        var fullPath = basePath.resolve(item.path).toAbsolutePath().toString();
+        return new Texture(fullPath);
     }
 
     @SuppressWarnings("unchecked")

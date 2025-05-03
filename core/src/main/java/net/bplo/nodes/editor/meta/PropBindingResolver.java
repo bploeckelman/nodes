@@ -3,6 +3,7 @@ package net.bplo.nodes.editor.meta;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
 import net.bplo.nodes.Util;
+import net.bplo.nodes.editor.Editor;
 import net.bplo.nodes.editor.Node;
 import net.bplo.nodes.editor.Prop;
 import net.bplo.nodes.editor.PropInputText;
@@ -18,10 +19,10 @@ public class PropBindingResolver {
 
     private static final String TAG = PropBindingResolver.class.getSimpleName();
 
-    private final AssetResolver assetResolver;
+    private final Editor editor;
 
-    public PropBindingResolver(AssetResolver assetResolver) {
-        this.assetResolver = assetResolver;
+    public PropBindingResolver(Editor editor) {
+        this.editor = editor;
     }
 
     public void resolveBindings(Node node, Array<Metadata.PropType<?>> propTypes) {
@@ -43,19 +44,17 @@ public class PropBindingResolver {
                 continue;
             }
 
+            propType.binding.transformer = createTransformer(propType.binding, propMap);
+
             // set change listener
             sourceProp.onChange = newValue -> {
-                if (propType.binding.transformer != null) {
-                    var transformed = propType.binding.transformer.apply(newValue);
-                    applyTransformedValue(targetProp, transformed);
-                }
+                var transformed = propType.binding.transformer.apply(newValue);
+                applyTransformedValue(targetProp, transformed);
             };
 
             // apply initial value
-            if (propType.binding.transformer != null) {
-                var initialValue = propType.binding.transformer.apply(sourceProp.getData());
-                applyTransformedValue(targetProp, initialValue);
-            }
+            var initialValue = propType.binding.transformer.apply(sourceProp.getData());
+            applyTransformedValue(targetProp, initialValue);
         }
     }
 
@@ -74,19 +73,19 @@ public class PropBindingResolver {
         // TODO(brian): add more handlers as needed
     }
 
-    private Function<Object, ?> createTransformer(Metadata metadata, Metadata.PropBinding<?> binding, Map<String, Prop> propMap) {
+    private Function<Object, ?> createTransformer(Metadata.PropBinding<?> binding, Map<String, Prop> propMap) {
         return switch (binding.transformType) {
             case extract_ref -> (value) -> {
                 if (!(value instanceof PropSelect.Data data)) return null;
-                return getPropertyFromSelection(metadata, data.getSelectedOption(), binding.propertyPath);
+                return getPropertyFromSelection(data.getSelectedOption(), binding.propertyPath);
             };
 
             case extract_array_names -> (value) -> {
                 if (!(value instanceof PropSelect.Data data)) return null;
-                var property = getPropertyFromSelection(metadata, data.getSelectedOption(), binding.propertyPath);
+                var property = getPropertyFromSelection(data.getSelectedOption(), binding.propertyPath);
                 if (property instanceof Array<?> array) {
                     return Util.asList(array).stream()
-                        .map(item -> extractRefName(metadata, item))
+                        .map(this::extractRefName)
                         .toArray(String[]::new);
                 }
                 return new String[0];
@@ -99,7 +98,7 @@ public class PropBindingResolver {
                     if (additionalSource == null) return null;
 
                     var additionalData = (PropSelect.Data) additionalSource.getData();
-                    var collection = getPropertyFromSelection(metadata, additionalData.getSelectedOption(), binding.propertyPath);
+                    var collection = getPropertyFromSelection(additionalData.getSelectedOption(), binding.propertyPath);
 
                     if (collection instanceof Array<?> array) {
                         return Util.asList(array).stream()
@@ -117,9 +116,9 @@ public class PropBindingResolver {
         };
     }
 
-    private Object getPropertyFromSelection(Metadata metadata, String selectedName, String propertyPath) {
+    private Object getPropertyFromSelection(String selectedName, String propertyPath) {
         // Find which asset type contains an item with this name
-        for (var assetType : metadata.assetTypes.values()) {
+        for (var assetType : editor.metadata.assetTypes.values()) {
             var item = Util.asList(assetType.items).stream()
                 .filter(i -> i.name.equals(selectedName))
                 .findFirst();
@@ -131,16 +130,16 @@ public class PropBindingResolver {
         return null;
     }
 
-    private String extractRefName(Metadata metadata, Object ref) {
+    private String extractRefName(Object ref) {
         if (ref instanceof AssetRef<?> assetRef) {
             // Look up the asset's name
-            for (var type : metadata.assetTypes.values()) {
+            for (var type : editor.metadata.assetTypes.values()) {
                 var item = type.findItem(assetRef.itemId);
                 if (item.isPresent()) {
                     return item.get().name;
                 }
             }
-            return assetRef.itemId; // Fallback to ID if name not found
+            return assetRef.itemId;
         }
 //        if (ref instanceof ObjectMap<?, ?> map) {
 //            var itemId = map.get("itemId");
