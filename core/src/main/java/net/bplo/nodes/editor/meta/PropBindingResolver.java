@@ -92,6 +92,9 @@ public class PropBindingResolver {
             var selectData = (PropSelect.Data) select.getData();
             selectData.options = strings;
             selectData.selectedIndex = selectData.options.length > 0 ? 0 : -1;
+
+            // trigger change listener to propagate changes to any bound props
+            select.onChange.changed(selectData);
         } else if (targetProp instanceof PropInputText inputText && value instanceof String string) {
             inputText.setText(string);
         }
@@ -124,14 +127,19 @@ public class PropBindingResolver {
                     var additionalSource = propMap.get(binding.additionalSourceId);
                     if (additionalSource == null) return null;
 
-                    var additionalData = (PropSelect.Data) additionalSource.getData();
-                    var collection = getPropertyFromSelection(additionalData.getSelectedOption(), binding.propertyPath);
+                    Object collection = null;
+                    if (additionalSource instanceof PropSelect additionalSelect) {
+                        var additionalData = (PropSelect.Data) additionalSelect.getData();
+                        collection = getPropertyFromSelection(additionalData.getSelectedOption(), binding.propertyPath);
+                    } else {
+                        Util.log(TAG, "Unsupported additional source type: %s".formatted(additionalSource.getClass().getSimpleName()));
+                    }
 
                     if (collection instanceof Array<?> array) {
                         return Util.asList(array).stream()
                             .filter(AssetRef.class::isInstance)
                             .map(AssetRef.class::cast)
-                            .filter(ref -> ref.itemId.equals(selectedItem))
+                            .filter(ref -> extractRefName(ref).equals(selectedItem))
                             .findFirst()
                             .orElse(null);
                     }

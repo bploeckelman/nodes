@@ -57,7 +57,7 @@
         {
           propClass: net.bplo.nodes.editor.PropThumbnail
           id: character-portrait
-          name: Portrait
+          name: Character Image
           binding: {
             sourceId: character-select
             propertyPath: portrait
@@ -77,9 +77,10 @@
         {
           propClass: net.bplo.nodes.editor.PropThumbnail
           id: character-pose-thumb
-          name: Portrait
+          name: Pose Image
           binding: {
             sourceId: character-pose-select
+            additionalSourceId: character-select
             propertyPath: poses
             transformType: resolve_from_array
           }
