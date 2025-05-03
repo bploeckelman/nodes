@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.extension.nodeditor.NodeEditor;
+import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiStyleVar;
 import net.bplo.nodes.imgui.FontAwesomeIcons;
 import net.bplo.nodes.imgui.ImGuiColors;
@@ -51,10 +52,20 @@ public class EditorWidget {
         ImGui.popFont();
     }
 
-    static void renderLoadAssetMetadataButton(Editor editor) {
-        ImGui.pushFont(EditorUtil.Fonts.icons);
+    static void renderLoadMetadataButton(Editor editor) {
+        var isMetadataLoaded = (editor.metadata != null);
+        var buttonColor        = isMetadataLoaded ? ImGuiColors.lime.asInt()       : ImGuiColors.orange.asInt();
+        var buttonActiveColor  = isMetadataLoaded ? ImGuiColors.chartreuse.asInt() : ImGuiColors.gold.asInt();
+        var buttonHoveredColor = isMetadataLoaded ? ImGuiColors.forest.asInt()     : ImGuiColors.darkYellow.asInt();
+        var buttonIcon = isMetadataLoaded ? FontAwesomeIcons.fileCircleCheck : FontAwesomeIcons.fileImport;
+        var buttonText = isMetadataLoaded ? "Metadata Loaded" : "Load Metadata";
 
-        if (ImGui.button(FontAwesomeIcons.fileImport + " Load Metadata")) {
+        ImGui.pushFont(EditorUtil.Fonts.icons);
+        ImGui.pushStyleColor(ImGuiCol.Button, buttonColor);
+        ImGui.pushStyleColor(ImGuiCol.ButtonActive, buttonActiveColor);
+        ImGui.pushStyleColor(ImGuiCol.ButtonHovered, buttonHoveredColor);
+
+        if (ImGui.button(buttonIcon + " " + buttonText)) {
             var fileChooser = new JFileChooser();
             fileChooser.setDialogTitle("Select Metadata File");
             fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -69,6 +80,7 @@ public class EditorWidget {
             }
         }
 
+        ImGui.popStyleColor(3);
         ImGui.popFont();
     }
 
