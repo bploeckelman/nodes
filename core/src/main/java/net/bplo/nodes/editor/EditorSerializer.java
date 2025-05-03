@@ -11,6 +11,7 @@ import net.bplo.nodes.editor.utils.PinKind;
 import net.bplo.nodes.editor.utils.PinType;
 
 import java.io.Serial;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,8 +35,15 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
 
     @Override
     public void write(Json json, NodeList nodeList, Class knownType) {
-        // Start a JSON array for all nodes
-        json.writeArrayStart();
+        // write a container object
+        json.writeObjectStart();
+
+        // write metadata path so it can be loaded along with a saved node list
+        var editor = Main.app.editor;
+        json.writeValue("metadata", editor.metadata.path);
+
+        // write an array for all nodes
+        json.writeArrayStart("nodeList");
 
         for (var node : nodeList) {
             json.writeObjectStart();
@@ -110,11 +118,28 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
         }
 
         json.writeArrayEnd();
+
+        json.writeObjectEnd();
     }
 
     @Override
     public NodeList read(Json json, JsonValue jsonData, Class clazz) {
         var nodes = new NodeList();
+
+        // load required metadata first
+        var editor = Main.app.editor;
+        var metadataPath = jsonData.getString("metadata", "");
+        if (metadataPath.isEmpty()) {
+            Util.log(TAG, "Missing required metadata path in json data, unable to load nodes");
+            return nodes;
+        } else {
+            // make sure we have an absolute path, even if the saved path is relative
+            var path = Paths.get(metadataPath).toAbsolutePath().toString();
+            editor.loadMetadata(path);
+        }
+
+        // get the node list array from the json data for the rest of the parsing
+        jsonData = jsonData.get("nodes");
 
         // Maps to store objects by id for reference during reconstruction
         var nodesById = new HashMap<Long, Node>();
@@ -253,7 +278,6 @@ public class EditorSerializer implements Json.Serializer<EditorSerializer.NodeLi
         }
 
         // after all nodes are loaded, resolve bindings for each node
-        var editor = Main.app.editor;
         var propBindingResolver = new PropBindingResolver(editor);
         for (var node : nodes) {
             editor.metadata.findNodeType(node.nodeTypeId)

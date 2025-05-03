@@ -1,230 +1,233 @@
-[
 {
-	id: 1
-	width: 200
-	nodeTypeId: test
-	headerText: Test
-	position: {
-		x: 1357
-		y: -611
-	}
-	pins: [
-		{
-			id: 2
-			kind: INPUT
-			type: FLOW
-		}
-		{
-			id: 3
-			kind: OUTPUT
-			type: FLOW
-		}
-	]
-	props: [
-		{
-			id: 4
-			name: Character
-			class: net.bplo.nodes.editor.PropSelect
-			data: {
-				options: [
-					Hero
-					Villain
-				]
-				selectedIndex: 0
-			}
-			propTypeId: character-select
-			pins: []
-		}
-		{
-			id: 5
-			name: Character Image
-			class: net.bplo.nodes.editor.PropThumbnail
-			data: {
-				typeId: image
-				itemId: hero-portrait
-			}
-			propTypeId: character-portrait
-			pins: []
-		}
-		{
-			id: 6
-			name: Pose
-			class: net.bplo.nodes.editor.PropSelect
-			data: {
-				options: [
-					Hero Idle
-					Hero Attack
-				]
-				selectedIndex: 0
-			}
-			propTypeId: character-pose-select
-			pins: []
-		}
-		{
-			id: 7
-			name: Pose Image
-			class: net.bplo.nodes.editor.PropThumbnail
-			data: {
-				typeId: image
-				itemId: hero-idle
-			}
-			propTypeId: character-pose-thumb
-			pins: []
-		}
-		{
-			id: 8
-			name: Override Name
-			class: net.bplo.nodes.editor.PropInputText
-			data: hero
-			propTypeId: character-name-override
-			pins: []
-		}
-		{
-			id: 9
-			name: Number
-			class: net.bplo.nodes.editor.PropInteger
-			data: 1
-			propTypeId: integer
-			pins: []
-		}
-		{
-			id: 10
-			name: Number
-			class: net.bplo.nodes.editor.PropFloat
-			data: 0.1
-			propTypeId: float
-			pins: []
-		}
-		{
-			id: 11
-			name: Text
-			class: net.bplo.nodes.editor.PropInputTextMultiline
-			data: Text associated with test node 1.
-			propTypeId: dialogue-text
-			pins: []
-		}
-	]
-	incomingLinks: []
-	outgoingLinks: [
-		{
-			id: 23
-			srcPinId: 3
-			dstPinId: 13
-		}
-	]
+  metadata: ../test-metadata.json
+  nodes: [
+  {
+  	id: 1
+  	width: 200
+  	nodeTypeId: test
+  	headerText: Test
+  	position: {
+  		x: 1357
+  		y: -611
+  	}
+  	pins: [
+  		{
+  			id: 2
+  			kind: INPUT
+  			type: FLOW
+  		}
+  		{
+  			id: 3
+  			kind: OUTPUT
+  			type: FLOW
+  		}
+  	]
+  	props: [
+  		{
+  			id: 4
+  			name: Character
+  			class: net.bplo.nodes.editor.PropSelect
+  			data: {
+  				options: [
+  					Hero
+  					Villain
+  				]
+  				selectedIndex: 0
+  			}
+  			propTypeId: character-select
+  			pins: []
+  		}
+  		{
+  			id: 5
+  			name: Character Image
+  			class: net.bplo.nodes.editor.PropThumbnail
+  			data: {
+  				typeId: image
+  				itemId: hero-portrait
+  			}
+  			propTypeId: character-portrait
+  			pins: []
+  		}
+  		{
+  			id: 6
+  			name: Pose
+  			class: net.bplo.nodes.editor.PropSelect
+  			data: {
+  				options: [
+  					Hero Idle
+  					Hero Attack
+  				]
+  				selectedIndex: 0
+  			}
+  			propTypeId: character-pose-select
+  			pins: []
+  		}
+  		{
+  			id: 7
+  			name: Pose Image
+  			class: net.bplo.nodes.editor.PropThumbnail
+  			data: {
+  				typeId: image
+  				itemId: hero-idle
+  			}
+  			propTypeId: character-pose-thumb
+  			pins: []
+  		}
+  		{
+  			id: 8
+  			name: Override Name
+  			class: net.bplo.nodes.editor.PropInputText
+  			data: hero
+  			propTypeId: character-name-override
+  			pins: []
+  		}
+  		{
+  			id: 9
+  			name: Number
+  			class: net.bplo.nodes.editor.PropInteger
+  			data: 1
+  			propTypeId: integer
+  			pins: []
+  		}
+  		{
+  			id: 10
+  			name: Number
+  			class: net.bplo.nodes.editor.PropFloat
+  			data: 0.1
+  			propTypeId: float
+  			pins: []
+  		}
+  		{
+  			id: 11
+  			name: Text
+  			class: net.bplo.nodes.editor.PropInputTextMultiline
+  			data: Text associated with test node 1.
+  			propTypeId: dialogue-text
+  			pins: []
+  		}
+  	]
+  	incomingLinks: []
+  	outgoingLinks: [
+  		{
+  			id: 23
+  			srcPinId: 3
+  			dstPinId: 13
+  		}
+  	]
+  }
+  {
+  	id: 12
+  	width: 200
+  	nodeTypeId: test
+  	headerText: Test
+  	position: {
+  		x: 1645
+  		y: -611
+  	}
+  	pins: [
+  		{
+  			id: 13
+  			kind: INPUT
+  			type: FLOW
+  		}
+  		{
+  			id: 14
+  			kind: OUTPUT
+  			type: FLOW
+  		}
+  	]
+  	props: [
+  		{
+  			id: 15
+  			name: Character
+  			class: net.bplo.nodes.editor.PropSelect
+  			data: {
+  				options: [
+  					Hero
+  					Villain
+  				]
+  				selectedIndex: 1
+  			}
+  			propTypeId: character-select
+  			pins: []
+  		}
+  		{
+  			id: 16
+  			name: Character Image
+  			class: net.bplo.nodes.editor.PropThumbnail
+  			data: {
+  				typeId: image
+  				itemId: villain-portrait
+  			}
+  			propTypeId: character-portrait
+  			pins: []
+  		}
+  		{
+  			id: 17
+  			name: Pose
+  			class: net.bplo.nodes.editor.PropSelect
+  			data: {
+  				options: [
+  					Villain Idle
+  					Villain Attack
+  				]
+  				selectedIndex: 0
+  			}
+  			propTypeId: character-pose-select
+  			pins: []
+  		}
+  		{
+  			id: 18
+  			name: Pose Image
+  			class: net.bplo.nodes.editor.PropThumbnail
+  			data: {
+  				typeId: image
+  				itemId: villain-idle
+  			}
+  			propTypeId: character-pose-thumb
+  			pins: []
+  		}
+  		{
+  			id: 19
+  			name: Override Name
+  			class: net.bplo.nodes.editor.PropInputText
+  			data: villain
+  			propTypeId: character-name-override
+  			pins: []
+  		}
+  		{
+  			id: 20
+  			name: Number
+  			class: net.bplo.nodes.editor.PropInteger
+  			data: -2
+  			propTypeId: integer
+  			pins: []
+  		}
+  		{
+  			id: 21
+  			name: Number
+  			class: net.bplo.nodes.editor.PropFloat
+  			data: -0.2
+  			propTypeId: float
+  			pins: []
+  		}
+  		{
+  			id: 22
+  			name: Text
+  			class: net.bplo.nodes.editor.PropInputTextMultiline
+  			data: Text associated with test node 2.
+  			propTypeId: dialogue-text
+  			pins: []
+  		}
+  	]
+  	incomingLinks: [
+  		{
+  			id: 23
+  			srcPinId: 3
+  			dstPinId: 13
+  		}
+  	]
+  	outgoingLinks: []
+  }
+  ]
 }
-{
-	id: 12
-	width: 200
-	nodeTypeId: test
-	headerText: Test
-	position: {
-		x: 1645
-		y: -611
-	}
-	pins: [
-		{
-			id: 13
-			kind: INPUT
-			type: FLOW
-		}
-		{
-			id: 14
-			kind: OUTPUT
-			type: FLOW
-		}
-	]
-	props: [
-		{
-			id: 15
-			name: Character
-			class: net.bplo.nodes.editor.PropSelect
-			data: {
-				options: [
-					Hero
-					Villain
-				]
-				selectedIndex: 1
-			}
-			propTypeId: character-select
-			pins: []
-		}
-		{
-			id: 16
-			name: Character Image
-			class: net.bplo.nodes.editor.PropThumbnail
-			data: {
-				typeId: image
-				itemId: villain-portrait
-			}
-			propTypeId: character-portrait
-			pins: []
-		}
-		{
-			id: 17
-			name: Pose
-			class: net.bplo.nodes.editor.PropSelect
-			data: {
-				options: [
-					Villain Idle
-					Villain Attack
-				]
-				selectedIndex: 0
-			}
-			propTypeId: character-pose-select
-			pins: []
-		}
-		{
-			id: 18
-			name: Pose Image
-			class: net.bplo.nodes.editor.PropThumbnail
-			data: {
-				typeId: image
-				itemId: villain-idle
-			}
-			propTypeId: character-pose-thumb
-			pins: []
-		}
-		{
-			id: 19
-			name: Override Name
-			class: net.bplo.nodes.editor.PropInputText
-			data: villain
-			propTypeId: character-name-override
-			pins: []
-		}
-		{
-			id: 20
-			name: Number
-			class: net.bplo.nodes.editor.PropInteger
-			data: -2
-			propTypeId: integer
-			pins: []
-		}
-		{
-			id: 21
-			name: Number
-			class: net.bplo.nodes.editor.PropFloat
-			data: -0.2
-			propTypeId: float
-			pins: []
-		}
-		{
-			id: 22
-			name: Text
-			class: net.bplo.nodes.editor.PropInputTextMultiline
-			data: Text associated with test node 2.
-			propTypeId: dialogue-text
-			pins: []
-		}
-	]
-	incomingLinks: [
-		{
-			id: 23
-			srcPinId: 3
-			dstPinId: 13
-		}
-	]
-	outgoingLinks: []
-}
-]
