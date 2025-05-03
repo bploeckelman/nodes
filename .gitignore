@@ -1,5 +1,7 @@
 ## Project:
 assets/editor.json
+assets/sprites/sprites*.atlas
+assets/sprites/sprites*.png
 
 ## Gradle:
 .gradle/
