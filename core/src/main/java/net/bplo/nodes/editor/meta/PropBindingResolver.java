@@ -8,8 +8,11 @@ import net.bplo.nodes.editor.Prop;
 import net.bplo.nodes.editor.PropInputText;
 import net.bplo.nodes.editor.PropSelect;
 import net.bplo.nodes.editor.PropThumbnail;
+import net.bplo.nodes.editor.meta.Metadata.AssetRef;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 public class PropBindingResolver {
 
@@ -58,8 +61,8 @@ public class PropBindingResolver {
 
     @SuppressWarnings("unchecked")
     private void applyTransformedValue(Prop targetProp, Object value) {
-        if (targetProp instanceof PropThumbnail thumbnail && value instanceof Metadata.AssetRef<?> assetRef) {
-            thumbnail.assetRef = (Metadata.AssetRef<Texture>) assetRef;
+        if (targetProp instanceof PropThumbnail thumbnail && value instanceof AssetRef<?> assetRef) {
+            thumbnail.assetRef = (AssetRef<Texture>) assetRef;
             thumbnail.clearImage();
         } else if (targetProp instanceof PropSelect select && value instanceof String[] strings) {
             var selectData = (PropSelect.Data) select.getData();
@@ -69,5 +72,80 @@ public class PropBindingResolver {
             inputText.setText(string);
         }
         // TODO(brian): add more handlers as needed
+    }
+
+    private Function<Object, ?> createTransformer(Metadata metadata, Metadata.PropBinding<?> binding, Map<String, Prop> propMap) {
+        return switch (binding.transformType) {
+            case extract_ref -> (value) -> {
+                if (!(value instanceof PropSelect.Data data)) return null;
+                return getPropertyFromSelection(metadata, data.getSelectedOption(), binding.propertyPath);
+            };
+
+            case extract_array_names -> (value) -> {
+                if (!(value instanceof PropSelect.Data data)) return null;
+                var property = getPropertyFromSelection(metadata, data.getSelectedOption(), binding.propertyPath);
+                if (property instanceof Array<?> array) {
+                    return Util.asList(array).stream()
+                        .map(item -> extractRefName(metadata, item))
+                        .toArray(String[]::new);
+                }
+                return new String[0];
+            };
+
+            case resolve_from_array -> (value) -> {
+                if (value instanceof PropSelect.Data data) {
+                    var selectedItem = data.getSelectedOption();
+                    var additionalSource = propMap.get(binding.additionalSourceId);
+                    if (additionalSource == null) return null;
+
+                    var additionalData = (PropSelect.Data) additionalSource.getData();
+                    var collection = getPropertyFromSelection(metadata, additionalData.getSelectedOption(), binding.propertyPath);
+
+                    if (collection instanceof Array<?> array) {
+                        return Util.asList(array).stream()
+                            .filter(AssetRef.class::isInstance)
+                            .map(AssetRef.class::cast)
+                            .filter(ref -> ref.itemId.equals(selectedItem))
+                            .findFirst()
+                            .orElse(null);
+                    }
+                }
+                return null;
+            };
+
+            default -> Function.identity();
+        };
+    }
+
+    private Object getPropertyFromSelection(Metadata metadata, String selectedName, String propertyPath) {
+        // Find which asset type contains an item with this name
+        for (var assetType : metadata.assetTypes.values()) {
+            var item = Util.asList(assetType.items).stream()
+                .filter(i -> i.name.equals(selectedName))
+                .findFirst();
+
+            if (item.isPresent()) {
+                return item.get().properties.get(propertyPath);
+            }
+        }
+        return null;
+    }
+
+    private String extractRefName(Metadata metadata, Object ref) {
+        if (ref instanceof AssetRef<?> assetRef) {
+            // Look up the asset's name
+            for (var type : metadata.assetTypes.values()) {
+                var item = type.findItem(assetRef.itemId);
+                if (item.isPresent()) {
+                    return item.get().name;
+                }
+            }
+            return assetRef.itemId; // Fallback to ID if name not found
+        }
+//        if (ref instanceof ObjectMap<?, ?> map) {
+//            var itemId = map.get("itemId");
+//            if (itemId != null) return itemId.toString();
+//        }
+        return "Unknown";
     }
 }

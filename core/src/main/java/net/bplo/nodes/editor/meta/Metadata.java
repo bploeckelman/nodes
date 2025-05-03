@@ -144,7 +144,12 @@ public class Metadata {
     }
 
     public static class PropBinding<T> {
+        public enum TransformType { extract_ref, extract_array_names, resolve_from_array }
+
         public String sourceId;
+        public String additionalSourceId;
+        public String propertyPath;
+        public TransformType transformType;
         public Function<Object, T> transformer;
 
         public static <T> PropBinding<T> create(String sourceId, Function<Object, T> transformer) {

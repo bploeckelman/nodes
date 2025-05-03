@@ -58,7 +58,11 @@
           propClass: net.bplo.nodes.editor.PropThumbnail
           id: character-portrait
           name: Portrait
-          binding: {sourceId: character-select, transformer: null}
+          binding: {
+            sourceId: character-select,
+            propertyPath: portrait,
+            transformType: extract_ref
+          }
         }
         {
           propClass: net.bplo.nodes.editor.PropSelect
