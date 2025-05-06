@@ -1,8 +1,14 @@
 package net.bplo.nodes.editor;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Array;
 import imgui.ImGui;
 import imgui.ImVec2;
+import imgui.ImVec4;
 import imgui.extension.nodeditor.NodeEditor;
+import imgui.extension.nodeditor.flag.NodeEditorStyleColor;
+import net.bplo.nodes.editor.meta.Metadata;
+import net.bplo.nodes.editor.meta.MetadataRegistry;
 import net.bplo.nodes.imgui.ImGuiColors;
 import net.bplo.nodes.imgui.ImGuiLayout;
 import net.bplo.nodes.imgui.ImGuiWidgetBounds;
@@ -83,8 +89,35 @@ public class Node extends EditorObject {
         return pins.stream().filter(filter);
     }
 
+    public Color getCharacterColor(MetadataRegistry registry) {
+        var characterSelectProp = findProp("character-select");
+        if (characterSelectProp.isPresent() && characterSelectProp.get().getData() != null) {
+            var data = (PropSelect.Data) characterSelectProp.get().getData();
+            var selectedIndex = data.selectedIndex;
+            var options = data.options;
+
+            if (selectedIndex >= 0 && selectedIndex < options.length) {
+                var selectedCharacterId = options[selectedIndex].toLowerCase(); // dropdown has name as value, lowercase it to id :/
+                var character = registry.findAssetType("character")
+                    .flatMap(assetType -> assetType.findItem(selectedCharacterId));
+
+                if (character.isPresent()) {
+                    var colorAsset = (Metadata.AssetItemRef) character.get().properties.get("color");
+                    if (colorAsset != null) {
+                        var hex = EditorObject.editor.metadataRegistry.findAssetType("color").flatMap(color -> color.findItem(colorAsset.id));
+                        return hex.map(asset -> Color.valueOf(asset.name)).orElse(Color.CLEAR);
+                    }
+                }
+            }
+        }
+        return Color.CLEAR;
+    }
+
     @Override
     public void render() {
+        Color color = getCharacterColor(EditorObject.editor.metadataRegistry);
+        NodeEditor.pushStyleColor(NodeEditorStyleColor.NodeBg, color.r, color.g, color.b, color.a);
+
         NodeEditor.beginNode(id);
         ImGui.pushID(id);
 
@@ -102,6 +135,7 @@ public class Node extends EditorObject {
         ImGui.popID();
         NodeEditor.endNode();
 
+        NodeEditor.popStyleColor();
         renderAfterNode();
     }
 
