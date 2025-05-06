@@ -1,14 +1,11 @@
 package net.bplo.nodes.editor;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Array;
 import imgui.ImGui;
 import imgui.ImVec2;
-import imgui.ImVec4;
 import imgui.extension.nodeditor.NodeEditor;
 import imgui.extension.nodeditor.flag.NodeEditorStyleColor;
 import net.bplo.nodes.editor.meta.Metadata;
-import net.bplo.nodes.editor.meta.MetadataRegistry;
 import net.bplo.nodes.imgui.ImGuiColors;
 import net.bplo.nodes.imgui.ImGuiLayout;
 import net.bplo.nodes.imgui.ImGuiWidgetBounds;
@@ -89,7 +86,7 @@ public class Node extends EditorObject {
         return pins.stream().filter(filter);
     }
 
-    public Color getCharacterColor(MetadataRegistry registry) {
+    public Color getCharacterColor(Metadata metadata) {
         var characterSelectProp = findProp("character-select");
         if (characterSelectProp.isPresent() && characterSelectProp.get().getData() != null) {
             var data = (PropSelect.Data) characterSelectProp.get().getData();
@@ -98,13 +95,13 @@ public class Node extends EditorObject {
 
             if (selectedIndex >= 0 && selectedIndex < options.length) {
                 var selectedCharacterId = options[selectedIndex].toLowerCase(); // dropdown has name as value, lowercase it to id :/
-                var character = registry.findAssetType("character")
+                var character = metadata.findAssetType("character")
                     .flatMap(assetType -> assetType.findItem(selectedCharacterId));
 
                 if (character.isPresent()) {
-                    var colorAsset = (Metadata.AssetItemRef) character.get().properties.get("color");
+                    var colorAsset = (Metadata.AssetRef) character.get().properties.get("color");
                     if (colorAsset != null) {
-                        var hex = EditorObject.editor.metadataRegistry.findAssetType("color").flatMap(color -> color.findItem(colorAsset.id));
+                        var hex = metadata.findAssetType("color").flatMap(color -> color.findItem(colorAsset.itemId));
                         return hex.map(asset -> Color.valueOf(asset.name)).orElse(Color.CLEAR);
                     }
                 }
@@ -115,7 +112,7 @@ public class Node extends EditorObject {
 
     @Override
     public void render() {
-        Color color = getCharacterColor(EditorObject.editor.metadataRegistry);
+        Color color = getCharacterColor(EditorObject.editor.metadata);
         NodeEditor.pushStyleColor(NodeEditorStyleColor.NodeBg, color.r, color.g, color.b, color.a);
 
         NodeEditor.beginNode(id);

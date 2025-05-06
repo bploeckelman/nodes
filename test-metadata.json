@@ -4,8 +4,8 @@
       id: color,
       name: Color,
       items: [
-        {id: red, name: ff6666}
-        {id: blue, name: 6666ff}
+        {typeId: color, id: red, name: ff6666}
+        {typeId: color, id: blue, name: 6666ff}
       ]
     },
     {
@@ -33,7 +33,7 @@
               {typeId: image, itemId: hero-idle, class: net.bplo.nodes.editor.meta.Metadata$AssetRef}
               {typeId: image, itemId: hero-attack, class: net.bplo.nodes.editor.meta.Metadata$AssetRef}
             ]
-            color: {type: color, id: blue, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
+            color: {typeId: color, itemId: blue, class: net.bplo.nodes.editor.meta.Metadata$AssetRef}
           }
         }
         {
@@ -45,7 +45,7 @@
               {typeId: image, itemId: villain-idle, class: net.bplo.nodes.editor.meta.Metadata$AssetRef}
               {typeId: image, itemId: villain-attack, class: net.bplo.nodes.editor.meta.Metadata$AssetRef}
             ]
-            color: {type: color, id: red, class: net.bplo.nodes.editor.meta.Metadata$AssetItemRef}
+            color: {typeId: color, itemId: red, class: net.bplo.nodes.editor.meta.Metadata$AssetRef}
           }
         }
       ]
